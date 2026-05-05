@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Users, Shield, Compass, Rocket, RefreshCw,
+  LayoutDashboard, Users, Shield, Compass, Rocket, Leaf,
   ClipboardCheck, Target, Calendar, BarChart3, BookOpen, Settings,
   ChevronLeft, ChevronRight, Heart
 } from 'lucide-react';
@@ -15,7 +15,7 @@ const NAV_ITEMS = [
   { label: 'Stabilize', path: '/stabilize', icon: Shield, roles: 'all' },
   { label: 'Align', path: '/align', icon: Compass, roles: 'all' },
   { label: 'Execute', path: '/execute', icon: Rocket, roles: 'all' },
-  { label: 'Sustain', path: '/stage/sustain', icon: RefreshCw, roles: 'all' },
+  { label: 'Sustain', path: '/sustain', icon: Leaf, roles: 'all' },
   { type: 'divider', label: 'Tools' },
   { label: 'Assessments', path: '/assessments', icon: ClipboardCheck, roles: 'all' },
   { label: 'Actions', path: '/actions', icon: Target, roles: 'all' },

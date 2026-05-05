@@ -1,0 +1,65 @@
+{
+  "name": "QuarterlyReview",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "quarter": {
+      "type": "string",
+      "description": "e.g. 2025-Q2"
+    },
+    "facilitator": {
+      "type": "string"
+    },
+    "wins": {
+      "type": "string",
+      "description": "Key wins this quarter"
+    },
+    "misses": {
+      "type": "string",
+      "description": "What didn't get done / why"
+    },
+    "health_trend": {
+      "type": "string",
+      "enum": [
+        "improving",
+        "stable",
+        "declining"
+      ],
+      "default": "stable"
+    },
+    "momentum_trend": {
+      "type": "string",
+      "enum": [
+        "improving",
+        "stable",
+        "declining"
+      ],
+      "default": "stable"
+    },
+    "key_learnings": {
+      "type": "string"
+    },
+    "next_quarter_focus": {
+      "type": "string"
+    },
+    "renewal_action": {
+      "type": "string",
+      "description": "Reset/renewal commitment"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_review",
+        "complete"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "organization_id",
+    "quarter"
+  ]
+}

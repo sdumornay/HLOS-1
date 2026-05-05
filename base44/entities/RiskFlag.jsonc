@@ -1,0 +1,61 @@
+{
+  "name": "RiskFlag",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "slipping_priority",
+        "recurring_conflict",
+        "incomplete_followthrough",
+        "health_decline",
+        "momentum_drop",
+        "other"
+      ],
+      "default": "slipping_priority"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "raised_by": {
+      "type": "string"
+    },
+    "related_item_id": {
+      "type": "string",
+      "description": "ID of related action, conflict, etc."
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "acknowledged",
+        "resolved"
+      ],
+      "default": "open"
+    },
+    "resolution_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "title",
+    "type"
+  ]
+}

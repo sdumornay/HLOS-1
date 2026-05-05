@@ -1,0 +1,53 @@
+{
+  "name": "HealthPulse",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "respondent_email": {
+      "type": "string"
+    },
+    "month": {
+      "type": "string",
+      "description": "YYYY-MM format"
+    },
+    "overall_health": {
+      "type": "number",
+      "description": "1-10"
+    },
+    "trust": {
+      "type": "number",
+      "description": "1-10"
+    },
+    "clarity": {
+      "type": "number",
+      "description": "1-10"
+    },
+    "momentum": {
+      "type": "number",
+      "description": "1-10"
+    },
+    "conflict_level": {
+      "type": "number",
+      "description": "1-10, lower is healthier"
+    },
+    "highlight": {
+      "type": "string",
+      "description": "One thing going well"
+    },
+    "concern": {
+      "type": "string",
+      "description": "One thing to watch"
+    },
+    "renewal_needed": {
+      "type": "boolean",
+      "default": false
+    }
+  },
+  "required": [
+    "organization_id",
+    "respondent_email",
+    "month"
+  ]
+}
