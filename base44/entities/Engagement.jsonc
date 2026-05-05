@@ -1,0 +1,45 @@
+{
+  "name": "Engagement",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "coach_email": {
+      "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "paused",
+        "completed"
+      ],
+      "default": "active"
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "stabilize",
+        "align",
+        "execute",
+        "sustain"
+      ],
+      "default": "stabilize"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id"
+  ]
+}

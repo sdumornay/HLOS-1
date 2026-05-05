@@ -5,7 +5,17 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+
+import AppLayout from '@/components/layout/AppLayout';
+import Dashboard from '@/pages/Dashboard';
+import TeamDashboard from '@/pages/TeamDashboard';
+import StageWorkflow from '@/pages/StageWorkflow';
+import Assessments from '@/pages/Assessments';
+import Actions from '@/pages/Actions';
+import Sessions from '@/pages/Sessions';
+import Reviews from '@/pages/Reviews';
+import Resources from '@/pages/Resources';
+import Organizations from '@/pages/Organizations';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +43,17 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Dashboard />} />
+        <Route path="/team" element={<TeamDashboard />} />
+        <Route path="/stage/:stage" element={<StageWorkflow />} />
+        <Route path="/assessments" element={<Assessments />} />
+        <Route path="/actions" element={<Actions />} />
+        <Route path="/sessions" element={<Sessions />} />
+        <Route path="/reviews" element={<Reviews />} />
+        <Route path="/resources" element={<Resources />} />
+        <Route path="/organizations" element={<Organizations />} />
+      </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

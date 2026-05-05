@@ -1,0 +1,37 @@
+{
+  "name": "User",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "super_admin",
+        "coach",
+        "lead_pastor",
+        "team_member"
+      ],
+      "default": "team_member"
+    },
+    "organization_id": {
+      "type": "string",
+      "description": "Primary organization"
+    },
+    "team_ids": {
+      "type": "array",
+      "description": "Teams this user belongs to",
+      "items": {
+        "type": "string"
+      }
+    },
+    "title": {
+      "type": "string",
+      "description": "Job title or role title"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "avatar_url": {
+      "type": "string"
+    }
+  }
+}

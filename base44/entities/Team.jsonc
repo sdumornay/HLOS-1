@@ -1,0 +1,40 @@
+{
+  "name": "Team",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Team name"
+    },
+    "organization_id": {
+      "type": "string",
+      "description": "Reference to organization"
+    },
+    "description": {
+      "type": "string"
+    },
+    "members": {
+      "type": "array",
+      "description": "List of member emails",
+      "items": {
+        "type": "string"
+      }
+    },
+    "lead_email": {
+      "type": "string",
+      "description": "Team lead email"
+    },
+    "health_score": {
+      "type": "number",
+      "default": 0
+    },
+    "momentum_score": {
+      "type": "number",
+      "default": 0
+    }
+  },
+  "required": [
+    "name",
+    "organization_id"
+  ]
+}

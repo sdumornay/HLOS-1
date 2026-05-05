@@ -1,0 +1,66 @@
+{
+  "name": "StageProgress",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "stabilize",
+        "align",
+        "execute",
+        "sustain"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "completed"
+      ],
+      "default": "not_started"
+    },
+    "started_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "milestones": {
+      "type": "array",
+      "description": "Key milestones for this stage",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean"
+          },
+          "completed_date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "health_score_at_start": {
+      "type": "number"
+    },
+    "health_score_at_end": {
+      "type": "number"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "stage"
+  ]
+}

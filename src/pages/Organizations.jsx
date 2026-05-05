@@ -1,0 +1,131 @@
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { useCurrentUser } from '@/lib/useCurrentUser';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Plus, Building2, MapPin } from 'lucide-react';
+import StageProgressBar from '@/components/dashboard/StageProgressBar';
+
+export default function Organizations() {
+  const { canManageAll } = useCurrentUser();
+  const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
+  const [form, setForm] = useState({ name: '', type: 'church', city: '', state: '' });
+
+  const { data: organizations = [] } = useQuery({
+    queryKey: ['organizations'],
+    queryFn: () => base44.entities.Organization.list(),
+  });
+
+  const createMutation = useMutation({
+    mutationFn: (data) => base44.entities.Organization.create(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      setOpen(false);
+      setForm({ name: '', type: 'church', city: '', state: '' });
+    },
+  });
+
+  if (!canManageAll) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-muted-foreground">You don't have permission to view this page.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h1 className="text-2xl lg:text-3xl font-display font-bold">Organizations</h1>
+          <p className="text-muted-foreground mt-1">Manage churches and organizations</p>
+        </div>
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button><Plus className="h-4 w-4 mr-2" />Add Organization</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Add Organization</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 mt-4">
+              <div>
+                <Label>Name</Label>
+                <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Church or org name" />
+              </div>
+              <div>
+                <Label>Type</Label>
+                <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="church">Church</SelectItem>
+                    <SelectItem value="ministry">Ministry</SelectItem>
+                    <SelectItem value="nonprofit">Nonprofit</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>City</Label>
+                  <Input value={form.city} onChange={e => setForm(f => ({ ...f, city: e.target.value }))} placeholder="City" />
+                </div>
+                <div>
+                  <Label>State</Label>
+                  <Input value={form.state} onChange={e => setForm(f => ({ ...f, state: e.target.value }))} placeholder="State" />
+                </div>
+              </div>
+              <Button onClick={() => createMutation.mutate(form)} className="w-full" disabled={createMutation.isPending}>
+                {createMutation.isPending ? 'Creating...' : 'Create Organization'}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      <div className="grid gap-4">
+        {organizations.map(org => (
+          <Card key={org.id} className="border-border/50 shadow-sm">
+            <CardContent className="p-5">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                <div className="h-12 w-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Building2 className="h-6 w-6 text-primary" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold">{org.name}</h3>
+                    <Badge variant="outline" className="text-xs capitalize">{org.type}</Badge>
+                  </div>
+                  {(org.city || org.state) && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                      <MapPin className="h-3 w-3" />
+                      {[org.city, org.state].filter(Boolean).join(', ')}
+                    </p>
+                  )}
+                </div>
+                <div className="w-full sm:w-64">
+                  <StageProgressBar currentStage={org.current_stage || 'stabilize'} />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+        {organizations.length === 0 && (
+          <Card className="border-border/50">
+            <CardContent className="py-12 text-center">
+              <Building2 className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
+              <p className="text-muted-foreground">No organizations yet. Add your first church or org.</p>
+            </CardContent>
+          </Card>
+        )}
+      </div>
+    </div>
+  );
+}

@@ -1,0 +1,48 @@
+{
+  "name": "Resource",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "guide",
+        "template",
+        "video",
+        "article",
+        "worksheet"
+      ],
+      "default": "guide"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "stabilize",
+        "align",
+        "execute",
+        "sustain",
+        "general"
+      ]
+    },
+    "url": {
+      "type": "string"
+    },
+    "file_url": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title"
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "name": "Organization",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Church or organization name"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "church",
+        "ministry",
+        "nonprofit",
+        "other"
+      ],
+      "default": "church"
+    },
+    "city": {
+      "type": "string"
+    },
+    "state": {
+      "type": "string"
+    },
+    "current_stage": {
+      "type": "string",
+      "enum": [
+        "stabilize",
+        "align",
+        "execute",
+        "sustain"
+      ],
+      "default": "stabilize"
+    },
+    "health_score": {
+      "type": "number",
+      "default": 0
+    },
+    "momentum_score": {
+      "type": "number",
+      "default": 0
+    },
+    "coach_email": {
+      "type": "string",
+      "description": "Email of assigned coach"
+    },
+    "logo_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name"
+  ]
+}
