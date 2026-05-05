@@ -14,7 +14,7 @@ const NAV_ITEMS = [
   { type: 'divider', label: 'Framework' },
   { label: 'Stabilize', path: '/stabilize', icon: Shield, roles: 'all' },
   { label: 'Align', path: '/align', icon: Compass, roles: 'all' },
-  { label: 'Execute', path: '/stage/execute', icon: Rocket, roles: 'all' },
+  { label: 'Execute', path: '/execute', icon: Rocket, roles: 'all' },
   { label: 'Sustain', path: '/stage/sustain', icon: RefreshCw, roles: 'all' },
   { type: 'divider', label: 'Tools' },
   { label: 'Assessments', path: '/assessments', icon: ClipboardCheck, roles: 'all' },

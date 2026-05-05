@@ -1,0 +1,75 @@
+{
+  "name": "MeetingAgenda",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "duration_minutes": {
+      "type": "number",
+      "default": 60
+    },
+    "facilitator": {
+      "type": "string"
+    },
+    "attendees": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "items": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "inform",
+              "discuss",
+              "decide",
+              "pray"
+            ]
+          },
+          "owner": {
+            "type": "string"
+          },
+          "duration_minutes": {
+            "type": "number"
+          },
+          "notes": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "completed"
+      ],
+      "default": "draft"
+    },
+    "recap_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "title",
+    "date"
+  ]
+}

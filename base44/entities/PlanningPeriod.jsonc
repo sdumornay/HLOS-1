@@ -1,0 +1,55 @@
+{
+  "name": "PlanningPeriod",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "period": {
+      "type": "string",
+      "enum": [
+        "30_day",
+        "60_day",
+        "90_day"
+      ],
+      "default": "30_day"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "theme": {
+      "type": "string",
+      "description": "Focus theme for this period"
+    },
+    "goals": {
+      "type": "string"
+    },
+    "key_risks": {
+      "type": "string"
+    },
+    "resources_needed": {
+      "type": "string"
+    },
+    "review_notes": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planning",
+        "active",
+        "completed"
+      ],
+      "default": "planning"
+    }
+  },
+  "required": [
+    "organization_id",
+    "period"
+  ]
+}

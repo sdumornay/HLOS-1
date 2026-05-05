@@ -1,0 +1,64 @@
+{
+  "name": "ExecuteAction",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "due_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "priority": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "plan_period": {
+      "type": "string",
+      "enum": [
+        "30_day",
+        "60_day",
+        "90_day"
+      ],
+      "default": "30_day"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "overdue",
+        "cancelled"
+      ],
+      "default": "pending"
+    },
+    "completed_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "title",
+    "owner"
+  ]
+}

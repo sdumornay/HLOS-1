@@ -1,0 +1,72 @@
+{
+  "name": "DecisionLog",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "decision": {
+      "type": "string"
+    },
+    "context": {
+      "type": "string",
+      "description": "Why this decision was made"
+    },
+    "made_by": {
+      "type": "string",
+      "description": "Person or group who made the decision"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "financial",
+        "staffing",
+        "ministry",
+        "strategy",
+        "operations",
+        "communications",
+        "other"
+      ],
+      "default": "ministry"
+    },
+    "impact": {
+      "type": "string",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "affected_teams": {
+      "type": "string"
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "reversed",
+        "superseded"
+      ],
+      "default": "active"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "decision",
+    "made_by",
+    "date"
+  ]
+}
