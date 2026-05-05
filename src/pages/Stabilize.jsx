@@ -64,7 +64,8 @@ export default function Stabilize() {
           <Shield className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Stabilize Module</h1>
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-0.5">Step 1</p>
+          <h1 className="text-xl font-barlow font-bold tracking-tight">Stabilize Module</h1>
           <p className="text-sm text-muted-foreground">Surface tension, build safety, and establish communication foundations</p>
         </div>
       </div>

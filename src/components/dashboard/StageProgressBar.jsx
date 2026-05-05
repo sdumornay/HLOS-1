@@ -4,10 +4,10 @@ import { cn } from '@/lib/utils';
 
 const STAGE_ICONS = { stabilize: Shield, align: Compass, execute: Rocket, sustain: RefreshCw };
 const STAGE_COLORS = {
-  stabilize: { active: 'bg-red-500 text-white', completed: 'bg-red-500 text-white', line: 'bg-red-500' },
-  align: { active: 'bg-amber-500 text-white', completed: 'bg-amber-500 text-white', line: 'bg-amber-500' },
-  execute: { active: 'bg-emerald-500 text-white', completed: 'bg-emerald-500 text-white', line: 'bg-emerald-500' },
-  sustain: { active: 'bg-blue-500 text-white', completed: 'bg-blue-500 text-white', line: 'bg-blue-500' },
+  stabilize: { active: 'bg-secondary text-secondary-foreground', completed: 'bg-secondary text-secondary-foreground', line: 'bg-secondary' },
+  align: { active: 'bg-accent text-accent-foreground', completed: 'bg-accent text-accent-foreground', line: 'bg-accent' },
+  execute: { active: 'bg-primary text-primary-foreground', completed: 'bg-primary text-primary-foreground', line: 'bg-primary' },
+  sustain: { active: 'bg-accent text-accent-foreground', completed: 'bg-accent text-accent-foreground', line: 'bg-accent' },
 };
 
 const STAGES_ORDER = ['stabilize', 'align', 'execute', 'sustain'];
@@ -32,7 +32,7 @@ export default function StageProgressBar({ currentStage, completedStages = [] })
                 isCompleted || isPast
                   ? cn(colors.completed, 'border-transparent')
                   : isCurrent
-                    ? cn(colors.active, 'border-transparent ring-4 ring-offset-2', `ring-${stage === 'stabilize' ? 'red' : stage === 'align' ? 'amber' : stage === 'execute' ? 'emerald' : 'blue'}-200`)
+                    ? cn(colors.active, 'border-transparent ring-4 ring-offset-2 ring-accent/30')
                     : 'bg-muted text-muted-foreground border-border'
               )}>
                 {isCompleted ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}

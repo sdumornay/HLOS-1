@@ -60,18 +60,38 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl lg:text-3xl font-display font-bold text-foreground">
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-1">Healthy Leadership OS</p>
+          <h1 className="text-2xl lg:text-3xl font-barlow font-bold text-foreground tracking-tight">
             Leadership Health Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1">
+          <p className="text-muted-foreground mt-1 text-sm">
             Health First. Momentum Next.
           </p>
         </div>
         {currentOrg && (
-          <Badge variant="outline" className="text-sm px-3 py-1 w-fit">
-            {currentOrg.name} — <span className="capitalize font-medium">{currentOrg.current_stage || 'stabilize'}</span>
+          <Badge className="text-sm px-3 py-1.5 w-fit bg-primary text-primary-foreground border-0 font-semibold">
+            {currentOrg.name} — <span className="capitalize ml-1">{currentOrg.current_stage || 'stabilize'}</span>
           </Badge>
         )}
+      </div>
+
+      {/* Brand banner */}
+      <div className="rounded-xl bg-gradient-to-r from-primary via-primary to-secondary/80 p-px shadow-lg">
+        <div className="rounded-xl bg-gradient-to-r from-primary to-[hsl(220,65%,14%)] px-6 py-4 flex items-center gap-4">
+          <div className="h-10 w-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center flex-shrink-0">
+            <Heart className="h-5 w-5 text-accent" />
+          </div>
+          <div className="flex-1">
+            <p className="text-white font-barlow font-bold text-lg tracking-wide">STABILIZE → ALIGN → EXECUTE → SUSTAIN</p>
+            <p className="text-white/60 text-xs mt-0.5">Moving teams from friction to momentum through a reproducible system for team health</p>
+          </div>
+          {currentOrg && (
+            <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
+              <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+              <span className="text-accent text-xs font-semibold uppercase tracking-wider capitalize">{currentOrg.current_stage || 'Stabilize'} Stage</span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Stage Progress */}

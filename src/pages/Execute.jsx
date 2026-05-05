@@ -21,7 +21,8 @@ export default function Execute() {
           <Rocket className="h-5 w-5 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Execute Module</h1>
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-0.5">Step 3</p>
+          <h1 className="text-xl font-barlow font-bold tracking-tight">Execute Module</h1>
           <p className="text-sm text-muted-foreground">Drive accountability, track decisions, and execute your 30/60/90-day plan</p>
         </div>
       </div>

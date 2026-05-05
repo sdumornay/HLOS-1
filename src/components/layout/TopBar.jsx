@@ -17,7 +17,7 @@ export default function TopBar({ onMenuToggle }) {
     : '?';
 
   return (
-    <header className="h-16 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-4 lg:px-6">
+    <header className="h-16 border-b border-border bg-card/95 backdrop-blur-sm flex items-center justify-between px-4 lg:px-6 shadow-sm">
       <Button variant="ghost" size="icon" className="lg:hidden" onClick={onMenuToggle}>
         <Menu className="h-5 w-5" />
       </Button>
@@ -32,7 +32,7 @@ export default function TopBar({ onMenuToggle }) {
               <p className="text-xs text-muted-foreground">{ROLE_LABELS[user?.role] || 'Team Member'}</p>
             </div>
             <Avatar className="h-8 w-8">
-              <AvatarFallback className="bg-primary text-primary-foreground text-xs">{initials}</AvatarFallback>
+              <AvatarFallback className="bg-accent text-accent-foreground text-xs font-semibold">{initials}</AvatarFallback>
             </Avatar>
           </button>
         </DropdownMenuTrigger>

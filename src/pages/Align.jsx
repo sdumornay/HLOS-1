@@ -63,7 +63,8 @@ export default function Align() {
           <Compass className="h-5 w-5 text-secondary" />
         </div>
         <div>
-          <h1 className="text-xl font-bold">Align Module</h1>
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-0.5">Step 2</p>
+          <h1 className="text-xl font-barlow font-bold tracking-tight">Align Module</h1>
           <p className="text-sm text-muted-foreground">Establish shared understanding, clarify roles, and build team cohesion</p>
         </div>
       </div>

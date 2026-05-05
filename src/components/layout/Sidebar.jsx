@@ -43,13 +43,13 @@ export default function Sidebar({ collapsed, setCollapsed }) {
     )}>
       {/* Logo */}
       <div className="flex items-center gap-3 px-4 h-16 border-b border-sidebar-border">
-        <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center flex-shrink-0">
+        <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center flex-shrink-0 shadow-[0_0_12px_rgba(240,180,41,0.5)]">
           <Heart className="h-4 w-4 text-sidebar-primary-foreground" />
         </div>
         {!collapsed && (
           <div className="overflow-hidden">
-            <p className="text-sm font-semibold text-sidebar-primary-foreground truncate">LHOS</p>
-            <p className="text-[10px] text-sidebar-foreground/60 truncate">Leadership Health OS</p>
+            <p className="text-base font-barlow font-bold tracking-widest text-sidebar-primary uppercase truncate">HLOS</p>
+            <p className="text-[10px] text-sidebar-foreground/50 truncate">Healthy Leadership OS</p>
           </div>
         )}
       </div>
@@ -76,8 +76,8 @@ export default function Sidebar({ collapsed, setCollapsed }) {
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150",
                 isActive
-                  ? "bg-sidebar-accent text-sidebar-primary-foreground font-medium"
-                  : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50"
+                  ? "bg-sidebar-accent text-sidebar-primary font-semibold border-l-2 border-sidebar-primary"
+                  : "text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60"
               )}
             >
               <Icon className="h-4 w-4 flex-shrink-0" />
