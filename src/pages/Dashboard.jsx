@@ -4,42 +4,58 @@ import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Heart, TrendingUp, Target, Calendar, Users, ArrowRight } from 'lucide-react';
+import { Heart, TrendingUp, Target, Calendar, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import ScoreCard from '@/components/dashboard/ScoreCard';
 import StageProgressBar from '@/components/dashboard/StageProgressBar';
 import HealthRadar from '@/components/dashboard/HealthRadar';
 import MomentumChart from '@/components/dashboard/MomentumChart';
+import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel.jsx';
 
 export default function Dashboard() {
-  const { user, canManageAll, loading: userLoading } = useCurrentUser();
+  const { user, isAdmin, isCoach, loading: userLoading } = useCurrentUser();
 
+  const orgId = user?.organization_id;
+
+  // Admins see all orgs; coaches see assigned orgs; others see their own org
   const { data: organizations = [] } = useQuery({
     queryKey: ['organizations'],
-    queryFn: () => base44.entities.Organization.list(),
+    queryFn: () => isAdmin
+      ? base44.entities.Organization.list()
+      : isCoach
+        ? base44.entities.Organization.filter({ coach_email: user?.email })
+        : base44.entities.Organization.filter({ id: orgId }),
+    enabled: !!user,
   });
 
   const { data: assessments = [] } = useQuery({
-    queryKey: ['assessments'],
-    queryFn: () => base44.entities.Assessment.list('-created_date', 50),
+    queryKey: ['assessments', orgId],
+    queryFn: () => isAdmin
+      ? base44.entities.Assessment.list('-created_date', 50)
+      : base44.entities.Assessment.filter({ organization_id: orgId }),
+    enabled: !!orgId,
   });
 
   const { data: actions = [] } = useQuery({
-    queryKey: ['actions'],
-    queryFn: () => base44.entities.Action.list('-created_date', 50),
+    queryKey: ['actions', orgId],
+    queryFn: () => isAdmin
+      ? base44.entities.Action.list('-created_date', 50)
+      : base44.entities.Action.filter({ organization_id: orgId }),
+    enabled: !!orgId,
   });
 
   const { data: sessions = [] } = useQuery({
-    queryKey: ['sessions'],
-    queryFn: () => base44.entities.Session.list('-date', 10),
+    queryKey: ['sessions', orgId],
+    queryFn: () => isAdmin
+      ? base44.entities.Session.list('-date', 10)
+      : base44.entities.Session.filter({ organization_id: orgId }),
+    enabled: !!orgId,
   });
 
-  // Filter data by user's organization if not admin/coach
-  const orgId = user?.organization_id;
-  const filteredAssessments = canManageAll ? assessments : assessments.filter(a => a.organization_id === orgId);
-  const filteredActions = canManageAll ? actions : actions.filter(a => a.organization_id === orgId);
-  const filteredSessions = canManageAll ? sessions : sessions.filter(s => s.organization_id === orgId);
+  const filteredAssessments = assessments;
+  const filteredActions = actions;
+  const filteredSessions = sessions;
 
   const currentOrg = organizations.find(o => o.id === orgId) || organizations[0];
 
@@ -117,6 +133,9 @@ export default function Dashboard() {
         <HealthRadar assessments={recentAssessments} />
         <MomentumChart assessments={recentAssessments} />
       </div>
+
+      {/* Security Audit — super_admin only */}
+      {isAdmin && <SecurityAuditPanel />}
 
       {/* Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
