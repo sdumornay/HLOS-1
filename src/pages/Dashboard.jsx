@@ -11,7 +11,7 @@ import ScoreCard from '@/components/dashboard/ScoreCard';
 import StageProgressBar from '@/components/dashboard/StageProgressBar';
 import HealthRadar from '@/components/dashboard/HealthRadar';
 import MomentumChart from '@/components/dashboard/MomentumChart';
-import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel.jsx';
+import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach, loading: userLoading } = useCurrentUser();
