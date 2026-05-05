@@ -1,0 +1,63 @@
+{
+  "name": "NVCConversation",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "participant_a": {
+      "type": "string"
+    },
+    "participant_b": {
+      "type": "string"
+    },
+    "situation": {
+      "type": "string",
+      "description": "What happened \u2014 objective observation"
+    },
+    "feelings_a": {
+      "type": "string",
+      "description": "Feelings of participant A"
+    },
+    "needs_a": {
+      "type": "string",
+      "description": "Underlying needs of participant A"
+    },
+    "request_a": {
+      "type": "string",
+      "description": "Specific request from participant A"
+    },
+    "feelings_b": {
+      "type": "string",
+      "description": "Feelings of participant B"
+    },
+    "needs_b": {
+      "type": "string",
+      "description": "Underlying needs of participant B"
+    },
+    "request_b": {
+      "type": "string",
+      "description": "Specific request from participant B"
+    },
+    "agreements_reached": {
+      "type": "string"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_progress",
+        "resolved"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "organization_id",
+    "situation"
+  ]
+}

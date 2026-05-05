@@ -1,0 +1,47 @@
+{
+  "name": "LeaderInterview",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "interviewee_name": {
+      "type": "string"
+    },
+    "interviewee_role": {
+      "type": "string"
+    },
+    "interviewer": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string",
+      "format": "date"
+    },
+    "strengths_observed": {
+      "type": "string"
+    },
+    "tensions_perceived": {
+      "type": "string"
+    },
+    "leadership_gaps": {
+      "type": "string"
+    },
+    "hopes_for_team": {
+      "type": "string"
+    },
+    "concerns": {
+      "type": "string"
+    },
+    "notable_quotes": {
+      "type": "string"
+    },
+    "coach_observations": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "interviewee_name"
+  ]
+}

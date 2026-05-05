@@ -1,0 +1,66 @@
+{
+  "name": "ConflictTrigger",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "trigger_description": {
+      "type": "string"
+    },
+    "trigger_category": {
+      "type": "string",
+      "enum": [
+        "change_announcement",
+        "meeting_behavior",
+        "resource_allocation",
+        "role_overlap",
+        "communication_gap",
+        "leadership_decision",
+        "workload_imbalance",
+        "other"
+      ],
+      "default": "other"
+    },
+    "frequency": {
+      "type": "string",
+      "enum": [
+        "rare",
+        "occasional",
+        "frequent",
+        "constant"
+      ],
+      "default": "occasional"
+    },
+    "impact_level": {
+      "type": "string",
+      "enum": [
+        "low",
+        "moderate",
+        "high",
+        "critical"
+      ],
+      "default": "moderate"
+    },
+    "pattern_notes": {
+      "type": "string",
+      "description": "Any patterns observed"
+    },
+    "mitigation_strategy": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "monitored",
+        "resolved"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "organization_id",
+    "trigger_description"
+  ]
+}

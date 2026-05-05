@@ -1,0 +1,47 @@
+{
+  "name": "CommAgreement",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "agreement_text": {
+      "type": "string"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "meeting_norms",
+        "conflict_protocol",
+        "feedback",
+        "decision_making",
+        "communication_channels",
+        "other"
+      ],
+      "default": "meeting_norms"
+    },
+    "agreed_by": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Emails of team members who agreed"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "active",
+        "retired"
+      ],
+      "default": "proposed"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "agreement_text"
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "name": "ConflictIntake",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "submitted_by": {
+      "type": "string"
+    },
+    "parties_involved": {
+      "type": "string",
+      "description": "Names or roles of people involved"
+    },
+    "conflict_description": {
+      "type": "string"
+    },
+    "conflict_type": {
+      "type": "string",
+      "enum": [
+        "interpersonal",
+        "vision_values",
+        "role_clarity",
+        "workload",
+        "communication",
+        "leadership_style",
+        "other"
+      ],
+      "default": "interpersonal"
+    },
+    "intensity": {
+      "type": "number",
+      "description": "1-10 scale"
+    },
+    "duration": {
+      "type": "string",
+      "enum": [
+        "days",
+        "weeks",
+        "months",
+        "over_a_year"
+      ],
+      "default": "weeks"
+    },
+    "impact_on_team": {
+      "type": "string"
+    },
+    "desired_outcome": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "in_process",
+        "resolved"
+      ],
+      "default": "open"
+    }
+  },
+  "required": [
+    "organization_id",
+    "conflict_description"
+  ]
+}
