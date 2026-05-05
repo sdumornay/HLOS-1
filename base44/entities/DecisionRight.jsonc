@@ -1,0 +1,68 @@
+{
+  "name": "DecisionRight",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "decision_area": {
+      "type": "string",
+      "description": "e.g. Budget, Staffing, Worship Planning"
+    },
+    "description": {
+      "type": "string"
+    },
+    "decider": {
+      "type": "string",
+      "description": "Who has final say"
+    },
+    "consulted": {
+      "type": "string",
+      "description": "Who must be consulted before deciding"
+    },
+    "informed": {
+      "type": "string",
+      "description": "Who must be informed after deciding"
+    },
+    "raci_type": {
+      "type": "string",
+      "enum": [
+        "decide",
+        "consult",
+        "inform",
+        "accountable"
+      ],
+      "default": "decide"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "financial",
+        "staffing",
+        "ministry",
+        "strategy",
+        "operations",
+        "communications",
+        "other"
+      ],
+      "default": "ministry"
+    },
+    "clarity_status": {
+      "type": "string",
+      "enum": [
+        "clear",
+        "disputed",
+        "unclear"
+      ],
+      "default": "unclear"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "decision_area",
+    "decider"
+  ]
+}

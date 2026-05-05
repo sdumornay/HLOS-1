@@ -1,0 +1,56 @@
+{
+  "name": "WorkstyleAssessment",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "member_name": {
+      "type": "string"
+    },
+    "member_email": {
+      "type": "string"
+    },
+    "workstyle_type": {
+      "type": "string",
+      "enum": [
+        "driver",
+        "expressive",
+        "amiable",
+        "analytical"
+      ],
+      "description": "Primary workstyle"
+    },
+    "secondary_type": {
+      "type": "string",
+      "enum": [
+        "driver",
+        "expressive",
+        "amiable",
+        "analytical"
+      ]
+    },
+    "strengths": {
+      "type": "string"
+    },
+    "blindspots": {
+      "type": "string"
+    },
+    "communication_preference": {
+      "type": "string"
+    },
+    "decision_style": {
+      "type": "string"
+    },
+    "stress_response": {
+      "type": "string"
+    },
+    "coach_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "member_name"
+  ]
+}

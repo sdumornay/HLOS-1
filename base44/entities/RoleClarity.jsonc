@@ -1,0 +1,58 @@
+{
+  "name": "RoleClarity",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "member_name": {
+      "type": "string"
+    },
+    "member_email": {
+      "type": "string"
+    },
+    "role_title": {
+      "type": "string"
+    },
+    "primary_responsibilities": {
+      "type": "string"
+    },
+    "success_looks_like": {
+      "type": "string"
+    },
+    "decisions_i_own": {
+      "type": "string"
+    },
+    "decisions_i_influence": {
+      "type": "string"
+    },
+    "decisions_i_defer": {
+      "type": "string"
+    },
+    "overlaps_with": {
+      "type": "string",
+      "description": "Roles this person's work overlaps with"
+    },
+    "gaps_identified": {
+      "type": "string"
+    },
+    "clarity_score": {
+      "type": "number",
+      "description": "1-10 self-reported clarity"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "reviewed",
+        "agreed"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "organization_id",
+    "member_name",
+    "role_title"
+  ]
+}

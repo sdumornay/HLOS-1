@@ -1,0 +1,64 @@
+{
+  "name": "LeadershipCovenant",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "default": "Leadership Team Covenant"
+    },
+    "preamble": {
+      "type": "string"
+    },
+    "commitments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "signatories": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "signed_date": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "review_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "active",
+        "under_review"
+      ],
+      "default": "draft"
+    }
+  },
+  "required": [
+    "organization_id",
+    "title"
+  ]
+}

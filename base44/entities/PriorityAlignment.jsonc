@@ -1,0 +1,65 @@
+{
+  "name": "PriorityAlignment",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string",
+      "description": "Priority or initiative name"
+    },
+    "description": {
+      "type": "string"
+    },
+    "timeframe": {
+      "type": "string",
+      "enum": [
+        "30_day",
+        "60_day",
+        "90_day",
+        "annual",
+        "multi_year"
+      ],
+      "default": "90_day"
+    },
+    "alignment_level": {
+      "type": "string",
+      "enum": [
+        "fully_aligned",
+        "mostly_aligned",
+        "partially_aligned",
+        "not_aligned"
+      ],
+      "default": "mostly_aligned"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "team_input": {
+      "type": "string",
+      "description": "Notes from team discussion"
+    },
+    "obstacles": {
+      "type": "string"
+    },
+    "rank": {
+      "type": "number",
+      "description": "Priority rank (1 = highest)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "proposed",
+        "active",
+        "on_hold",
+        "completed"
+      ],
+      "default": "proposed"
+    }
+  },
+  "required": [
+    "organization_id",
+    "title"
+  ]
+}

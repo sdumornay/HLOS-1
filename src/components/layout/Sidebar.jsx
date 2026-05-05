@@ -13,7 +13,7 @@ const NAV_ITEMS = [
   { label: 'Team Dashboard', path: '/team', icon: Users, roles: 'all' },
   { type: 'divider', label: 'Framework' },
   { label: 'Stabilize', path: '/stabilize', icon: Shield, roles: 'all' },
-  { label: 'Align', path: '/stage/align', icon: Compass, roles: 'all' },
+  { label: 'Align', path: '/align', icon: Compass, roles: 'all' },
   { label: 'Execute', path: '/stage/execute', icon: Rocket, roles: 'all' },
   { label: 'Sustain', path: '/stage/sustain', icon: RefreshCw, roles: 'all' },
   { type: 'divider', label: 'Tools' },

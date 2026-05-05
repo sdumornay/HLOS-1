@@ -1,0 +1,51 @@
+{
+  "name": "FiveDysfunctions",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "respondent_email": {
+      "type": "string"
+    },
+    "trust": {
+      "type": "number",
+      "description": "1-5: Absence of Trust"
+    },
+    "conflict": {
+      "type": "number",
+      "description": "1-5: Fear of Conflict"
+    },
+    "commitment": {
+      "type": "number",
+      "description": "1-5: Lack of Commitment"
+    },
+    "accountability": {
+      "type": "number",
+      "description": "1-5: Avoidance of Accountability"
+    },
+    "results": {
+      "type": "number",
+      "description": "1-5: Inattention to Results"
+    },
+    "trust_notes": {
+      "type": "string"
+    },
+    "conflict_notes": {
+      "type": "string"
+    },
+    "commitment_notes": {
+      "type": "string"
+    },
+    "accountability_notes": {
+      "type": "string"
+    },
+    "results_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "respondent_email"
+  ]
+}
