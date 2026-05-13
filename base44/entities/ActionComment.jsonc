@@ -1,0 +1,26 @@
+{
+  "name": "ActionComment",
+  "type": "object",
+  "properties": {
+    "action_id": {
+      "type": "string"
+    },
+    "organization_id": {
+      "type": "string"
+    },
+    "author_email": {
+      "type": "string"
+    },
+    "author_name": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "action_id",
+    "author_email",
+    "text"
+  ]
+}

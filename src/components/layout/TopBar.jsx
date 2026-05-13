@@ -8,6 +8,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { LogOut, User, Menu } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
+import NotificationBell from '@/components/notifications/NotificationBell';
 
 export default function TopBar({ onMenuToggle }) {
   const { user } = useCurrentUser();
@@ -23,6 +24,8 @@ export default function TopBar({ onMenuToggle }) {
       </Button>
 
       <div className="flex-1" />
+
+      <NotificationBell />
 
       <DropdownMenu>
         <DropdownMenuTrigger asChild>

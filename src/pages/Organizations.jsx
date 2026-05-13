@@ -11,9 +11,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Building2, MapPin } from 'lucide-react';
 import StageProgressBar from '@/components/dashboard/StageProgressBar';
+import CoachAssignmentPanel from '@/components/organizations/CoachAssignmentPanel';
+import BulkImport from '@/components/shared/BulkImport';
+import ExportPDFButton from '@/components/shared/ExportPDFButton';
 
 export default function Organizations() {
-  const { canManageAll } = useCurrentUser();
+  const { canManageAll, user } = useCurrentUser();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'church', city: '', state: '' });
@@ -47,10 +50,24 @@ export default function Organizations() {
           <h1 className="text-2xl lg:text-3xl font-display font-bold">Organizations</h1>
           <p className="text-muted-foreground mt-1">Manage churches and organizations</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />Add Organization</Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <BulkImport organizationId={user?.organization_id} />
+          <ExportPDFButton
+            title="Organizations Report"
+            subtitle={`${organizations.length} organizations — ${new Date().toLocaleDateString()}`}
+            filename="organizations.pdf"
+            sections={[{
+              heading: 'Organization List',
+              table: {
+                headers: ['Name', 'Type', 'Stage', 'Coach', 'City/State'],
+                rows: organizations.map(o => [o.name, o.type, o.current_stage || 'stabilize', o.coach_email || 'Unassigned', [o.city, o.state].filter(Boolean).join(', ')])
+              }
+            }]}
+          />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" />Add Organization</Button>
+            </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Add Organization</DialogTitle>
@@ -87,7 +104,8 @@ export default function Organizations() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-4">
@@ -126,6 +144,8 @@ export default function Organizations() {
           </Card>
         )}
       </div>
+
+      <CoachAssignmentPanel organizations={organizations} />
     </div>
   );
 }

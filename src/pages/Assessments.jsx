@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, ClipboardCheck } from 'lucide-react';
 import { format } from 'date-fns';
+import ExportPDFButton from '@/components/shared/ExportPDFButton';
 
 const DIMENSIONS = [
   { key: 'trust', label: 'Trust', desc: 'How much do team members trust each other?' },
@@ -70,10 +71,27 @@ export default function Assessments() {
           <h1 className="text-2xl lg:text-3xl font-display font-bold">Assessments</h1>
           <p className="text-muted-foreground mt-1">Pulse surveys and health check-ins</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />New Assessment</Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <ExportPDFButton
+            title="Assessments Report"
+            subtitle={`${myAssessments.length} assessments`}
+            filename="assessments.pdf"
+            sections={[{
+              heading: 'Assessment History',
+              table: {
+                headers: ['Date', 'Respondent', 'Type', 'Stage', 'Health Score'],
+                rows: myAssessments.map(a => [
+                  a.created_date ? format(new Date(a.created_date), 'MMM d, yyyy') : '—',
+                  a.respondent_email, a.type, a.stage || '—',
+                  a.overall_health?.toFixed(1) || '—'
+                ])
+              }
+            }]}
+          />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" />New Assessment</Button>
+            </DialogTrigger>
           <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Take Assessment</DialogTitle>
@@ -137,7 +155,8 @@ export default function Assessments() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-3">

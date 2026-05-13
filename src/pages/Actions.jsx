@@ -11,14 +11,17 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Target, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { Plus, Target, CheckCircle2, Clock, AlertCircle, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
+import ActionComments from '@/components/actions/ActionComments';
+import ExportPDFButton from '@/components/shared/ExportPDFButton';
 
 export default function Actions() {
   const { user, canManageAll } = useCurrentUser();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('all');
+  const [expandedId, setExpandedId] = useState(null);
   const [form, setForm] = useState({
     title: '', description: '', owner_email: '', priority: 'medium',
     status: 'pending', stage: 'stabilize', plan_period: '30_day', due_date: '',
@@ -72,10 +75,23 @@ export default function Actions() {
           <h1 className="text-2xl lg:text-3xl font-display font-bold">Action Tracker</h1>
           <p className="text-muted-foreground mt-1">Track commitments and follow-through</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />New Action</Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <ExportPDFButton
+            title="Action Tracker"
+            subtitle={`${myActions.length} actions`}
+            filename="actions.pdf"
+            sections={[{
+              heading: 'Actions',
+              table: {
+                headers: ['Title', 'Owner', 'Status', 'Priority', 'Due Date'],
+                rows: myActions.map(a => [a.title, a.owner_email || '—', a.status, a.priority, a.due_date || '—'])
+              }
+            }]}
+          />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" />New Action</Button>
+            </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>Create Action Item</DialogTitle>
@@ -141,7 +157,8 @@ export default function Actions() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       {/* Filter Tabs */}
@@ -158,31 +175,43 @@ export default function Actions() {
       <div className="grid gap-3">
         {filtered.map(action => (
           <Card key={action.id} className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-4 flex items-center gap-3">
-              <button
-                onClick={() => toggleComplete.mutate({ id: action.id, status: action.status })}
-                className="flex-shrink-0"
-              >
-                {action.status === 'completed' ? (
-                  <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                ) : action.status === 'overdue' ? (
-                  <AlertCircle className="h-5 w-5 text-destructive" />
-                ) : (
-                  <Clock className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
-                )}
-              </button>
-              <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${action.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>{action.title}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {action.owner_email || 'Unassigned'}
-                  {action.due_date && ` • Due ${format(new Date(action.due_date), 'MMM d')}`}
-                </p>
+            <CardContent className="p-4">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => toggleComplete.mutate({ id: action.id, status: action.status })}
+                  className="flex-shrink-0"
+                >
+                  {action.status === 'completed' ? (
+                    <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                  ) : action.status === 'overdue' ? (
+                    <AlertCircle className="h-5 w-5 text-destructive" />
+                  ) : (
+                    <Clock className="h-5 w-5 text-muted-foreground hover:text-primary transition-colors" />
+                  )}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p className={`text-sm font-medium ${action.status === 'completed' ? 'line-through text-muted-foreground' : ''}`}>{action.title}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {action.owner_email || 'Unassigned'}
+                    {action.due_date && ` • Due ${format(new Date(action.due_date), 'MMM d')}`}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge className={`text-xs ${priorityColors[action.priority]}`}>{action.priority}</Badge>
+                  <Badge variant="outline" className="text-xs capitalize">{action.stage}</Badge>
+                  {action.plan_period && <Badge variant="secondary" className="text-xs">{action.plan_period?.replace('_', ' ')}</Badge>}
+                  <button
+                    onClick={() => setExpandedId(expandedId === action.id ? null : action.id)}
+                    className="ml-1 p-1 rounded hover:bg-muted transition-colors"
+                    title="Comments"
+                  >
+                    <MessageSquare className="h-4 w-4 text-muted-foreground" />
+                  </button>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <Badge className={`text-xs ${priorityColors[action.priority]}`}>{action.priority}</Badge>
-                <Badge variant="outline" className="text-xs capitalize">{action.stage}</Badge>
-                {action.plan_period && <Badge variant="secondary" className="text-xs">{action.plan_period?.replace('_', ' ')}</Badge>}
-              </div>
+              {expandedId === action.id && (
+                <ActionComments actionId={action.id} organizationId={action.organization_id} />
+              )}
             </CardContent>
           </Card>
         ))}

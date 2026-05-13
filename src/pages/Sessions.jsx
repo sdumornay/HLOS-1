@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Calendar, FileText, Users } from 'lucide-react';
 import { format } from 'date-fns';
+import ExportPDFButton from '@/components/shared/ExportPDFButton';
 
 export default function Sessions() {
   const { user, canManageAll } = useCurrentUser();
@@ -48,10 +49,23 @@ export default function Sessions() {
           <h1 className="text-2xl lg:text-3xl font-display font-bold">Sessions & Decision Log</h1>
           <p className="text-muted-foreground mt-1">Track meetings, coaching sessions, and decisions</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-2" />Log Session</Button>
-          </DialogTrigger>
+        <div className="flex items-center gap-2">
+          <ExportPDFButton
+            title="Sessions & Decision Log"
+            subtitle={`${mySessions.length} sessions`}
+            filename="sessions.pdf"
+            sections={[{
+              heading: 'Session History',
+              table: {
+                headers: ['Title', 'Date', 'Type', 'Stage', 'Summary'],
+                rows: mySessions.map(s => [s.title, s.date ? format(new Date(s.date), 'MMM d, yyyy') : '—', s.type, s.stage || '—', s.summary ? s.summary.slice(0, 60) + (s.summary.length > 60 ? '…' : '') : '—'])
+              }
+            }]}
+          />
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button><Plus className="h-4 w-4 mr-2" />Log Session</Button>
+            </DialogTrigger>
           <DialogContent className="max-w-lg">
             <DialogHeader>
               <DialogTitle>Log a Session</DialogTitle>
@@ -104,7 +118,8 @@ export default function Sessions() {
               </Button>
             </div>
           </DialogContent>
-        </Dialog>
+          </Dialog>
+        </div>
       </div>
 
       <div className="grid gap-3">
