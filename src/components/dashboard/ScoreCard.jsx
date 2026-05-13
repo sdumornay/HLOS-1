@@ -10,7 +10,7 @@ export default function ScoreCard({ title, score, maxScore = 10, subtitle, icon:
     : percentage >= 70 ? 'bg-blue-500' : percentage >= 40 ? 'bg-indigo-400' : 'bg-slate-400';
 
   return (
-    <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+    <Card className="border-border/50 shadow-sm hover:shadow-md hover:border-primary/30 transition-all cursor-pointer">
       <CardContent className="p-5">
         <div className="flex items-start justify-between mb-3">
           <div>

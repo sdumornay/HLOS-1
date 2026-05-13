@@ -133,10 +133,10 @@ export default function Dashboard() {
 
       {/* Score Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <ScoreCard title="Overall Health" score={avgHealth} icon={Heart} variant="health" subtitle={`${recentAssessments.length} assessments`} />
-        <ScoreCard title="Momentum" score={completionRate} icon={TrendingUp} variant="momentum" subtitle={`${completedActions}/${totalActions} actions done`} />
-        <ScoreCard title="Overdue Items" score={overdueActions} maxScore={totalActions || 1} icon={Target} variant="health" subtitle="Needs attention" />
-        <ScoreCard title="Sessions" score={filteredSessions.length} maxScore={20} icon={Calendar} variant="momentum" subtitle="Total meetings logged" />
+        <Link to="/assessments"><ScoreCard title="Overall Health" score={avgHealth} icon={Heart} variant="health" subtitle={`${recentAssessments.length} assessments`} /></Link>
+        <Link to="/actions"><ScoreCard title="Momentum" score={completionRate} icon={TrendingUp} variant="momentum" subtitle={`${completedActions}/${totalActions} actions done`} /></Link>
+        <Link to="/actions"><ScoreCard title="Overdue Items" score={overdueActions} maxScore={totalActions || 1} icon={Target} variant="health" subtitle="Needs attention" /></Link>
+        <Link to="/sessions"><ScoreCard title="Sessions" score={filteredSessions.length} maxScore={20} icon={Calendar} variant="momentum" subtitle="Total meetings logged" /></Link>
       </div>
 
       {/* Charts */}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Shield, Compass, Rocket, RefreshCw, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -26,9 +27,9 @@ export default function StageProgressBar({ currentStage, completedStages = [] })
 
         return (
           <div key={stage} className="contents">
-            <div className="flex flex-col items-center gap-1.5">
+            <Link to={`/${stage}`} className="flex flex-col items-center gap-1.5 group">
               <div className={cn(
-                "h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 border-2",
+                "h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 border-2 group-hover:scale-110 group-hover:shadow-md",
                 isCompleted || isPast
                   ? cn(colors.completed, 'border-transparent')
                   : isCurrent
@@ -38,10 +39,10 @@ export default function StageProgressBar({ currentStage, completedStages = [] })
                 {isCompleted ? <Check className="h-4 w-4" /> : <Icon className="h-4 w-4" />}
               </div>
               <span className={cn(
-                "text-xs font-medium capitalize",
+                "text-xs font-medium capitalize group-hover:text-primary transition-colors",
                 isCurrent ? 'text-foreground' : 'text-muted-foreground'
               )}>{stage}</span>
-            </div>
+            </Link>
             {i < STAGES_ORDER.length - 1 && (
               <div className={cn(
                 "flex-1 h-0.5 mx-2 rounded-full transition-all duration-500",
