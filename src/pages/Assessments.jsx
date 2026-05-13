@@ -11,9 +11,10 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ClipboardCheck } from 'lucide-react';
+import { Plus, ClipboardCheck, Activity, Users } from 'lucide-react';
 import { format } from 'date-fns';
 import ExportPDFButton from '@/components/shared/ExportPDFButton';
+import SurveyLaunchCard from '@/components/shared/SurveyLaunchCard';
 
 const DIMENSIONS = [
   { key: 'trust', label: 'Trust', desc: 'How much do team members trust each other?' },
@@ -157,6 +158,26 @@ export default function Assessments() {
           </DialogContent>
           </Dialog>
         </div>
+      </div>
+
+      {/* External Survey Launchers */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <SurveyLaunchCard
+          title="Team Health & Culture Assessment"
+          description="Based on Lencioni's Five Dysfunctions — 15 questions on trust, conflict, commitment, accountability, and results. Takes 5-7 minutes."
+          url="https://org-pulse-check.base44.app"
+          icon={Users}
+          accentColor="text-secondary"
+          badgeLabel="5 Dysfunctions"
+        />
+        <SurveyLaunchCard
+          title="Workstyle Assessment"
+          description="Discover your natural leadership approach across Head, Heart, Gut, and Feet dimensions. 20 questions, ~5 minutes."
+          url="https://workstyle-nav-go.base44.app"
+          icon={Activity}
+          accentColor="text-accent"
+          badgeLabel="Workstyle"
+        />
       </div>
 
       <div className="grid gap-3">

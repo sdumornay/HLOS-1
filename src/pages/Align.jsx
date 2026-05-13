@@ -9,7 +9,8 @@ import RoleClarityWorksheet from '@/components/align/RoleClarityWorksheet';
 import PriorityAlignmentPage from '@/components/align/PriorityAlignmentPage';
 import DecisionRightsMap from '@/components/align/DecisionRightsMap';
 import LeadershipCovenant from '@/components/align/LeadershipCovenant';
-import { Compass } from 'lucide-react';
+import { Compass, Users, Footprints } from 'lucide-react';
+import SurveyLaunchCard from '@/components/shared/SurveyLaunchCard';
 
 export default function Align() {
   const { user } = useCurrentUser();
@@ -70,6 +71,26 @@ export default function Align() {
       </div>
 
       <AlignProgress counts={counts} />
+
+      {/* External Survey Launchers */}
+      <div className="grid gap-3 sm:grid-cols-2">
+        <SurveyLaunchCard
+          title="Team Health & Culture Assessment"
+          description="Based on Lencioni's Five Dysfunctions — identify gaps in trust, conflict, commitment, accountability, and results. 15 questions, 5-7 minutes."
+          url="https://org-pulse-check.base44.app"
+          icon={Users}
+          accentColor="text-secondary"
+          badgeLabel="5 Dysfunctions"
+        />
+        <SurveyLaunchCard
+          title="Workstyle Assessment"
+          description="Map your team's natural leadership styles across Head (Analytical), Heart (Relational), Gut (Decisive), and Feet (Action-Oriented). ~5 minutes."
+          url="https://workstyle-nav-go.base44.app"
+          icon={Footprints}
+          accentColor="text-accent"
+          badgeLabel="Workstyle"
+        />
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <FiveDysfunctionsDiagnostic orgId={orgId} />
