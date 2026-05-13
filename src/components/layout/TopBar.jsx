@@ -6,12 +6,25 @@ import { Button } from '@/components/ui/button';
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User, Menu } from 'lucide-react';
+import { LogOut, User, Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
+import { useLocation, useNavigate } from 'react-router-dom';
+
+const PAGE_ORDER = [
+  '/', '/team',
+  '/stabilize', '/align', '/execute', '/sustain',
+  '/assessments', '/actions', '/sessions', '/reviews', '/resources', '/organizations',
+];
 
 export default function TopBar({ onMenuToggle }) {
   const { user } = useCurrentUser();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentIndex = PAGE_ORDER.indexOf(location.pathname);
+  const prevPath = currentIndex > 0 ? PAGE_ORDER[currentIndex - 1] : null;
+  const nextPath = currentIndex < PAGE_ORDER.length - 1 ? PAGE_ORDER[currentIndex + 1] : null;
 
   const initials = user?.full_name
     ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
@@ -22,6 +35,16 @@ export default function TopBar({ onMenuToggle }) {
       <Button variant="ghost" size="icon" className="lg:hidden" onClick={onMenuToggle}>
         <Menu className="h-5 w-5" />
       </Button>
+
+      {/* Prev / Next navigation */}
+      <div className="flex items-center gap-1 ml-2">
+        <Button variant="ghost" size="icon" disabled={!prevPath} onClick={() => prevPath && navigate(prevPath)} className="h-8 w-8">
+          <ChevronLeft className="h-4 w-4" />
+        </Button>
+        <Button variant="ghost" size="icon" disabled={!nextPath} onClick={() => nextPath && navigate(nextPath)} className="h-8 w-8">
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
 
       <div className="flex-1" />
 
