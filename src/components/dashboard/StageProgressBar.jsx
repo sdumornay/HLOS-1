@@ -25,7 +25,7 @@ export default function StageProgressBar({ currentStage, completedStages = [] })
         const colors = STAGE_COLORS[stage];
 
         return (
-          <React.Fragment key={stage}>
+          <div key={stage} className="contents">
             <div className="flex flex-col items-center gap-1.5">
               <div className={cn(
                 "h-10 w-10 rounded-full flex items-center justify-center transition-all duration-300 border-2",
@@ -48,7 +48,7 @@ export default function StageProgressBar({ currentStage, completedStages = [] })
                 isPast || isCompleted ? colors.line : 'bg-border'
               )} />
             )}
-          </React.Fragment>
+          </div>
         );
       })}
     </div>
