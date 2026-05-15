@@ -139,7 +139,17 @@ export default function OnboardingWizard({ open, onClose }) {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div><Label>City</Label><Input value={orgData.city} onChange={e => setOrgData(d => ({ ...d, city: e.target.value }))} placeholder="City" /></div>
-                <div><Label>State</Label><Input value={orgData.state} onChange={e => setOrgData(d => ({ ...d, state: e.target.value }))} placeholder="State" /></div>
+                <div>
+                  <Label>State</Label>
+                  <Select value={orgData.state} onValueChange={v => setOrgData(d => ({ ...d, state: v }))}>
+                    <SelectTrigger><SelectValue placeholder="State" /></SelectTrigger>
+                    <SelectContent className="max-h-60 overflow-y-auto">
+                      {["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"].map(s => (
+                        <SelectItem key={s} value={s}>{s}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <Button className="w-full" onClick={handleOrgNext} disabled={!orgData.name.trim() || createOrg.isPending}>
                 {createOrg.isPending ? 'Creating...' : <>Next <ChevronRight className="h-4 w-4 ml-1" /></>}
