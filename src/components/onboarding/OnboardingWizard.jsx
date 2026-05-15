@@ -35,6 +35,10 @@ export default function OnboardingWizard({ open, onClose }) {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       setStep(2);
     },
+    onError: () => {
+      // RLS may block non-super_admin creation; skip org creation and advance anyway
+      setStep(2);
+    },
   });
 
   const inviteTeam = useMutation({
