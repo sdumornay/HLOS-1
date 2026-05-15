@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Building2, MapPin } from 'lucide-react';
+import { Plus, Building2, MapPin, Pencil } from 'lucide-react';
 import StageProgressBar from '@/components/dashboard/StageProgressBar';
 import CoachAssignmentPanel from '@/components/organizations/CoachAssignmentPanel';
 import BulkImport from '@/components/shared/BulkImport';
@@ -20,11 +20,28 @@ export default function Organizations() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ name: '', type: 'church', city: '', state: '' });
+  const [editOrg, setEditOrg] = useState(null);
+  const [editForm, setEditForm] = useState({});
 
   const { data: organizations = [] } = useQuery({
     queryKey: ['organizations'],
     queryFn: () => base44.entities.Organization.list(),
   });
+
+  const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }) => base44.entities.Organization.update(id, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      setEditOrg(null);
+    },
+  });
+
+  const openEdit = (org) => {
+    setEditOrg(org);
+    setEditForm({ name: org.name, type: org.type || 'church', city: org.city || '', state: org.state || '' });
+  };
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Organization.create(data),
@@ -131,6 +148,9 @@ export default function Organizations() {
                 <div className="w-full sm:w-64">
                   <StageProgressBar currentStage={org.current_stage || 'stabilize'} />
                 </div>
+                <Button size="icon" variant="ghost" onClick={() => openEdit(org)} title="Edit organization">
+                  <Pencil className="h-4 w-4 text-muted-foreground" />
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -146,6 +166,57 @@ export default function Organizations() {
       </div>
 
       <CoachAssignmentPanel organizations={organizations} />
+
+      {/* Edit Organization Dialog */}
+      <Dialog open={!!editOrg} onOpenChange={(v) => !v && setEditOrg(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Organization</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 mt-4">
+            <div>
+              <Label>Name</Label>
+              <Input value={editForm.name || ''} onChange={e => setEditForm(f => ({ ...f, name: e.target.value }))} placeholder="Church or org name" />
+            </div>
+            <div>
+              <Label>Type</Label>
+              <Select value={editForm.type} onValueChange={v => setEditForm(f => ({ ...f, type: v }))}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="church">Church</SelectItem>
+                  <SelectItem value="ministry">Ministry</SelectItem>
+                  <SelectItem value="nonprofit">Nonprofit</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>City</Label>
+                <Input value={editForm.city || ''} onChange={e => setEditForm(f => ({ ...f, city: e.target.value }))} placeholder="City" />
+              </div>
+              <div>
+                <Label>State</Label>
+                <Select value={editForm.state} onValueChange={v => setEditForm(f => ({ ...f, state: v }))}>
+                  <SelectTrigger><SelectValue placeholder="State" /></SelectTrigger>
+                  <SelectContent className="max-h-60 overflow-y-auto">
+                    {US_STATES.map(s => (
+                      <SelectItem key={s} value={s}>{s}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+            <Button
+              onClick={() => updateMutation.mutate({ id: editOrg.id, data: editForm })}
+              className="w-full"
+              disabled={!editForm.name?.trim() || updateMutation.isPending}
+            >
+              {updateMutation.isPending ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
