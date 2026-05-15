@@ -61,8 +61,12 @@ export default function OnboardingWizard({ open, onClose }) {
     },
   });
 
-  const handleOrgNext = () => {
+  const handleOrgNext = async () => {
     if (!orgData.name.trim()) return;
+    // Ensure the user has a role that allows org creation
+    if (!user?.role || user.role === 'user') {
+      await base44.auth.updateMe({ role: 'lead_pastor' });
+    }
     createOrg.mutate({ ...orgData, coach_email: user?.email, current_stage: 'stabilize' });
   };
 
