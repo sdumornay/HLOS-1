@@ -28,12 +28,26 @@
       "data.organization_id": "{{user.organization_id}}"
     },
     "read": {
-      "data.organization_id": "{{user.organization_id}}"
+      "$or": [
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     },
     "update": {
       "$or": [
         {
           "data.author_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
         },
         {
           "$and": [
@@ -58,11 +72,6 @@
               "data.organization_id": "{{user.organization_id}}"
             }
           ]
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
         }
       ]
     },
@@ -72,6 +81,11 @@
           "data.author_email": "{{user.email}}"
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "$and": [
             {
               "user_condition": {
@@ -94,11 +108,6 @@
               "data.organization_id": "{{user.organization_id}}"
             }
           ]
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
         }
       ]
     }
