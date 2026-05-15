@@ -52,25 +52,6 @@
     "name"
   ],
   "rls": {
-    "create": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "coach"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "lead_pastor"
-          }
-        }
-      ]
-    },
     "read": {
       "$or": [
         {
