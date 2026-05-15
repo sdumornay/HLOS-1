@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -31,11 +32,13 @@ export default function OnboardingWizard({ open, onClose }) {
     mutationFn: (data) => base44.entities.Organization.create(data),
     onSuccess: async (org) => {
       setCreatedOrgId(org.id);
-      await base44.auth.updateMe({ organization_id: org.id });
+      await base44.auth.updateMe({ organization_id: org.id, role: 'lead_pastor' });
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       setStep(2);
     },
-
+    onError: (err) => {
+      toast.error('Could not create organization: ' + (err?.message || 'Unknown error'));
+    },
   });
 
   const inviteTeam = useMutation({
