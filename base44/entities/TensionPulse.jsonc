@@ -54,6 +54,11 @@
           "data.respondent_email": "{{user.email}}"
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "$and": [
             {
               "user_condition": {
@@ -76,11 +81,6 @@
               "data.organization_id": "{{user.organization_id}}"
             }
           ]
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
         }
       ]
     },
@@ -90,6 +90,11 @@
           "data.respondent_email": "{{user.email}}"
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "$and": [
             {
               "user_condition": {
@@ -112,17 +117,20 @@
               "data.organization_id": "{{user.organization_id}}"
             }
           ]
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
         }
       ]
     },
     "delete": {
       "$or": [
         {
+          "data.respondent_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "$and": [
             {
               "user_condition": {
@@ -145,11 +153,6 @@
               "data.organization_id": "{{user.organization_id}}"
             }
           ]
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
         }
       ]
     }
