@@ -14,6 +14,7 @@ import MomentumChart from '@/components/dashboard/MomentumChart';
 import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import BenchmarkPanel from '@/components/dashboard/BenchmarkPanel';
 import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
+import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach, loading: userLoading } = useCurrentUser();
@@ -153,6 +154,9 @@ export default function Dashboard() {
 
       {/* Benchmarking */}
       {orgId && <BenchmarkPanel orgId={orgId} />}
+
+      {/* Admin Org Overview — super_admin and coach only */}
+      {(isAdmin || isCoach) && <AdminOrgWidget />}
 
       {/* Security Audit — super_admin only */}
       {isAdmin && <SecurityAuditPanel />}
