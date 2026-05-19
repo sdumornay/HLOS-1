@@ -55,7 +55,7 @@ export default function TopBar({ onMenuToggle }) {
           <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium">{user?.full_name || 'User'}</p>
-              <p className="text-xs text-muted-foreground hidden">{ROLE_LABELS[user?.role] || 'Team Member'}</p>
+              
             </div>
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-accent text-accent-foreground text-xs font-semibold">{initials}</AvatarFallback>
