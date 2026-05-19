@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, ClipboardCheck, Activity, Users } from 'lucide-react';
+import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ExportPDFButton from '@/components/shared/ExportPDFButton';
 import SurveyLaunchCard from '@/components/shared/SurveyLaunchCard';
@@ -49,10 +50,18 @@ export default function Assessments() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assessments'] });
       setOpen(false);
+      toast.success('Assessment saved.');
+    },
+    onError: (err) => {
+      toast.error('Failed to save: ' + (err?.message || 'Unknown error'));
     },
   });
 
   const handleSubmit = () => {
+    if (!orgId) {
+      toast.error('No organization found. Please complete onboarding first.');
+      return;
+    }
     const scores = DIMENSIONS.map(d => form[d.key]);
     const healthSum = scores.reduce((s, v) => s + v, 0);
     const overall = parseFloat((healthSum / scores.length).toFixed(1));

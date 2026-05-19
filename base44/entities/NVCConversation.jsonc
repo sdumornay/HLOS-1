@@ -61,9 +61,6 @@
     "situation"
   ],
   "rls": {
-    "create": {
-      "data.organization_id": "{{user.organization_id}}"
-    },
     "read": {
       "$or": [
         {
