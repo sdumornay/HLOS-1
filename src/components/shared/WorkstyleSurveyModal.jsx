@@ -78,6 +78,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [showManualCopy, setShowManualCopy] = useState(false);
 
   const saveMutation = useMutation({
     mutationFn: (data) => base44.entities.WorkstyleAssessment.create(data),
@@ -107,21 +108,59 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
     }
   };
 
-  const handleShare = () => {
-    const text = result
-      ? `My workstyle is ${STYLES[result.primary].emoji} ${STYLES[result.primary].label} (secondary: ${STYLES[result.secondary].label}). "${STYLES[result.primary].desc}"`
-      : '';
-    navigator.clipboard.writeText(text).then(() => {
+  const handleShare = async () => {
+    if (!result) return;
+    const text = `My workstyle is ${STYLES[result.primary].emoji} ${STYLES[result.primary].label} (secondary: ${STYLES[result.secondary].label}). "${STYLES[result.primary].desc}"`;
+
+    // Try Web Share API first (mobile-friendly)
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'My Workstyle Result', text });
+        return;
+      } catch (_) {
+        // user cancelled or not supported — fall through to clipboard
+      }
+    }
+
+    // Try clipboard API
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      try {
+        await navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2500);
+        toast.success('Result copied to clipboard!');
+        return;
+      } catch (_) {
+        // fall through to textarea fallback
+      }
+    }
+
+    // Textarea fallback for restricted contexts (iframes, HTTP)
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.position = 'fixed';
+    el.style.opacity = '0';
+    document.body.appendChild(el);
+    el.focus();
+    el.select();
+    try {
+      document.execCommand('copy');
       setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setTimeout(() => setCopied(false), 2500);
       toast.success('Result copied to clipboard!');
-    });
+    } catch (_) {
+      toast.error('Could not copy automatically. Please copy the text below manually.');
+      setShowManualCopy(true);
+    } finally {
+      document.body.removeChild(el);
+    }
   };
 
   const handleClose = () => {
     setStep(0);
     setAnswers({});
     setResult(null);
+    setShowManualCopy(false);
     onClose();
   };
 
@@ -191,6 +230,19 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
 
             {saveMutation.isPending && (
               <p className="text-xs text-muted-foreground text-center">Saving your results...</p>
+            )}
+
+            {showManualCopy && result && (
+              <div className="space-y-1">
+                <p className="text-xs text-muted-foreground">Copy your result manually:</p>
+                <textarea
+                  readOnly
+                  onClick={e => e.target.select()}
+                  className="w-full text-xs border border-border rounded-md p-2 bg-muted resize-none"
+                  rows={3}
+                  value={`My workstyle is ${STYLES[result.primary].emoji} ${STYLES[result.primary].label} (secondary: ${STYLES[result.secondary].label}). "${STYLES[result.primary].desc}"`}
+                />
+              </div>
             )}
           </div>
         )}
