@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { toast } from 'sonner';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -7,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { CheckCircle2, Building2, Users, ChevronRight, Heart, Plus, X } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
+import { CheckCircle2, Building2, Users, ChevronRight, Heart, Plus, X, AlertCircle } from 'lucide-react';
 
 const STEPS = [
   { id: 'org',    title: 'Your Organization', icon: Building2 },
@@ -18,6 +18,8 @@ const STEPS = [
 export default function OnboardingWizard({ open, onComplete }) {
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [errorMsg, setErrorMsg] = React.useState('');
 
   const [step, setStep] = useState(0);
   const [orgName, setOrgName] = useState('');
@@ -28,40 +30,30 @@ export default function OnboardingWizard({ open, onComplete }) {
   // ── Step 1: create org + link user ────────────────────────────────────────
   const createOrgMutation = useMutation({
     mutationFn: async () => {
-      let org;
-      try {
-        org = await base44.entities.Organization.create({
-          name: orgName.trim(),
-          city: city.trim(),
-          current_stage: 'stabilize',
-          health_score: 0,
-          momentum_score: 0,
-        });
-      } catch (err) {
-        console.error('Failed to create org:', err);
-        throw new Error('Organization creation failed: ' + (err?.message || JSON.stringify(err)));
-      }
+      setErrorMsg('');
+      const org = await base44.entities.Organization.create({
+        name: orgName.trim(),
+        city: city.trim(),
+        current_stage: 'stabilize',
+        health_score: 0,
+        momentum_score: 0,
+      });
 
-      try {
-        await base44.auth.updateMe({
-          organization_id: org.id,
-          role: 'lead_pastor',
-          onboarded: true,
-        });
-      } catch (err) {
-        console.error('Failed to update user profile:', err);
-        throw new Error('Profile update failed: ' + (err?.message || JSON.stringify(err)));
-      }
+      await base44.auth.updateMe({
+        organization_id: org.id,
+        role: 'lead_pastor',
+        onboarded: true,
+      });
 
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
-      queryClient.invalidateQueries({ queryKey: ['all-organizations'] });
-      queryClient.invalidateQueries({ queryKey: ['all-users-admin'] });
       return org;
     },
     onSuccess: () => setStep(1),
     onError: (err) => {
-      console.error('Onboarding error:', err);
-      toast.error(err?.message || 'Setup failed. Please try again.');
+      const msg = err?.response?.data?.message || err?.message || 'Setup failed. Please try again.';
+      console.error('Onboarding error:', msg, err);
+      setErrorMsg(msg);
+      toast({ title: 'Setup failed', description: msg, variant: 'destructive' });
     },
   });
 
@@ -151,6 +143,13 @@ export default function OnboardingWizard({ open, onComplete }) {
                   />
                 </div>
               </div>
+
+              {errorMsg && (
+                <div className="flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2 text-sm text-destructive">
+                  <AlertCircle className="h-4 w-4 shrink-0" />
+                  <span>{errorMsg}</span>
+                </div>
+              )}
 
               <Button
                 className="w-full"

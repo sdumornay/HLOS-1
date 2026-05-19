@@ -9,14 +9,14 @@ import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
 export default function AppLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { user, isAdmin, loading: userLoading } = useCurrentUser();
+  const { user, isAdmin, loading } = useCurrentUser();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
-    if (!userLoading && user && !isAdmin && !user.organization_id && !user.onboarded) {
+    if (!loading && user && !isAdmin && !user.organization_id) {
       setShowOnboarding(true);
     }
-  }, [user, userLoading, isAdmin]);
+  }, [user, loading, isAdmin]);
 
   return (
     <div className="min-h-screen bg-background">
