@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -13,19 +13,10 @@ import HealthRadar from '@/components/dashboard/HealthRadar';
 import MomentumChart from '@/components/dashboard/MomentumChart';
 import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import BenchmarkPanel from '@/components/dashboard/BenchmarkPanel';
-import OnboardingWizard from '@/components/onboarding/OnboardingWizard';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 
 export default function Dashboard() {
-  const { user, isAdmin, isCoach, loading: userLoading } = useCurrentUser();
-  const [showOnboarding, setShowOnboarding] = useState(false);
-
-  // Show onboarding only for non-admin users who haven't set up an org yet
-  useEffect(() => {
-    if (!userLoading && user && !isAdmin && !user.organization_id && !user.onboarded) {
-      setShowOnboarding(true);
-    }
-  }, [user, userLoading, isAdmin]);
+  const { user, isAdmin, isCoach } = useCurrentUser();
 
   const orgId = user?.organization_id;
 
@@ -84,13 +75,6 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <OnboardingWizard
-        open={showOnboarding}
-        onComplete={() => {
-          setShowOnboarding(false);
-          window.location.reload(); // reload so user context (org_id, role) refreshes
-        }}
-      />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
