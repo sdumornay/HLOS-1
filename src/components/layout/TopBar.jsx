@@ -4,18 +4,18 @@ import { ROLE_LABELS } from '@/lib/constants';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator
-} from '@/components/ui/dropdown-menu';
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from
+'@/components/ui/dropdown-menu';
 import { LogOut, User, Menu, ChevronLeft, ChevronRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import NotificationBell from '@/components/notifications/NotificationBell';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const PAGE_ORDER = [
-  '/', '/team',
-  '/stabilize', '/align', '/execute', '/sustain',
-  '/assessments', '/actions', '/sessions', '/reviews', '/resources', '/organizations',
-];
+'/', '/team',
+'/stabilize', '/align', '/execute', '/sustain',
+'/assessments', '/actions', '/sessions', '/reviews', '/resources', '/organizations'];
+
 
 export default function TopBar({ onMenuToggle }) {
   const { user } = useCurrentUser();
@@ -26,9 +26,9 @@ export default function TopBar({ onMenuToggle }) {
   const prevPath = currentIndex > 0 ? PAGE_ORDER[currentIndex - 1] : null;
   const nextPath = currentIndex < PAGE_ORDER.length - 1 ? PAGE_ORDER[currentIndex + 1] : null;
 
-  const initials = user?.full_name
-    ? user.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
-    : '?';
+  const initials = user?.full_name ?
+  user.full_name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2) :
+  '?';
 
   return (
     <header className="h-16 border-b border-border bg-card/95 backdrop-blur-sm flex items-center justify-between px-4 lg:px-6 shadow-sm">
@@ -55,7 +55,7 @@ export default function TopBar({ onMenuToggle }) {
           <button className="flex items-center gap-3 hover:opacity-80 transition-opacity">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-medium">{user?.full_name || 'User'}</p>
-              <p className="text-xs text-muted-foreground">{ROLE_LABELS[user?.role] || 'Team Member'}</p>
+              <p className="text-xs text-muted-foreground hidden">{ROLE_LABELS[user?.role] || 'Team Member'}</p>
             </div>
             <Avatar className="h-8 w-8">
               <AvatarFallback className="bg-accent text-accent-foreground text-xs font-semibold">{initials}</AvatarFallback>
@@ -74,6 +74,6 @@ export default function TopBar({ onMenuToggle }) {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </header>
-  );
+    </header>);
+
 }
