@@ -10,11 +10,17 @@
         "lead_pastor",
         "team_member"
       ],
-      "default": "team_member"
+      "default": "team_member",
+      "description": "super_admin = app owner/consultant with full cross-org access; coach = assigned to specific orgs; lead_pastor = org owner; team_member = standard org user"
     },
     "organization_id": {
       "type": "string",
-      "description": "Primary organization"
+      "description": "Primary organization (not required for super_admin)"
+    },
+    "onboarded": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether the user has completed first-run onboarding"
     },
     "team_ids": {
       "type": "array",

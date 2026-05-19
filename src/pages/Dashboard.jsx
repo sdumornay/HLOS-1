@@ -19,12 +19,12 @@ export default function Dashboard() {
   const { user, isAdmin, isCoach, loading: userLoading } = useCurrentUser();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Show onboarding if the user has no org and hasn't been onboarded yet
+  // Show onboarding only for non-admin users who haven't set up an org yet
   useEffect(() => {
-    if (!userLoading && user && !user.organization_id && !user.onboarded) {
+    if (!userLoading && user && !isAdmin && !user.organization_id && !user.onboarded) {
       setShowOnboarding(true);
     }
-  }, [user, userLoading]);
+  }, [user, userLoading, isAdmin]);
 
   const orgId = user?.organization_id;
 
