@@ -52,6 +52,7 @@
     "name"
   ],
   "rls": {
+    "create": {},
     "read": {
       "$or": [
         {

@@ -48,7 +48,10 @@ export default function OnboardingWizard({ open, onComplete }) {
       return org;
     },
     onSuccess: () => setStep(1),
-    onError: (err) => toast.error('Could not create organization: ' + (err?.message || 'Unknown error')),
+    onError: (err) => {
+      console.error('Onboarding org creation error:', err);
+      toast.error('Could not create organization: ' + (err?.message || JSON.stringify(err) || 'Unknown error'));
+    },
   });
 
   // ── Step 2: invite team members ───────────────────────────────────────────
