@@ -13,10 +13,10 @@ export default function AppLayout() {
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   useEffect(() => {
-    if (!loading && user && !isAdmin && !user.organization_id) {
+    if (!loading && user && !user.organization_id) {
       setShowOnboarding(true);
     }
-  }, [user, loading, isAdmin]);
+  }, [user, loading]);
 
   return (
     <div className="min-h-screen bg-background">

@@ -27,30 +27,23 @@ export default function OnboardingWizard({ open, onComplete }) {
   const [city, setCity] = useState('');
   const [members, setMembers] = useState([{ name: '', email: '' }]);
 
-  // ── Step 1: create org + link user ────────────────────────────────────────
+  // ── Step 1: create org + link user via backend function ──────────────────
   const createOrgMutation = useMutation({
     mutationFn: async () => {
       setErrorMsg('');
-      const org = await base44.entities.Organization.create({
+      const response = await base44.functions.invoke('createOrganization', {
         name: orgName.trim(),
         city: city.trim(),
-        current_stage: 'stabilize',
-        health_score: 0,
-        momentum_score: 0,
       });
-
-      await base44.auth.updateMe({
-        organization_id: org.id,
-        role: 'lead_pastor',
-        onboarded: true,
-      });
-
+      if (response.data?.error) {
+        throw new Error(response.data.error);
+      }
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
-      return org;
+      return response.data?.org;
     },
     onSuccess: () => setStep(1),
     onError: (err) => {
-      const msg = err?.response?.data?.message || err?.message || 'Setup failed. Please try again.';
+      const msg = err?.response?.data?.error || err?.message || 'Setup failed. Please try again.';
       console.error('Onboarding error:', msg, err);
       setErrorMsg(msg);
       toast({ title: 'Setup failed', description: msg, variant: 'destructive' });
