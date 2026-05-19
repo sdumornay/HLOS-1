@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -105,6 +106,10 @@ export default function NVCConversationHelper({ orgId }) {
       queryClient.invalidateQueries({ queryKey: ['nvcConversations', orgId] });
       setOpen(false);
       setForm({ ...BLANK });
+      toast.success('Conversation saved.');
+    },
+    onError: (err) => {
+      toast.error('Failed to save: ' + (err?.message || 'Permission denied. Make sure your organization is set up.'));
     },
   });
 
