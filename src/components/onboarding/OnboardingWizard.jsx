@@ -40,7 +40,6 @@ export default function OnboardingWizard({ open, onComplete }) {
         organization_id: org.id,
         role: 'lead_pastor',
         onboarded: true,
-        full_name: leaderName.trim() || user?.full_name,
       });
       // Invalidate both the regular org list and the admin all-orgs view
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
