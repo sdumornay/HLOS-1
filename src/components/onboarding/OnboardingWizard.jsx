@@ -28,20 +28,31 @@ export default function OnboardingWizard({ open, onComplete }) {
   // ── Step 1: create org + link user ────────────────────────────────────────
   const createOrgMutation = useMutation({
     mutationFn: async () => {
-      const org = await base44.entities.Organization.create({
-        name: orgName.trim(),
-        city: city.trim(),
-        current_stage: 'stabilize',
-        health_score: 0,
-        momentum_score: 0,
-      });
-      // Link user to org, set role, mark onboarded
-      await base44.auth.updateMe({
-        organization_id: org.id,
-        role: 'lead_pastor',
-        onboarded: true,
-      });
-      // Invalidate both the regular org list and the admin all-orgs view
+      let org;
+      try {
+        org = await base44.entities.Organization.create({
+          name: orgName.trim(),
+          city: city.trim(),
+          current_stage: 'stabilize',
+          health_score: 0,
+          momentum_score: 0,
+        });
+      } catch (err) {
+        console.error('Failed to create org:', err);
+        throw new Error('Organization creation failed: ' + (err?.message || JSON.stringify(err)));
+      }
+
+      try {
+        await base44.auth.updateMe({
+          organization_id: org.id,
+          role: 'lead_pastor',
+          onboarded: true,
+        });
+      } catch (err) {
+        console.error('Failed to update user profile:', err);
+        throw new Error('Profile update failed: ' + (err?.message || JSON.stringify(err)));
+      }
+
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       queryClient.invalidateQueries({ queryKey: ['all-organizations'] });
       queryClient.invalidateQueries({ queryKey: ['all-users-admin'] });
@@ -49,8 +60,8 @@ export default function OnboardingWizard({ open, onComplete }) {
     },
     onSuccess: () => setStep(1),
     onError: (err) => {
-      console.error('Onboarding org creation error:', err);
-      toast.error('Could not create organization: ' + (err?.message || JSON.stringify(err) || 'Unknown error'));
+      console.error('Onboarding error:', err);
+      toast.error(err?.message || 'Setup failed. Please try again.');
     },
   });
 
