@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -16,6 +15,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ExportPDFButton from '@/components/shared/ExportPDFButton';
 import SurveyLaunchCard from '@/components/shared/SurveyLaunchCard';
+import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
 
 const DIMENSIONS = [
   { key: 'trust', label: 'Trust', desc: 'How much do team members trust each other?' },
@@ -30,6 +30,7 @@ export default function Assessments() {
   const { user, canManageAll } = useCurrentUser();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [workstyleOpen, setWorkstyleOpen] = useState(false);
   const [form, setForm] = useState({
     type: 'pulse',
     stage: 'stabilize',
@@ -102,74 +103,74 @@ export default function Assessments() {
             <DialogTrigger asChild>
               <Button><Plus className="h-4 w-4 mr-2" />New Assessment</Button>
             </DialogTrigger>
-          <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Take Assessment</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-5 mt-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label>Type</Label>
-                  <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="initial">Initial</SelectItem>
-                      <SelectItem value="pulse">Pulse</SelectItem>
-                      <SelectItem value="quarterly">Quarterly</SelectItem>
-                      <SelectItem value="exit">Exit</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label>Stage</Label>
-                  <Select value={form.stage} onValueChange={v => setForm(f => ({ ...f, stage: v }))}>
-                    <SelectTrigger><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="stabilize">Stabilize</SelectItem>
-                      <SelectItem value="align">Align</SelectItem>
-                      <SelectItem value="execute">Execute</SelectItem>
-                      <SelectItem value="sustain">Sustain</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              {DIMENSIONS.map(dim => (
-                <div key={dim.key} className="space-y-2">
-                  <div className="flex justify-between items-baseline">
-                    <Label>{dim.label}</Label>
-                    <span className="text-sm font-semibold text-primary">{form[dim.key]}/10</span>
+            <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Take Assessment</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-5 mt-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label>Type</Label>
+                    <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="initial">Initial</SelectItem>
+                        <SelectItem value="pulse">Pulse</SelectItem>
+                        <SelectItem value="quarterly">Quarterly</SelectItem>
+                        <SelectItem value="exit">Exit</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                  <p className="text-xs text-muted-foreground">{dim.desc}</p>
-                  <Slider
-                    value={[form[dim.key]]}
-                    min={1}
-                    max={10}
-                    step={1}
-                    onValueChange={([v]) => setForm(f => ({ ...f, [dim.key]: v }))}
+                  <div>
+                    <Label>Stage</Label>
+                    <Select value={form.stage} onValueChange={v => setForm(f => ({ ...f, stage: v }))}>
+                      <SelectTrigger><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="stabilize">Stabilize</SelectItem>
+                        <SelectItem value="align">Align</SelectItem>
+                        <SelectItem value="execute">Execute</SelectItem>
+                        <SelectItem value="sustain">Sustain</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                {DIMENSIONS.map(dim => (
+                  <div key={dim.key} className="space-y-2">
+                    <div className="flex justify-between items-baseline">
+                      <Label>{dim.label}</Label>
+                      <span className="text-sm font-semibold text-primary">{form[dim.key]}/10</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">{dim.desc}</p>
+                    <Slider
+                      value={[form[dim.key]]}
+                      min={1}
+                      max={10}
+                      step={1}
+                      onValueChange={([v]) => setForm(f => ({ ...f, [dim.key]: v }))}
+                    />
+                  </div>
+                ))}
+
+                <div>
+                  <Label>Notes</Label>
+                  <Textarea
+                    value={form.notes}
+                    onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+                    placeholder="Any additional observations..."
                   />
                 </div>
-              ))}
 
-              <div>
-                <Label>Notes</Label>
-                <Textarea
-                  value={form.notes}
-                  onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                  placeholder="Any additional observations..."
-                />
+                <Button onClick={handleSubmit} className="w-full" disabled={createMutation.isPending}>
+                  {createMutation.isPending ? 'Submitting...' : 'Submit Assessment'}
+                </Button>
               </div>
-
-              <Button onClick={handleSubmit} className="w-full" disabled={createMutation.isPending}>
-                {createMutation.isPending ? 'Submitting...' : 'Submit Assessment'}
-              </Button>
-            </div>
-          </DialogContent>
+            </DialogContent>
           </Dialog>
         </div>
       </div>
 
-      {/* External Survey Launchers */}
+      {/* Survey Launchers */}
       <div className="grid gap-3 sm:grid-cols-2">
         <SurveyLaunchCard
           title="Team Health & Culture Assessment"
@@ -179,15 +180,37 @@ export default function Assessments() {
           accentColor="text-secondary"
           badgeLabel="5 Dysfunctions"
         />
-        <SurveyLaunchCard
-          title="Workstyle Assessment"
-          description="Discover your natural leadership approach across Head, Heart, Gut, and Feet dimensions. 20 questions, ~5 minutes."
-          url="https://workstyle-nav-go.base44.app"
-          icon={Activity}
-          accentColor="text-accent"
-          badgeLabel="Workstyle"
-        />
+        {/* Workstyle: built-in modal so results save directly */}
+        <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-5 flex items-start gap-4">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Activity className="h-5 w-5 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-semibold">Workstyle Assessment</p>
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">
+                  Workstyle
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                Discover your natural leadership style — Driver, Expressive, Amiable, or Analytical. Results save to your profile and can be shared. ~3 minutes.
+              </p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">
+              Start
+            </Button>
+          </CardContent>
+        </Card>
       </div>
+
+      <WorkstyleSurveyModal
+        open={workstyleOpen}
+        onClose={() => setWorkstyleOpen(false)}
+        orgId={orgId}
+        userName={user?.full_name}
+        userEmail={user?.email}
+      />
 
       <div className="grid gap-3">
         {myAssessments.map(a => (
