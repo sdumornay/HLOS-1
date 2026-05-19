@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
-import { Share2, Check } from 'lucide-react';
+import { Share2 } from 'lucide-react';
 
 const QUESTIONS = [
   { id: 'q1', text: 'When making decisions, I prefer to:', options: [
@@ -77,7 +77,6 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
   const [step, setStep] = useState(0); // 0 = survey, 1 = results
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
-  const [copied, setCopied] = useState(false);
   const [showManualCopy, setShowManualCopy] = useState(false);
 
   const saveMutation = useMutation({
@@ -108,52 +107,9 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
     }
   };
 
-  const handleShare = async () => {
+  const handleShare = () => {
     if (!result) return;
-    const text = `My workstyle is ${STYLES[result.primary].emoji} ${STYLES[result.primary].label} (secondary: ${STYLES[result.secondary].label}). "${STYLES[result.primary].desc}"`;
-
-    // Try Web Share API first (mobile-friendly)
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: 'My Workstyle Result', text });
-        return;
-      } catch (_) {
-        // user cancelled or not supported — fall through to clipboard
-      }
-    }
-
-    // Try clipboard API
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      try {
-        await navigator.clipboard.writeText(text);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2500);
-        toast.success('Result copied to clipboard!');
-        return;
-      } catch (_) {
-        // fall through to textarea fallback
-      }
-    }
-
-    // Textarea fallback for restricted contexts (iframes, HTTP)
-    const el = document.createElement('textarea');
-    el.value = text;
-    el.style.position = 'fixed';
-    el.style.opacity = '0';
-    document.body.appendChild(el);
-    el.focus();
-    el.select();
-    try {
-      document.execCommand('copy');
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-      toast.success('Result copied to clipboard!');
-    } catch (_) {
-      toast.error('Could not copy automatically. Please copy the text below manually.');
-      setShowManualCopy(true);
-    } finally {
-      document.body.removeChild(el);
-    }
+    setShowManualCopy(true);
   };
 
   const handleClose = () => {
@@ -162,6 +118,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
     setResult(null);
     setShowManualCopy(false);
     onClose();
+
   };
 
   const currentQ = QUESTIONS[Object.keys(answers).length] || QUESTIONS[QUESTIONS.length - 1];
@@ -226,12 +183,14 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
 
             {showManualCopy && (
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Select all and copy:</p>
+                <p className="text-xs text-muted-foreground font-medium">Click the text below to select, then copy (Ctrl+C / Cmd+C):</p>
                 <textarea
                   readOnly
+                  autoFocus
                   onClick={e => e.target.select()}
-                  className="w-full text-xs border border-border rounded-md p-2 bg-muted resize-none"
-                  rows={3}
+                  onFocus={e => e.target.select()}
+                  className="w-full text-xs border border-primary rounded-md p-2 bg-muted resize-none focus:outline-none focus:ring-1 focus:ring-primary"
+                  rows={4}
                   value={`My workstyle is ${STYLES[result.primary].emoji} ${STYLES[result.primary].label} (secondary: ${STYLES[result.secondary].label}). "${STYLES[result.primary].desc}"`}
                 />
               </div>
@@ -244,8 +203,8 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
                 onClick={handleShare}
                 className="flex-1 gap-2"
               >
-                {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
-                {copied ? 'Copied!' : 'Share Results'}
+                <Share2 className="h-4 w-4" />
+                Share Results
               </Button>
               <Button type="button" onClick={handleClose} className="flex-1">Done</Button>
             </div>
