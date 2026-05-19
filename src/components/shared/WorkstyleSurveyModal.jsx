@@ -169,7 +169,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-lg overflow-y-auto" style={{ maxHeight: '90dvh' }}>
         <DialogHeader>
           <DialogTitle>Workstyle Assessment</DialogTitle>
         </DialogHeader>
@@ -206,7 +206,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
         )}
 
         {step === 1 && result && (
-          <div className="space-y-5 mt-2">
+          <div className="space-y-4 mt-2">
             <div className={`rounded-xl border p-5 text-center ${STYLES[result.primary].color}`}>
               <div className="text-4xl mb-2">{STYLES[result.primary].emoji}</div>
               <h2 className="text-xl font-bold">{STYLES[result.primary].label}</h2>
@@ -220,21 +220,13 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
               </Badge>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <Button variant="outline" onClick={handleShare} className="gap-2">
-                {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
-                {copied ? 'Copied!' : 'Share Results'}
-              </Button>
-              <Button onClick={handleClose}>Done</Button>
-            </div>
-
             {saveMutation.isPending && (
               <p className="text-xs text-muted-foreground text-center">Saving your results...</p>
             )}
 
-            {showManualCopy && result && (
+            {showManualCopy && (
               <div className="space-y-1">
-                <p className="text-xs text-muted-foreground">Copy your result manually:</p>
+                <p className="text-xs text-muted-foreground">Select all and copy:</p>
                 <textarea
                   readOnly
                   onClick={e => e.target.select()}
@@ -244,6 +236,19 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
                 />
               </div>
             )}
+
+            <div className="flex gap-2 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleShare}
+                className="flex-1 gap-2"
+              >
+                {copied ? <Check className="h-4 w-4" /> : <Share2 className="h-4 w-4" />}
+                {copied ? 'Copied!' : 'Share Results'}
+              </Button>
+              <Button type="button" onClick={handleClose} className="flex-1">Done</Button>
+            </div>
           </div>
         )}
       </DialogContent>
