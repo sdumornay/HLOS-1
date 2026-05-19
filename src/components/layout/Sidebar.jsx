@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Shield, Compass, Rocket, Leaf,
   ClipboardCheck, Target, Calendar, BarChart3, BookOpen, Settings,
-  ChevronLeft, ChevronRight, Heart
+  ChevronLeft, ChevronRight, Heart, Globe
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -24,6 +24,7 @@ const NAV_ITEMS = [
   { label: 'Resources', path: '/resources', icon: BookOpen, roles: 'all' },
   { type: 'divider', label: 'Admin' },
   { label: 'Organizations', path: '/organizations', icon: Settings, roles: ['super_admin', 'coach'] },
+  { label: 'All Organizations', path: '/all-organizations', icon: Globe, roles: ['super_admin'] },
 ];
 
 export default function Sidebar({ collapsed, setCollapsed }) {
