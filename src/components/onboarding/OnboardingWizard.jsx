@@ -42,7 +42,10 @@ export default function OnboardingWizard({ open, onComplete }) {
         onboarded: true,
         full_name: leaderName.trim() || user?.full_name,
       });
+      // Invalidate both the regular org list and the admin all-orgs view
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      queryClient.invalidateQueries({ queryKey: ['all-organizations'] });
+      queryClient.invalidateQueries({ queryKey: ['all-users-admin'] });
       return org;
     },
     onSuccess: () => setStep(1),
