@@ -19,6 +19,7 @@ export function useCurrentUser() {
   const isLeadPastor = user?.role === 'lead_pastor';
   const isTeamMember = user?.role === 'team_member';
   const canManageAll = isAdmin || isCoach;
+  const isOnboarded = !!user?.onboarded || !!user?.organization_id;
 
-  return { user, loading, isAdmin, isCoach, isLeadPastor, isTeamMember, canManageAll };
+  return { user, loading, isAdmin, isCoach, isLeadPastor, isTeamMember, canManageAll, isOnboarded };
 }

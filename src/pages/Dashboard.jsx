@@ -19,9 +19,9 @@ export default function Dashboard() {
   const { user, isAdmin, isCoach, loading: userLoading } = useCurrentUser();
   const [showOnboarding, setShowOnboarding] = useState(false);
 
-  // Auto-trigger onboarding for new users without an org
+  // Show onboarding if the user has no org and hasn't been onboarded yet
   useEffect(() => {
-    if (!userLoading && user && !user.organization_id) {
+    if (!userLoading && user && !user.organization_id && !user.onboarded) {
       setShowOnboarding(true);
     }
   }, [user, userLoading]);
@@ -83,7 +83,13 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
-      <OnboardingWizard open={showOnboarding} onClose={() => setShowOnboarding(false)} />
+      <OnboardingWizard
+        open={showOnboarding}
+        onComplete={() => {
+          setShowOnboarding(false);
+          window.location.reload(); // reload so user context (org_id, role) refreshes
+        }}
+      />
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
