@@ -14,12 +14,13 @@ export function useCurrentUser() {
     load();
   }, []);
 
-  const isAdmin = user?.role === 'super_admin';
-  const isCoach = user?.role === 'coach';
-  const isLeadPastor = user?.role === 'lead_pastor';
-  const isTeamMember = user?.role === 'team_member';
+  const effectiveRole = user?.data?.role || user?.role;
+  const isAdmin = effectiveRole === 'super_admin';
+  const isCoach = effectiveRole === 'coach';
+  const isLeadPastor = effectiveRole === 'lead_pastor';
+  const isTeamMember = effectiveRole === 'team_member';
   const canManageAll = isAdmin || isCoach;
-  const isOnboarded = !!user?.onboarded || !!user?.organization_id;
+  const isOnboarded = !!user?.onboarded || !!user?.organization_id || !!user?.data?.onboarded || !!user?.data?.organization_id;
 
   return { user, loading, isAdmin, isCoach, isLeadPastor, isTeamMember, canManageAll, isOnboarded };
 }

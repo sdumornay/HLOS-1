@@ -10,7 +10,9 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'User not found' }, { status: 404 });
     }
 
-    const updated = await base44.asServiceRole.entities.User.update(userId, { role });
+    const user = users[0];
+    const updatedData = { ...(user.data || {}), role };
+    const updated = await base44.asServiceRole.entities.User.update(userId, { data: updatedData });
     return Response.json({ success: true, user: updated });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
