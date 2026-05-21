@@ -7,7 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Building2, MapPin, Users, Calendar, Search, ArrowRight, Shield } from 'lucide-react';
+import { Building2, MapPin, Users, Calendar, Search, ArrowRight, Shield, Trash2 } from 'lucide-react';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from 'date-fns';
 
 const STAGE_COLORS = {
@@ -23,6 +24,21 @@ export default function AllOrganizations() {
   const [search, setSearch] = useState('');
   const [filterCity, setFilterCity] = useState('all');
   const [filterStage, setFilterStage] = useState('all');
+  const [deletingId, setDeletingId] = useState(null);
+  const queryClient = useQueryClient();
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.Organization.delete(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['all-organizations'] }),
+  });
+
+  const handleDelete = async (e, orgId) => {
+    e.stopPropagation();
+    if (!window.confirm('Delete this organization? This cannot be undone.')) return;
+    setDeletingId(orgId);
+    await deleteMutation.mutateAsync(orgId);
+    setDeletingId(null);
+  };
 
   const { data: organizations = [], isLoading: orgsLoading } = useQuery({
     queryKey: ['all-organizations'],
@@ -183,7 +199,16 @@ export default function AllOrganizations() {
                   <Calendar className="h-3 w-3" />
                   {org.created_date ? format(new Date(org.created_date), 'MMM d, yyyy') : '—'}
                 </span>
-                <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={(e) => handleDelete(e, org.id)}
+                    disabled={deletingId === org.id}
+                    className="p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors disabled:opacity-50"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                  <ArrowRight className="h-4 w-4 text-muted-foreground/40 group-hover:text-primary transition-colors" />
+                </div>
               </div>
             ))}
 
@@ -216,6 +241,15 @@ export default function AllOrganizations() {
                     <Calendar className="h-3 w-3" />
                     {org.created_date ? format(new Date(org.created_date), 'MMM d, yyyy') : '—'}
                   </span>
+                </div>
+                <div className="mt-2 flex justify-end">
+                  <button
+                    onClick={(e) => handleDelete(e, org.id)}
+                    disabled={deletingId === org.id}
+                    className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors disabled:opacity-50"
+                  >
+                    <Trash2 className="h-3 w-3" /> Delete
+                  </button>
                 </div>
               </div>
             ))}
