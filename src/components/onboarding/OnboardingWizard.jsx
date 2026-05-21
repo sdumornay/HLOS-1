@@ -151,6 +151,12 @@ export default function OnboardingWizard({ open, onComplete }) {
               >
                 {createOrgMutation.isPending ? 'Setting up...' : <>Continue <ChevronRight className="h-4 w-4 ml-1" /></>}
               </Button>
+              <button
+                onClick={onComplete}
+                className="w-full text-xs text-muted-foreground hover:underline pt-1"
+              >
+                Skip for now
+              </button>
             </div>
           )}
 
