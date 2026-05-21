@@ -9,7 +9,7 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, city } = await req.json();
+    const { name, city, role } = await req.json();
 
     if (!name?.trim()) {
       return Response.json({ error: 'Organization name is required' }, { status: 400 });
@@ -24,9 +24,10 @@ Deno.serve(async (req) => {
       momentum_score: 0,
     });
 
-    // Link the user to the new organization (role update not allowed via API)
-    await base44.auth.updateMe({
+    // Link the user to the new organization and set role via service role
+    await base44.asServiceRole.entities.User.update(user.id, {
       organization_id: org.id,
+      role: role || 'lead_pastor',
       onboarded: true,
     });
 

@@ -8,6 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import { CheckCircle2, Building2, Users, ChevronRight, Heart, Plus, X, AlertCircle } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const STEPS = [
   { id: 'org',    title: 'Your Organization', icon: Building2 },
@@ -23,6 +24,7 @@ export default function OnboardingWizard({ open, onComplete }) {
 
   const [step, setStep] = useState(0);
   const [orgName, setOrgName] = useState('');
+  const [role, setRole] = useState('lead_pastor');
   const [leaderName, setLeaderName] = useState('');
   const [city, setCity] = useState('');
   const [members, setMembers] = useState([{ name: '', email: '' }]);
@@ -34,6 +36,7 @@ export default function OnboardingWizard({ open, onComplete }) {
       const response = await base44.functions.invoke('createOrganization', {
         name: orgName.trim(),
         city: city.trim(),
+        role,
       });
       if (response.data?.error) {
         throw new Error(response.data.error);
@@ -125,6 +128,19 @@ export default function OnboardingWizard({ open, onComplete }) {
                     onChange={e => setLeaderName(e.target.value)}
                     placeholder="Pastor John Smith"
                   />
+                </div>
+                <div>
+                  <Label>Your Role *</Label>
+                  <Select value={role} onValueChange={setRole}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select your role" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="lead_pastor">Lead Pastor</SelectItem>
+                      <SelectItem value="coach">Coach</SelectItem>
+                      <SelectItem value="team_member">Team Member</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <Label htmlFor="city">City</Label>
