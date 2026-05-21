@@ -24,10 +24,9 @@ Deno.serve(async (req) => {
       momentum_score: 0,
     });
 
-    // Link the user to the new organization
+    // Link the user to the new organization (role update not allowed via API)
     await base44.auth.updateMe({
       organization_id: org.id,
-      role: 'lead_pastor',
       onboarded: true,
     });
 
