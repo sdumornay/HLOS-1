@@ -11,20 +11,25 @@ export default function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, isAdmin, loading } = useCurrentUser();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [skipped, setSkipped] = useState(false);
 
   useEffect(() => {
-    if (!loading && user && !user.organization_id) {
+    if (!loading && user && !user.organization_id && !skipped) {
       setShowOnboarding(true);
     }
-  }, [user, loading]);
+  }, [user, loading, skipped]);
 
   return (
     <div className="min-h-screen bg-background">
       <OnboardingWizard
         open={showOnboarding}
-        onComplete={() => {
+        onComplete={(completed) => {
           setShowOnboarding(false);
-          window.location.reload();
+          if (completed) {
+            window.location.reload();
+          } else {
+            setSkipped(true);
+          }
         }}
       />
       {/* Mobile overlay */}

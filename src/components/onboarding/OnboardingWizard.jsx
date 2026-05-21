@@ -232,7 +232,7 @@ export default function OnboardingWizard({ open, onComplete }) {
                   <span className="font-semibold text-foreground">Next step:</span> Head to Assessments and run your first Health Pulse to see where your team stands.
                 </p>
               </div>
-              <Button className="w-full" onClick={onComplete}>
+              <Button className="w-full" onClick={() => onComplete(true)}>
                 Go to My Dashboard
               </Button>
             </div>
