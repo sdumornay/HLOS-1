@@ -28,7 +28,7 @@ export default function AllOrganizations() {
   const queryClient = useQueryClient();
 
   const deleteMutation = useMutation({
-    mutationFn: (id) => base44.entities.Organization.delete(id),
+    mutationFn: (id) => base44.functions.invoke('deleteOrganization', { organizationId: id }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['all-organizations'] }),
   });
 
