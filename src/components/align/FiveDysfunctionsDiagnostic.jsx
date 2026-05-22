@@ -41,7 +41,7 @@ export default function FiveDysfunctionsDiagnostic({ orgId }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.FiveDysfunctions.create({ ...data, organization_id: orgId, respondent_email: user?.email }),
+    mutationFn: (data) => base44.functions.invoke('submitFiveDysfunctions', { ...data, organization_id: orgId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['fiveDysfunctions', orgId] });
       setOpen(false);
