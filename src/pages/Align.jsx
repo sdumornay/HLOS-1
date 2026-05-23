@@ -11,9 +11,15 @@ import DecisionRightsMap from '@/components/align/DecisionRightsMap';
 import LeadershipCovenant from '@/components/align/LeadershipCovenant';
 import { Compass, Users, Footprints } from 'lucide-react';
 import SurveyLaunchCard from '@/components/shared/SurveyLaunchCard';
+import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 
 export default function Align() {
   const { user } = useCurrentUser();
+  const [showWorkstyleModal, setShowWorkstyleModal] = useState(false);
   const orgId = user?.organization_id;
 
   const { data: dysfunctions = [] } = useQuery({
@@ -82,13 +88,33 @@ export default function Align() {
           accentColor="text-secondary"
           badgeLabel="5 Dysfunctions"
         />
-        <SurveyLaunchCard
-          title="Workstyle Assessment"
-          description="Map your team's natural leadership styles across Head (Analytical), Heart (Relational), Gut (Decisive), and Feet (Action-Oriented). ~5 minutes."
-          url="https://workstyle-nav-go.base44.app"
-          icon={Footprints}
-          accentColor="text-accent"
-          badgeLabel="Workstyle"
+        <Card className="border-border/50 shadow-sm">
+          <CardContent className="p-4 flex flex-col gap-3">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
+                <Footprints className="h-4 w-4 text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-semibold">Workstyle Assessment</p>
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">Workstyle</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Map your team's natural leadership styles across Head (Analytical), Heart (Relational), Gut (Decisive), and Feet (Action-Oriented). ~5 minutes.</p>
+              </div>
+            </div>
+            <Button size="sm" className="w-full" onClick={() => setShowWorkstyleModal(true)}>
+              Launch
+            </Button>
+          </CardContent>
+        </Card>
+
+        <WorkstyleSurveyModal
+          open={showWorkstyleModal}
+          onClose={() => setShowWorkstyleModal(false)}
+          orgId={orgId}
+          userName={user?.full_name || ''}
+          userEmail={user?.email || ''}
+          onSaved={() => setShowWorkstyleModal(false)}
         />
       </div>
 
