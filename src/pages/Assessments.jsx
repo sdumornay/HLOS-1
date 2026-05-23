@@ -28,10 +28,10 @@ const DIMENSIONS = [
 ];
 
 const WORKSTYLE_MAP = {
-  driver: { emoji: '🔴', label: 'Driver' },
-  expressive: { emoji: '🟡', label: 'Expressive' },
-  amiable: { emoji: '🟢', label: 'Amiable' },
-  analytical: { emoji: '🔵', label: 'Analytical' },
+  head: { emoji: '🧠', label: 'Head' },
+  heart: { emoji: '❤️', label: 'Heart' },
+  gut: { emoji: '🔥', label: 'Gut' },
+  feet: { emoji: '👟', label: 'Feet' },
 };
 
 export default function Assessments() {
@@ -54,7 +54,7 @@ export default function Assessments() {
     queryFn: () => base44.entities.Assessment.list('-created_date', 50),
   });
 
-  const { data: workstyleResults = [] } = useQuery({
+  const { data: workstyleResults = [], refetch: refetchWorkstyles } = useQuery({
     queryKey: ['workstyleAssessments', orgId],
     queryFn: () => base44.entities.WorkstyleAssessment.filter({ organization_id: orgId }, '-created_date', 50),
     enabled: !!orgId,
@@ -233,6 +233,7 @@ export default function Assessments() {
         orgId={orgId}
         userName={user?.full_name}
         userEmail={user?.email}
+        onSaved={() => refetchWorkstyles()}
       />
 
       {/* Team Health Trends */}
