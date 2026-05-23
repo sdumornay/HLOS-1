@@ -87,7 +87,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
       setResult(null);
       setShowManualCopy(false);
     }
-  }, [open, userName]);
+  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [showManualCopy, setShowManualCopy] = useState(false);
