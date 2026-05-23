@@ -114,7 +114,7 @@ export default function Align() {
           orgId={orgId}
           userName={user?.full_name || ''}
           userEmail={user?.email || ''}
-          onSaved={() => setShowWorkstyleModal(false)}
+          onSaved={() => {}}
         />
       </div>
 
