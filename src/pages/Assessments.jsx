@@ -14,6 +14,7 @@ import { Plus, ClipboardCheck, Activity, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ExportPDFButton from '@/components/shared/ExportPDFButton';
+import TeamHealthTrends from '@/components/assessments/TeamHealthTrends';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
 import FiveDysfunctionsModal from '@/components/shared/FiveDysfunctionsModal';
 
@@ -233,6 +234,11 @@ export default function Assessments() {
         userName={user?.full_name}
         userEmail={user?.email}
       />
+
+      {/* Team Health Trends */}
+      {myAssessments.length > 0 && (
+        <TeamHealthTrends assessments={myAssessments} />
+      )}
 
       {/* Workstyle Results */}
       {workstyleResults.length > 0 && (
