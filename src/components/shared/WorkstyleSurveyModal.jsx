@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -77,7 +77,17 @@ function computeResult(answers) {
 export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, userEmail, onSaved }) {
   const queryClient = useQueryClient();
   const [step, setStep] = useState(-1); // -1 = name entry, 0 = survey, 1 = results
-  const [nameInput, setNameInput] = useState(userName || '');
+  const [nameInput, setNameInput] = useState('');
+
+  useEffect(() => {
+    if (open) {
+      setStep(-1);
+      setNameInput(userName || '');
+      setAnswers({});
+      setResult(null);
+      setShowManualCopy(false);
+    }
+  }, [open, userName]);
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [showManualCopy, setShowManualCopy] = useState(false);
