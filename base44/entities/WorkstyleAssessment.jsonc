@@ -54,9 +54,7 @@
     "member_name"
   ],
   "rls": {
-    "create": {
-      "data.organization_id": "{{user.organization_id}}"
-    },
+    "create": {},
     "read": {
       "$or": [
         {

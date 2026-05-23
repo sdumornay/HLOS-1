@@ -26,6 +26,13 @@ const DIMENSIONS = [
   { key: 'conflict_intensity', label: 'Conflict Intensity', desc: 'How intense is unresolved conflict? (lower = healthier)' },
 ];
 
+const WORKSTYLE_MAP = {
+  driver: { emoji: '🔴', label: 'Driver' },
+  expressive: { emoji: '🟡', label: 'Expressive' },
+  amiable: { emoji: '🟢', label: 'Amiable' },
+  analytical: { emoji: '🔵', label: 'Analytical' },
+};
+
 export default function Assessments() {
   const { user, canManageAll } = useCurrentUser();
   const queryClient = useQueryClient();
@@ -39,12 +46,19 @@ export default function Assessments() {
     notes: '',
   });
 
+  const orgId = user?.organization_id;
+
   const { data: assessments = [] } = useQuery({
     queryKey: ['assessments'],
     queryFn: () => base44.entities.Assessment.list('-created_date', 50),
   });
 
-  const orgId = user?.organization_id;
+  const { data: workstyleResults = [] } = useQuery({
+    queryKey: ['workstyleAssessments', orgId],
+    queryFn: () => base44.entities.WorkstyleAssessment.filter({ organization_id: orgId }, '-created_date', 50),
+    enabled: !!orgId,
+  });
+
   const myAssessments = canManageAll ? assessments : assessments.filter(a => a.organization_id === orgId);
 
   const createMutation = useMutation({
@@ -67,7 +81,6 @@ export default function Assessments() {
     const scores = DIMENSIONS.map(d => form[d.key]);
     const healthSum = scores.reduce((s, v) => s + v, 0);
     const overall = parseFloat((healthSum / scores.length).toFixed(1));
-
     createMutation.mutate({
       ...form,
       organization_id: orgId,
@@ -188,7 +201,7 @@ export default function Assessments() {
             <Button size="sm" variant="outline" onClick={() => setFiveDysOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
           </CardContent>
         </Card>
-        {/* Workstyle: built-in modal so results save directly */}
+
         <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-start gap-4">
             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
@@ -197,17 +210,13 @@ export default function Assessments() {
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <p className="text-sm font-semibold">Workstyle Assessment</p>
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">
-                  Workstyle
-                </span>
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">Workstyle</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
                 Discover your natural leadership style — Driver, Expressive, Amiable, or Analytical. Results save to your profile and can be shared. ~3 minutes.
               </p>
             </div>
-            <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">
-              Start
-            </Button>
+            <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
           </CardContent>
         </Card>
       </div>
@@ -225,39 +234,78 @@ export default function Assessments() {
         userEmail={user?.email}
       />
 
-      <div className="grid gap-3">
-        {myAssessments.map(a => (
-          <Card key={a.id} className="border-border/50 shadow-sm">
-            <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <ClipboardCheck className="h-5 w-5 text-primary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium capitalize">{a.type} Assessment</p>
-                  <Badge variant="outline" className="text-xs capitalize">{a.stage}</Badge>
+      {/* Workstyle Results */}
+      {workstyleResults.length > 0 && (
+        <div className="space-y-3">
+          <h2 className="text-base font-semibold">Workstyle Results</h2>
+          <div className="grid gap-3">
+            {workstyleResults.map(w => {
+              const p = WORKSTYLE_MAP[w.workstyle_type] || { emoji: '⚪', label: w.workstyle_type };
+              const s = WORKSTYLE_MAP[w.secondary_type] || { emoji: '⚪', label: w.secondary_type };
+              return (
+                <Card key={w.id} className="border-border/50 shadow-sm">
+                  <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0 text-xl">
+                      {p.emoji}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="text-sm font-medium">{w.member_name}</p>
+                        <Badge variant="outline" className="text-xs">{p.label}</Badge>
+                        {w.secondary_type && (
+                          <Badge variant="outline" className="text-xs opacity-70">{s.emoji} {s.label}</Badge>
+                        )}
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {w.member_email && <span>{w.member_email} &bull; </span>}
+                        {w.created_date ? format(new Date(w.created_date), 'MMM d, yyyy') : ''}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Pulse Assessment History */}
+      <div className="space-y-3">
+        <h2 className="text-base font-semibold">Assessment History</h2>
+        <div className="grid gap-3">
+          {myAssessments.map(a => (
+            <Card key={a.id} className="border-border/50 shadow-sm">
+              <CardContent className="p-4 flex flex-col sm:flex-row sm:items-center gap-3">
+                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <ClipboardCheck className="h-5 w-5 text-primary" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  {a.respondent_email} • {a.created_date ? format(new Date(a.created_date), 'MMM d, yyyy') : ''}
-                </p>
-              </div>
-              <div className="flex items-center gap-4 text-sm">
-                <div className="text-center">
-                  <p className="font-bold text-lg">{a.overall_health?.toFixed(1) || '—'}</p>
-                  <p className="text-xs text-muted-foreground">Health</p>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium capitalize">{a.type} Assessment</p>
+                    <Badge variant="outline" className="text-xs capitalize">{a.stage}</Badge>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {a.respondent_email} &bull; {a.created_date ? format(new Date(a.created_date), 'MMM d, yyyy') : ''}
+                  </p>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-        {myAssessments.length === 0 && (
-          <Card className="border-border/50">
-            <CardContent className="py-12 text-center">
-              <ClipboardCheck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
-              <p className="text-muted-foreground">No assessments yet. Start your first pulse survey.</p>
-            </CardContent>
-          </Card>
-        )}
+                <div className="flex items-center gap-4 text-sm">
+                  <div className="text-center">
+                    <p className="font-bold text-lg">{a.overall_health?.toFixed(1) || '—'}</p>
+                    <p className="text-xs text-muted-foreground">Health</p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {myAssessments.length === 0 && (
+            <Card className="border-border/50">
+              <CardContent className="py-12 text-center">
+                <ClipboardCheck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
+                <p className="text-muted-foreground">No assessments yet. Start your first pulse survey.</p>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       </div>
     </div>
   );

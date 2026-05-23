@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { base44 } from '@/api/base44Client';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Share2 } from 'lucide-react';
 
 const QUESTIONS = [
@@ -74,7 +76,8 @@ function computeResult(answers) {
 
 export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, userEmail, onSaved }) {
   const queryClient = useQueryClient();
-  const [step, setStep] = useState(0); // 0 = survey, 1 = results
+  const [step, setStep] = useState(-1); // -1 = name entry, 0 = survey, 1 = results
+  const [nameInput, setNameInput] = useState('');
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [showManualCopy, setShowManualCopy] = useState(false);
@@ -98,7 +101,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
       setStep(1);
       saveMutation.mutate({
         organization_id: orgId,
-        member_name: userName || userEmail || 'Unknown',
+        member_name: nameInput.trim() || userName || userEmail || 'Unknown',
         member_email: userEmail || '',
         workstyle_type: res.primary,
         secondary_type: res.secondary,
@@ -113,7 +116,8 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
   };
 
   const handleClose = () => {
-    setStep(0);
+    setStep(-1);
+    setNameInput('');
     setAnswers({});
     setResult(null);
     setShowManualCopy(false);
@@ -130,6 +134,25 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
         <DialogHeader>
           <DialogTitle>Workstyle Assessment</DialogTitle>
         </DialogHeader>
+
+        {step === -1 && (
+          <div className="space-y-5 mt-2">
+            <p className="text-sm text-muted-foreground">Before we begin, please enter your name so your results can be recorded.</p>
+            <div className="space-y-2">
+              <Label>Your Name</Label>
+              <Input
+                value={nameInput}
+                onChange={e => setNameInput(e.target.value)}
+                placeholder={userName || 'Enter your name...'}
+                onKeyDown={e => e.key === 'Enter' && nameInput.trim() && setStep(0)}
+                autoFocus
+              />
+            </div>
+            <Button className="w-full" onClick={() => setStep(0)} disabled={!nameInput.trim()}>
+              Start Assessment
+            </Button>
+          </div>
+        )}
 
         {step === 0 && (
           <div className="space-y-5 mt-2">
