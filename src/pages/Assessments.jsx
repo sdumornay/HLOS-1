@@ -14,8 +14,8 @@ import { Plus, ClipboardCheck, Activity, Users } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ExportPDFButton from '@/components/shared/ExportPDFButton';
-import SurveyLaunchCard from '@/components/shared/SurveyLaunchCard';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
+import FiveDysfunctionsModal from '@/components/shared/FiveDysfunctionsModal';
 
 const DIMENSIONS = [
   { key: 'trust', label: 'Trust', desc: 'How much do team members trust each other?' },
@@ -31,6 +31,7 @@ export default function Assessments() {
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [workstyleOpen, setWorkstyleOpen] = useState(false);
+  const [fiveDysOpen, setFiveDysOpen] = useState(false);
   const [form, setForm] = useState({
     type: 'pulse',
     stage: 'stabilize',
@@ -172,14 +173,21 @@ export default function Assessments() {
 
       {/* Survey Launchers */}
       <div className="grid gap-3 sm:grid-cols-2">
-        <SurveyLaunchCard
-          title="Team Health & Culture Assessment"
-          description="Based on Lencioni's Five Dysfunctions — 15 questions on trust, conflict, commitment, accountability, and results. Takes 5-7 minutes."
-          url="https://org-pulse-check.base44.app"
-          icon={Users}
-          accentColor="text-secondary"
-          badgeLabel="5 Dysfunctions"
-        />
+        <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+          <CardContent className="p-5 flex items-start gap-4">
+            <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+              <Users className="h-5 w-5 text-secondary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <p className="text-sm font-semibold">Team Health &amp; Culture Assessment</p>
+                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30">5 Dysfunctions</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Based on Lencioni&#39;s Five Dysfunctions — rate trust, conflict, commitment, accountability, and results. Takes 3-5 minutes.</p>
+            </div>
+            <Button size="sm" variant="outline" onClick={() => setFiveDysOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
+          </CardContent>
+        </Card>
         {/* Workstyle: built-in modal so results save directly */}
         <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
           <CardContent className="p-5 flex items-start gap-4">
@@ -204,6 +212,11 @@ export default function Assessments() {
         </Card>
       </div>
 
+      <FiveDysfunctionsModal
+        open={fiveDysOpen}
+        onClose={() => setFiveDysOpen(false)}
+        orgId={orgId}
+      />
       <WorkstyleSurveyModal
         open={workstyleOpen}
         onClose={() => setWorkstyleOpen(false)}
