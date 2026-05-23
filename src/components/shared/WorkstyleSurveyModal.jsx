@@ -77,7 +77,7 @@ function computeResult(answers) {
 export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, userEmail, onSaved }) {
   const queryClient = useQueryClient();
   const [step, setStep] = useState(-1); // -1 = name entry, 0 = survey, 1 = results
-  const [nameInput, setNameInput] = useState('');
+  const [nameInput, setNameInput] = useState(userName || '');
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
   const [showManualCopy, setShowManualCopy] = useState(false);
@@ -117,7 +117,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
 
   const handleClose = () => {
     setStep(-1);
-    setNameInput('');
+    setNameInput(userName || '');
     setAnswers({});
     setResult(null);
     setShowManualCopy(false);
