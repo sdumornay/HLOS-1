@@ -185,6 +185,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
       const res = computeResult(updated);
       setResult(res);
       setStep('results');
+      if (orgId) {
       saveMutation.mutate({
         organization_id: orgId,
         member_name: nameInput.trim() || userName || userEmail || 'Unknown',
@@ -193,6 +194,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
         secondary_type: res.secondary,
         strengths: STYLES[res.primary].desc,
       });
+    }
     }
   };
 

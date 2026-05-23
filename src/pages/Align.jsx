@@ -27,7 +27,7 @@ export default function Align() {
     queryFn: () => base44.entities.FiveDysfunctions.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
-  const { data: workstyles = [] } = useQuery({
+  const { data: workstyles = [], refetch: refetchWorkstyles } = useQuery({
     queryKey: ['workstyleAssessments', orgId],
     queryFn: () => base44.entities.WorkstyleAssessment.filter({ organization_id: orgId }),
     enabled: !!orgId,
@@ -114,7 +114,7 @@ export default function Align() {
           orgId={orgId}
           userName={user?.full_name || ''}
           userEmail={user?.email || ''}
-          onSaved={() => {}}
+          onSaved={() => refetchWorkstyles()}
         />
       </div>
 
