@@ -11,13 +11,13 @@ import { Badge } from '@/components/ui/badge';
 import { Users2, Plus, ChevronDown, ChevronUp } from 'lucide-react';
 
 const STYLES = {
-  driver: { label: 'Driver', color: 'bg-red-100 text-red-800 border-red-200', desc: 'Results-focused, decisive, direct, competitive', emoji: '🔴' },
-  expressive: { label: 'Expressive', color: 'bg-yellow-100 text-yellow-800 border-yellow-200', desc: 'Enthusiastic, creative, social, relationship-oriented', emoji: '🟡' },
-  amiable: { label: 'Amiable', color: 'bg-green-100 text-green-800 border-green-200', desc: 'Supportive, patient, empathetic, collaborative', emoji: '🟢' },
-  analytical: { label: 'Analytical', color: 'bg-blue-100 text-blue-800 border-blue-200', desc: 'Detail-oriented, systematic, accurate, logical', emoji: '🔵' },
+  head: { label: 'Head', color: 'bg-cyan-100 text-cyan-800 border-cyan-200', desc: 'Analytical & Strategic', emoji: '🧠' },
+  heart: { label: 'Heart', color: 'bg-rose-100 text-rose-800 border-rose-200', desc: 'Empathetic & Relational', emoji: '❤️' },
+  gut: { label: 'Gut', color: 'bg-amber-100 text-amber-800 border-amber-200', desc: 'Intuitive & Decisive', emoji: '🔥' },
+  feet: { label: 'Feet', color: 'bg-green-100 text-green-800 border-green-200', desc: 'Practical & Action-Oriented', emoji: '👟' },
 };
 
-const BLANK = { member_name: '', member_email: '', workstyle_type: 'driver', secondary_type: '', strengths: '', blindspots: '', communication_preference: '', decision_style: '', stress_response: '', coach_notes: '' };
+const BLANK = { member_name: '', member_email: '', workstyle_type: 'head', secondary_type: '', strengths: '', blindspots: '', communication_preference: '', decision_style: '', stress_response: '', coach_notes: '' };
 
 export default function WorkstyleResults({ orgId }) {
   const queryClient = useQueryClient();

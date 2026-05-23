@@ -14,20 +14,20 @@
     "workstyle_type": {
       "type": "string",
       "enum": [
-        "driver",
-        "expressive",
-        "amiable",
-        "analytical"
+        "head",
+        "heart",
+        "gut",
+        "feet"
       ],
       "description": "Primary workstyle"
     },
     "secondary_type": {
       "type": "string",
       "enum": [
-        "driver",
-        "expressive",
-        "amiable",
-        "analytical"
+        "head",
+        "heart",
+        "gut",
+        "feet"
       ]
     },
     "strengths": {
