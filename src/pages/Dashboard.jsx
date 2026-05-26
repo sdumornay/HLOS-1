@@ -14,6 +14,7 @@ import MomentumChart from '@/components/dashboard/MomentumChart';
 import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import BenchmarkPanel from '@/components/dashboard/BenchmarkPanel';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
+import WorkstyleCard from '@/components/dashboard/WorkstyleCard';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach } = useCurrentUser();
@@ -145,8 +146,9 @@ export default function Dashboard() {
       {/* Security Audit — super_admin only */}
       {isAdmin && <SecurityAuditPanel />}
 
-      {/* Recent Activity */}
+      {/* Workstyle + Recent Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <WorkstyleCard userEmail={user?.email} />
         {/* Recent Actions */}
         <Card className="border-border/50 shadow-sm">
           <CardHeader className="pb-3 flex flex-row items-center justify-between">
