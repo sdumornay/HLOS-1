@@ -86,16 +86,9 @@
           }
         },
         {
-          "$and": [
-            {
-              "user_condition": {
-                "role": "coach"
-              }
-            },
-            {
-              "data.coach_email": "{{user.email}}"
-            }
-          ]
+          "user_condition": {
+            "role": "coach"
+          }
         },
         {
           "$and": [

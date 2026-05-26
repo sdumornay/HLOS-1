@@ -32,14 +32,14 @@ export default function Organizations() {
   const US_STATES = ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Organization.update(id, data),
+    mutationFn: ({ id, data }) => base44.functions.invoke('updateOrganization', { id, data }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
       setEditOrg(null);
       toast.success('Organization updated.');
     },
     onError: (err) => {
-      toast.error('Failed to save: ' + (err?.message || 'Permission denied or unknown error'));
+      toast.error('Failed to save: ' + (err?.message || 'Unknown error'));
     },
   });
 
