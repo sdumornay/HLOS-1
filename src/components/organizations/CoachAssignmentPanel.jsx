@@ -98,7 +98,7 @@ export default function CoachAssignmentPanel({ organizations }) {
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.entities.Organization.update(id, data),
+    mutationFn: ({ id, data }) => base44.functions.invoke('updateOrganization', { id, data }),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['organizations'] }),
   });
 
