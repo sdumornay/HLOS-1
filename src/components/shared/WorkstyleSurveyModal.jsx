@@ -25,7 +25,7 @@ const QUESTIONS = [
   { id: 'q3', text: 'When I make decisions, I rely most on:', options: [
     { label: 'Logic, evidence, and careful analysis', style: 'head' },
     { label: 'How the decision will affect relationships and team morale', style: 'heart' },
-    { label: 'A strong inner sense of what\'s right', style: 'gut' },
+    { label: "A strong inner sense of what's right", style: 'gut' },
     { label: 'Past experience and what has worked practically before', style: 'feet' },
   ]},
   { id: 'q4', text: 'Under pressure, I tend to:', options: [
@@ -80,7 +80,7 @@ const QUESTIONS = [
     { label: 'Does the data support this? What are the risks?', style: 'head' },
     { label: 'How will this affect the people involved?', style: 'heart' },
     { label: 'Does this feel right? Is this the bold move we need?', style: 'gut' },
-    { label: 'Can we actually implement this? What\'s the first step?', style: 'feet' },
+    { label: "Can we actually implement this? What's the first step?", style: 'feet' },
   ]},
   { id: 'q13', text: 'My communication style is best described as:', options: [
     { label: 'Precise, measured, and evidence-driven', style: 'head' },
@@ -133,10 +133,10 @@ const QUESTIONS = [
 ];
 
 const STYLES = {
-  head: { label: 'Head', emoji: '🧠', color: 'bg-cyan-100 text-cyan-800 border-cyan-200', desc: 'Analytical & Strategic — You lead with data, careful thinking, and structured plans. You ensure decisions are well-reasoned and risks are managed.' },
-  heart: { label: 'Heart', emoji: '❤️', color: 'bg-rose-100 text-rose-800 border-rose-200', desc: 'Empathetic & Relational — You lead with care for people. You build trust, maintain harmony, and ensure everyone feels heard and valued.' },
-  gut: { label: 'Gut', emoji: '🔥', color: 'bg-amber-100 text-amber-800 border-amber-200', desc: 'Intuitive & Decisive — You lead with instinct and vision. You are bold, courageous, and willing to take risks others won\'t.' },
-  feet: { label: 'Feet', emoji: '👟', color: 'bg-green-100 text-green-800 border-green-200', desc: 'Practical & Action-Oriented — You lead through execution. You get things done, keep projects moving, and deliver consistent results.' },
+  head:  { label: 'Head',  emoji: '🧠', color: 'bg-cyan-100 text-cyan-800 border-cyan-200',   desc: 'Analytical & Strategic — You lead with data, careful thinking, and structured plans. You ensure decisions are well-reasoned and risks are managed.' },
+  heart: { label: 'Heart', emoji: '❤️', color: 'bg-rose-100 text-rose-800 border-rose-200',   desc: 'Empathetic & Relational — You lead with care for people. You build trust, maintain harmony, and ensure everyone feels heard and valued.' },
+  gut:   { label: 'Gut',   emoji: '🔥', color: 'bg-amber-100 text-amber-800 border-amber-200', desc: "Intuitive & Decisive — You lead with instinct and vision. You are bold, courageous, and willing to take risks others won't." },
+  feet:  { label: 'Feet',  emoji: '👟', color: 'bg-green-100 text-green-800 border-green-200', desc: 'Practical & Action-Oriented — You lead through execution. You get things done, keep projects moving, and deliver consistent results.' },
 };
 
 function computeResult(answers) {
@@ -148,7 +148,7 @@ function computeResult(answers) {
 
 export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, userEmail, onSaved }) {
   const queryClient = useQueryClient();
-  const [step, setStep] = useState(-1); // -1 = name entry, 0+ = question index, 'results' = results
+  const [step, setStep] = useState(-1);
   const [nameInput, setNameInput] = useState('');
   const [answers, setAnswers] = useState({});
   const [result, setResult] = useState(null);
@@ -168,6 +168,7 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
     mutationFn: (data) => base44.entities.WorkstyleAssessment.create(data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['workstyleAssessments', orgId] });
+      queryClient.invalidateQueries({ queryKey: ['workstyle-mine', userEmail] });
       if (onSaved) onSaved();
       toast.success('Workstyle saved!');
     },
@@ -185,16 +186,14 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
       const res = computeResult(updated);
       setResult(res);
       setStep('results');
-      if (orgId) {
       saveMutation.mutate({
-        organization_id: orgId,
+        organization_id: orgId || '',
         member_name: nameInput.trim() || userName || userEmail || 'Unknown',
         member_email: userEmail || '',
         workstyle_type: res.primary,
         secondary_type: res.secondary,
         strengths: STYLES[res.primary].desc,
       });
-    }
     }
   };
 
