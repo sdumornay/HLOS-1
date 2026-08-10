@@ -51,12 +51,13 @@ export const STAGE_META = {
     name: 'Sustain',
     icon: 'Leaf',
     color: 'purple',
-    what: 'Maintain health momentum, review progress, and renew team commitments',
-    why: 'Sustaining health requires ongoing measurement and intentional renewal. Without it, teams drift back into old patterns.',
+    what: 'Maintain health and momentum without depending permanently on the consultant',
+    why: 'Sustaining health requires ongoing measurement, guided quarterly resets, and intentional renewal. Without these rhythms, teams drift back into old patterns.',
     toolKeys: ['health_pulse', 'risk_flags', 'quarterly_review', 'renewal'],
     disciplines: [
-      { number: 12, name: 'Measurement', description: 'Track trends, flag risks, and review quarterly' },
-      { number: 13, name: 'Renewal', description: 'Reset and re-energize the team' },
+      { number: 12, name: 'Monthly Review', description: 'Health, momentum, priorities, issues, and commitments at a glance' },
+      { number: 13, name: 'Quarterly Reset', description: 'Guided review of progress, patterns, and next priorities' },
+      { number: 14, name: 'Renewal', description: 'Reflect on sustainability and areas requiring renewal' },
     ],
   },
 };

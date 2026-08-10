@@ -1,83 +1,53 @@
 {
-  "name": "QuarterlyReview",
+  "name": "RenewalReflection",
   "type": "object",
   "properties": {
     "organization_id": {
       "type": "string"
     },
-    "quarter": {
+    "reflection_date": {
       "type": "string",
-      "description": "e.g. 2025-Q2"
+      "format": "date"
     },
-    "facilitator": {
+    "respondent_email": {
       "type": "string"
     },
-    "what_improved": {
-      "type": "string",
-      "description": "What improved this quarter?"
+    "leadership_sustainability": {
+      "type": "number",
+      "description": "1-10: How sustainable is your leadership right now?"
     },
-    "what_declined": {
-      "type": "string",
-      "description": "What declined this quarter?"
+    "team_relationships": {
+      "type": "number",
+      "description": "1-10: Health of team relationships"
     },
-    "what_accomplished": {
-      "type": "string",
-      "description": "What did we accomplish?"
+    "communication_health": {
+      "type": "number",
+      "description": "1-10: Quality of communication"
     },
-    "what_failed": {
-      "type": "string",
-      "description": "What did we fail to complete?"
+    "workload": {
+      "type": "number",
+      "description": "1-10: How manageable is the workload? (10 = sustainable)"
     },
-    "recurring_issues": {
-      "type": "string",
-      "description": "What recurring issues are appearing?"
+    "leadership_pressure": {
+      "type": "number",
+      "description": "1-10: How much pressure is on leadership? (10 = healthy/balanced)"
     },
-    "stop_doing": {
-      "type": "string",
-      "description": "What should we stop doing?"
+    "ministry_rhythm": {
+      "type": "number",
+      "description": "1-10: Health of ministry rhythm and pace"
     },
-    "continue_doing": {
+    "renewal_areas": {
       "type": "string",
-      "description": "What should we continue?"
+      "description": "Areas requiring renewal"
     },
-    "next_quarter_attention": {
+    "reflection_notes": {
       "type": "string",
-      "description": "What needs attention in the next quarter?"
-    },
-    "next_priorities": {
-      "type": "string",
-      "description": "What are our next 3-5 priorities?"
-    },
-    "health_trend": {
-      "type": "string",
-      "enum": [
-        "improving",
-        "stable",
-        "declining"
-      ],
-      "default": "stable"
-    },
-    "momentum_trend": {
-      "type": "string",
-      "enum": [
-        "improving",
-        "stable",
-        "declining"
-      ],
-      "default": "stable"
-    },
-    "key_learnings": {
-      "type": "string"
-    },
-    "renewal_action": {
-      "type": "string",
-      "description": "Reset/renewal commitment"
+      "description": "General reflection notes"
     },
     "status": {
       "type": "string",
       "enum": [
         "draft",
-        "in_review",
         "complete"
       ],
       "default": "draft"
@@ -85,7 +55,7 @@
   },
   "required": [
     "organization_id",
-    "quarter"
+    "reflection_date"
   ],
   "rls": {
     "create": {
@@ -178,18 +148,6 @@
             {
               "user_condition": {
                 "role": "lead_pastor"
-              }
-            },
-            {
-              "data.organization_id": "{{user.organization_id}}"
-            }
-          ]
-        },
-        {
-          "$and": [
-            {
-              "user_condition": {
-                "role": "coach"
               }
             },
             {
