@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { computeUnifiedHealthScore, computeMomentumScore } from '@/lib/healthMetrics';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, TrendingUp, Target, Calendar, ArrowRight } from 'lucide-react';
@@ -15,13 +16,13 @@ import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import BenchmarkPanel from '@/components/dashboard/BenchmarkPanel';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 import WorkstyleCard from '@/components/dashboard/WorkstyleCard';
+import NextStepsPanel from '@/components/dashboard/NextStepsPanel';
+import RiskFlagSummary from '@/components/dashboard/RiskFlagSummary';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach } = useCurrentUser();
-
   const orgId = user?.organization_id;
 
-  // Admins see all orgs; coaches see assigned orgs; others see their own org
   const { data: organizations = [] } = useQuery({
     queryKey: ['organizations'],
     queryFn: () => isAdmin
@@ -37,6 +38,18 @@ export default function Dashboard() {
     queryFn: () => isAdmin
       ? base44.entities.Assessment.list('-created_date', 50)
       : base44.entities.Assessment.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
+  const { data: healthPulses = [] } = useQuery({
+    queryKey: ['healthPulses', orgId],
+    queryFn: () => base44.entities.HealthPulse.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
+  const { data: tensionPulses = [] } = useQuery({
+    queryKey: ['tensionPulses', orgId],
+    queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
 
@@ -56,23 +69,34 @@ export default function Dashboard() {
     enabled: !!orgId,
   });
 
-  const filteredAssessments = assessments;
-  const filteredActions = actions;
-  const filteredSessions = sessions;
+  const { data: decisions = [] } = useQuery({
+    queryKey: ['decisionLog', orgId],
+    queryFn: () => base44.entities.DecisionLog.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
+  const { data: stageProgress = [] } = useQuery({
+    queryKey: ['stageProgress', orgId],
+    queryFn: () => base44.entities.StageProgress.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
+  const { data: planPeriods = [] } = useQuery({
+    queryKey: ['planningPeriods', orgId],
+    queryFn: () => base44.entities.PlanningPeriod.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
 
   const currentOrg = organizations.find(o => o.id === orgId) || organizations[0];
+  const currentStage = currentOrg?.current_stage || 'stabilize';
 
-  // Compute average health
-  const recentAssessments = filteredAssessments.slice(0, 20);
-  const avgHealth = recentAssessments.length > 0
-    ? recentAssessments.reduce((s, a) => s + (a.overall_health || 0), 0) / recentAssessments.length
-    : 0;
+  const unifiedHealth = computeUnifiedHealthScore(assessments, healthPulses, tensionPulses);
+  const unifiedMomentum = computeMomentumScore(actions, decisions, stageProgress, planPeriods);
 
-  const completedActions = filteredActions.filter(a => a.status === 'completed').length;
-  const totalActions = filteredActions.length;
-  const completionRate = totalActions > 0 ? (completedActions / totalActions) * 10 : 0;
-
-  const overdueActions = filteredActions.filter(a => a.status !== 'completed' && a.due_date && new Date(a.due_date) < new Date()).length;
+  const recentAssessments = assessments.slice(0, 20);
+  const completedActions = actions.filter(a => a.status === 'completed').length;
+  const totalActions = actions.length;
+  const overdueActions = actions.filter(a => a.status !== 'completed' && a.due_date && new Date(a.due_date) < new Date()).length;
 
   return (
     <div className="space-y-6">
@@ -83,13 +107,11 @@ export default function Dashboard() {
           <h1 className="text-2xl lg:text-3xl font-barlow font-bold text-foreground tracking-tight">
             Leadership Health Dashboard
           </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Health First. Momentum Next.
-          </p>
+          <p className="text-muted-foreground mt-1 text-sm">Health First. Momentum Next.</p>
         </div>
         {currentOrg && (
           <Badge className="text-sm px-3 py-1.5 w-fit bg-primary text-primary-foreground border-0 font-semibold">
-            {currentOrg.name} — <span className="capitalize ml-1">{currentOrg.current_stage || 'stabilize'}</span>
+            {currentOrg.name} — <span className="capitalize ml-1">{currentStage}</span>
           </Badge>
         )}
       </div>
@@ -107,7 +129,7 @@ export default function Dashboard() {
           {currentOrg && (
             <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
               <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-accent text-xs font-semibold uppercase tracking-wider capitalize">{currentOrg.current_stage || 'Stabilize'} Stage</span>
+              <span className="text-accent text-xs font-semibold uppercase tracking-wider capitalize">{currentStage} Stage</span>
             </div>
           )}
         </div>
@@ -116,19 +138,19 @@ export default function Dashboard() {
       {/* Stage Progress */}
       <Card className="border-border/50 shadow-sm">
         <CardContent className="py-6 px-4 lg:px-8">
-          <StageProgressBar
-            currentStage={currentOrg?.current_stage || 'stabilize'}
-            completedStages={[]}
-          />
+          <StageProgressBar currentStage={currentStage} completedStages={[]} />
         </CardContent>
       </Card>
 
+      {/* Next Steps — contextual guidance */}
+      {orgId && <NextStepsPanel stage={currentStage} orgId={orgId} />}
+
       {/* Score Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link to="/assessments"><ScoreCard title="Overall Health" score={avgHealth} icon={Heart} variant="health" subtitle={`${recentAssessments.length} assessments`} /></Link>
-        <Link to="/actions"><ScoreCard title="Momentum" score={completionRate} icon={TrendingUp} variant="momentum" subtitle={`${completedActions}/${totalActions} actions done`} /></Link>
+        <Link to="/assessments"><ScoreCard title="Overall Health" score={unifiedHealth} icon={Heart} variant="health" subtitle={`${recentAssessments.length} assessments`} /></Link>
+        <Link to="/actions"><ScoreCard title="Momentum Score" score={unifiedMomentum} icon={TrendingUp} variant="momentum" subtitle={`${completedActions}/${totalActions} actions done`} /></Link>
         <Link to="/actions"><ScoreCard title="Overdue Items" score={overdueActions} maxScore={totalActions || 1} icon={Target} variant="health" subtitle="Needs attention" /></Link>
-        <Link to="/sessions"><ScoreCard title="Sessions" score={filteredSessions.length} maxScore={20} icon={Calendar} variant="momentum" subtitle="Total meetings logged" /></Link>
+        <Link to="/sessions"><ScoreCard title="Sessions" score={sessions.length} maxScore={20} icon={Calendar} variant="momentum" subtitle="Total meetings logged" /></Link>
       </div>
 
       {/* Charts */}
@@ -136,6 +158,9 @@ export default function Dashboard() {
         <HealthRadar assessments={recentAssessments} />
         <MomentumChart assessments={recentAssessments} />
       </div>
+
+      {/* Risk Flags */}
+      {orgId && <RiskFlagSummary />}
 
       {/* Benchmarking */}
       {orgId && <BenchmarkPanel orgId={orgId} />}
@@ -158,18 +183,18 @@ export default function Dashboard() {
             </Link>
           </CardHeader>
           <CardContent className="space-y-2">
-            {filteredActions.slice(0, 5).map(action => (
+            {actions.slice(0, 5).map(action => (
               <div key={action.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{action.title}</p>
-                  <p className="text-xs text-muted-foreground">{action.owner_email}</p>
+                  <p className="text-xs text-muted-foreground">{action.owner_email || action.owner}</p>
                 </div>
                 <Badge variant={action.status === 'completed' ? 'default' : action.status === 'overdue' ? 'destructive' : 'secondary'} className="text-xs ml-2">
                   {action.status?.replace('_', ' ')}
                 </Badge>
               </div>
             ))}
-            {filteredActions.length === 0 && (
+            {actions.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-6">No actions yet. Start by creating your first action item.</p>
             )}
           </CardContent>
@@ -184,7 +209,7 @@ export default function Dashboard() {
             </Link>
           </CardHeader>
           <CardContent className="space-y-2">
-            {filteredSessions.slice(0, 5).map(session => (
+            {sessions.slice(0, 5).map(session => (
               <div key={session.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{session.title}</p>
@@ -193,7 +218,7 @@ export default function Dashboard() {
                 <Badge variant="outline" className="text-xs capitalize ml-2">{session.stage}</Badge>
               </div>
             ))}
-            {filteredSessions.length === 0 && (
+            {sessions.length === 0 && (
               <p className="text-sm text-muted-foreground text-center py-6">No sessions logged yet.</p>
             )}
           </CardContent>

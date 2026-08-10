@@ -70,8 +70,8 @@ export default function Reviews() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl lg:text-3xl font-display font-bold">Reviews & Reports</h1>
-        <p className="text-muted-foreground mt-1">Monthly pulse review and quarterly dashboard</p>
+        <h1 className="text-2xl lg:text-3xl font-display font-bold">Reports & Analytics</h1>
+        <p className="text-muted-foreground mt-1">Unified reporting and analytics across all stages</p>
       </div>
 
       {/* Momentum Scores */}

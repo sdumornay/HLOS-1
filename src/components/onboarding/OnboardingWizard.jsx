@@ -37,6 +37,7 @@ export default function OnboardingWizard({ open, onComplete }) {
         name: orgName.trim(),
         city: city.trim(),
         role,
+        leaderName: leaderName.trim(),
       });
       if (response.data?.error) {
         throw new Error(response.data.error);

@@ -10,6 +10,7 @@ import CommunicationAgreements from '@/components/stabilize/CommunicationAgreeme
 import ConflictTriggerTracker from '@/components/stabilize/ConflictTriggerTracker';
 import NVCConversationHelper from '@/components/stabilize/NVCConversationHelper';
 import { Shield } from 'lucide-react';
+import NumberedTool from '@/components/stages/NumberedTool';
 
 export default function Stabilize() {
   const { user } = useCurrentUser();
@@ -73,14 +74,25 @@ export default function Stabilize() {
       {/* Progress indicator spans full width */}
       <StabilizeProgress counts={counts} />
 
-      {/* 2-column grid for tools */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ConflictIntakeForm orgId={orgId} />
-        <TensionPulseSurvey orgId={orgId} />
-        <LeaderInterviewNotes orgId={orgId} />
-        <CommunicationAgreements orgId={orgId} />
-        <ConflictTriggerTracker orgId={orgId} />
-        <NVCConversationHelper orgId={orgId} />
+        <NumberedTool number={1} title="Conflict Intake" description="Surface and document active conflicts">
+          <ConflictIntakeForm orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={2} title="Tension Pulse Survey" description="Baseline team tension and trust levels">
+          <TensionPulseSurvey orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={3} title="Leader Interviews" description="Gather 1-on-1 perspectives from key leaders">
+          <LeaderInterviewNotes orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={4} title="Communication Agreements" description="Agree on how the team will communicate">
+          <CommunicationAgreements orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={5} title="Conflict Trigger Tracker" description="Map recurring patterns that spark conflict">
+          <ConflictTriggerTracker orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={6} title="NVC Conversations" description="Use nonviolent communication to resolve tension">
+          <NVCConversationHelper orgId={orgId} />
+        </NumberedTool>
       </div>
     </div>
   );

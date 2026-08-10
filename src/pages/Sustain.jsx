@@ -6,6 +6,7 @@ import QuarterlyReviewPanel from '@/components/sustain/QuarterlyReviewPanel';
 import TrendDashboard from '@/components/sustain/TrendDashboard';
 import RenewalPrompts from '@/components/sustain/RenewalPrompts';
 import RiskFlagPanel from '@/components/sustain/RiskFlagPanel';
+import NumberedTool from '@/components/stages/NumberedTool';
 
 export default function Sustain() {
   const { user } = useCurrentUser();
@@ -26,16 +27,19 @@ export default function Sustain() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Full-width trend dashboard */}
         <TrendDashboard orgId={orgId} />
-
-        {/* Left column */}
-        <MonthlyHealthPulse orgId={orgId} />
-        <RiskFlagPanel orgId={orgId} />
-
-        {/* Right column */}
-        <QuarterlyReviewPanel orgId={orgId} />
-        <RenewalPrompts orgId={orgId} />
+        <NumberedTool number={1} title="Monthly Health Pulse" description="Track health and momentum trends over time">
+          <MonthlyHealthPulse orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={2} title="Risk Flags" description="Surface emerging issues before they escalate">
+          <RiskFlagPanel orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={3} title="Quarterly Review" description="Reflect on wins, misses, and key learnings">
+          <QuarterlyReviewPanel orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={4} title="Renewal Prompts" description="Reset and re-energize the team">
+          <RenewalPrompts orgId={orgId} />
+        </NumberedTool>
       </div>
     </div>
   );

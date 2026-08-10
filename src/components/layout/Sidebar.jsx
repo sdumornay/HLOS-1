@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Shield, Compass, Rocket, Leaf,
   ClipboardCheck, Target, Calendar, BarChart3, BookOpen, Settings,
-  ChevronLeft, ChevronRight, Heart, Globe
+  ChevronLeft, ChevronRight, Heart, Globe, Briefcase
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -20,11 +20,11 @@ const NAV_ITEMS = [
   { label: 'Assessments', path: '/assessments', icon: ClipboardCheck, roles: 'all' },
   { label: 'Actions', path: '/actions', icon: Target, roles: 'all' },
   { label: 'Sessions', path: '/sessions', icon: Calendar, roles: 'all' },
-  { label: 'Reviews', path: '/reviews', icon: BarChart3, roles: 'all' },
+  { label: 'Reports & Analytics', path: '/reviews', icon: BarChart3, roles: 'all' },
   { label: 'Resources', path: '/resources', icon: BookOpen, roles: 'all' },
   { type: 'divider', label: 'Admin' },
+  { label: 'Coach Workspace', path: '/coach', icon: Briefcase, roles: ['coach'] },
   { label: 'Organizations', path: '/organizations', icon: Settings, roles: ['super_admin', 'coach'] },
-  { label: 'All Organizations', path: '/all-organizations', icon: Globe, roles: ['super_admin'] },
 ];
 
 export default function Sidebar({ collapsed, setCollapsed }) {

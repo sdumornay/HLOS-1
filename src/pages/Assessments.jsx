@@ -214,7 +214,7 @@ export default function Assessments() {
                 <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">Workstyle</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Discover your natural leadership style — Driver, Expressive, Amiable, or Analytical. Results save to your profile and can be shared. ~3 minutes.
+                Discover your natural leadership style — Head, Heart, Gut, or Feet. Results save to your profile and can be shared. ~3 minutes.
               </p>
             </div>
             <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>

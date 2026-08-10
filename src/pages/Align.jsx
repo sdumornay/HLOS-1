@@ -10,7 +10,8 @@ import PriorityAlignmentPage from '@/components/align/PriorityAlignmentPage';
 import DecisionRightsMap from '@/components/align/DecisionRightsMap';
 import LeadershipCovenant from '@/components/align/LeadershipCovenant';
 import { Compass, Users, Footprints } from 'lucide-react';
-import SurveyLaunchCard from '@/components/shared/SurveyLaunchCard';
+import NumberedTool from '@/components/stages/NumberedTool';
+import { Link } from 'react-router-dom';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
@@ -80,14 +81,25 @@ export default function Align() {
 
       {/* External Survey Launchers */}
       <div className="grid gap-3 sm:grid-cols-2">
-        <SurveyLaunchCard
-          title="Team Health & Culture Assessment"
-          description="Based on Lencioni's Five Dysfunctions — identify gaps in trust, conflict, commitment, accountability, and results. 15 questions, 5-7 minutes."
-          url="https://org-pulse-check.base44.app"
-          icon={Users}
-          accentColor="text-secondary"
-          badgeLabel="5 Dysfunctions"
-        />
+        <Card className="border-border/50 shadow-sm">
+          <CardContent className="p-4 flex flex-col gap-3">
+            <div className="flex items-start gap-3">
+              <div className="h-9 w-9 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
+                <Users className="h-4 w-4 text-secondary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-semibold">Team Health &amp; Culture Assessment</p>
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">5 Dysfunctions</Badge>
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">Based on Lencioni's Five Dysfunctions — identify gaps in trust, conflict, commitment, accountability, and results. 15 questions, 5-7 minutes.</p>
+              </div>
+            </div>
+            <Link to="/assessments">
+              <Button size="sm" className="w-full">Go to Assessments</Button>
+            </Link>
+          </CardContent>
+        </Card>
         <Card className="border-border/50 shadow-sm">
           <CardContent className="p-4 flex flex-col gap-3">
             <div className="flex items-start gap-3">
@@ -119,13 +131,24 @@ export default function Align() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <FiveDysfunctionsDiagnostic orgId={orgId} />
-        <WorkstyleResults orgId={orgId} />
-        <RoleClarityWorksheet orgId={orgId} />
-        <PriorityAlignmentPage orgId={orgId} />
-        <DecisionRightsMap orgId={orgId} />
-        {/* Leadership Covenant spans full width via col-span-full on the component */}
-        <LeadershipCovenant orgId={orgId} />
+        <NumberedTool number={1} title="Team Health Diagnostic" description="Assess trust, conflict, commitment, accountability, results">
+          <FiveDysfunctionsDiagnostic orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={2} title="Workstyle Assessments" description="Map team leadership styles (Head, Heart, Gut, Feet)">
+          <WorkstyleResults orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={3} title="Role Clarity Worksheets" description="Define responsibilities and decision authority">
+          <RoleClarityWorksheet orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={4} title="Priority Alignment" description="Agree on what matters most right now">
+          <PriorityAlignmentPage orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={5} title="Decision-Rights Map" description="Clarify who decides, who is consulted, who is informed">
+          <DecisionRightsMap orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={6} title="Leadership Covenant" description="Document team commitments and sign together" className="col-span-full">
+          <LeadershipCovenant orgId={orgId} />
+        </NumberedTool>
       </div>
     </div>
   );

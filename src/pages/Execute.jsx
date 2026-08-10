@@ -7,6 +7,7 @@ import ExecutionDashboard from '@/components/execute/ExecutionDashboard';
 import MeetingAgendaBuilder from '@/components/execute/MeetingAgendaBuilder';
 import DecisionLogPanel from '@/components/execute/DecisionLogPanel';
 import ActionTracker from '@/components/execute/ActionTracker';
+import NumberedTool from '@/components/stages/NumberedTool';
 import PlanningBoard from '@/components/execute/PlanningBoard';
 
 export default function Execute() {
@@ -28,20 +29,19 @@ export default function Execute() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Full-width execution dashboard */}
         <ExecutionDashboard orgId={orgId} />
-
-        {/* Full-width 30/60/90 planning board */}
         <PlanningBoard orgId={orgId} />
-
-        {/* Action tracker — full width */}
         <div className="col-span-full">
-          <ActionTracker orgId={orgId} />
+          <NumberedTool number={1} title="Action Tracker" description="Break goals into concrete, owned tasks">
+            <ActionTracker orgId={orgId} />
+          </NumberedTool>
         </div>
-
-        {/* Two column: agenda + decision log */}
-        <MeetingAgendaBuilder orgId={orgId} />
-        <DecisionLogPanel orgId={orgId} />
+        <NumberedTool number={2} title="Meeting Agendas" description="Structure meetings for decisions, not just updates">
+          <MeetingAgendaBuilder orgId={orgId} />
+        </NumberedTool>
+        <NumberedTool number={3} title="Decision Log" description="Record what was decided, why, and who was involved">
+          <DecisionLogPanel orgId={orgId} />
+        </NumberedTool>
       </div>
     </div>
   );

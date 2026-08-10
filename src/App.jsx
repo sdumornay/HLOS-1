@@ -16,7 +16,7 @@ import Sessions from '@/pages/Sessions';
 import Reviews from '@/pages/Reviews';
 import Resources from '@/pages/Resources';
 import Organizations from '@/pages/Organizations';
-import AllOrganizations from '@/pages/AllOrganizations';
+import CoachWorkspace from '@/pages/CoachWorkspace';
 import Stabilize from '@/pages/Stabilize';
 import Align from '@/pages/Align';
 import Execute from '@/pages/Execute';
@@ -62,7 +62,7 @@ const AuthenticatedApp = () => {
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/organizations" element={<Organizations />} />
-        <Route path="/all-organizations" element={<AllOrganizations />} />
+        <Route path="/coach" element={<CoachWorkspace />} />
       </Route>
       <Route path="*" element={<PageNotFound />} />
     </Routes>
