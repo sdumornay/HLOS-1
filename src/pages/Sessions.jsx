@@ -28,6 +28,11 @@ export default function Sessions() {
     queryFn: () => base44.entities.Session.list('-date', 50),
   });
 
+  const { data: decisions = [] } = useQuery({
+    queryKey: ['decisionLog'],
+    queryFn: () => base44.entities.DecisionLog.list('-date', 100),
+  });
+
   const orgId = user?.organization_id;
   const mySessions = canManageAll ? sessions : sessions.filter(s => s.organization_id === orgId);
 
@@ -158,14 +163,14 @@ export default function Sessions() {
                       <p className="text-sm text-muted-foreground">{session.notes}</p>
                     </div>
                   )}
-                  {session.decisions?.length > 0 && (
+                  {decisions.filter(d => d.session_id === session.id).length > 0 && (
                     <div>
                       <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Decisions</p>
-                      {session.decisions.map((d, i) => (
-                        <div key={i} className="flex items-center gap-2 py-1">
+                      {decisions.filter(d => d.session_id === session.id).map((d, i) => (
+                        <div key={d.id || i} className="flex items-center gap-2 py-1">
                           <FileText className="h-3 w-3 text-muted-foreground" />
-                          <span className="text-sm">{d.description}</span>
-                          {d.owner && <Badge variant="secondary" className="text-xs">{d.owner}</Badge>}
+                          <span className="text-sm">{d.decision}</span>
+                          {d.made_by && <Badge variant="secondary" className="text-xs">{d.made_by}</Badge>}
                         </div>
                       ))}
                     </div>

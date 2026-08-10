@@ -30,8 +30,8 @@ export default function PlanningBoard({ orgId }) {
   });
 
   const { data: actions = [] } = useQuery({
-    queryKey: ['executeActions', orgId],
-    queryFn: () => base44.entities.ExecuteAction.filter({ organization_id: orgId }),
+    queryKey: ['actions'],
+    queryFn: () => base44.entities.Action.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
 

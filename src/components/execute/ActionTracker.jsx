@@ -28,19 +28,19 @@ export default function ActionTracker({ orgId, compact = false }) {
   const [form, setForm] = useState({ ...BLANK });
 
   const { data: actions = [] } = useQuery({
-    queryKey: ['executeActions', orgId],
-    queryFn: () => base44.entities.ExecuteAction.filter({ organization_id: orgId }),
+    queryKey: ['actions'],
+    queryFn: () => base44.entities.Action.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.ExecuteAction.create({ ...data, organization_id: orgId }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['executeActions', orgId] }); setOpen(false); setForm({ ...BLANK }); },
+    mutationFn: (data) => base44.entities.Action.create({ ...data, organization_id: orgId, stage: 'execute' }),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['actions'] }); setOpen(false); setForm({ ...BLANK }); },
   });
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, status }) => base44.entities.ExecuteAction.update(id, { status, ...(status === 'completed' ? { completed_date: new Date().toISOString().split('T')[0] } : {}) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['executeActions', orgId] }),
+    mutationFn: ({ id, status }) => base44.entities.Action.update(id, { status, ...(status === 'completed' ? { completed_date: new Date().toISOString().split('T')[0] } : {}) }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['actions'] }),
   });
 
   const withOverdue = actions.map(a => ({

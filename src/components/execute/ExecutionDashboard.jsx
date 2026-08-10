@@ -9,8 +9,8 @@ import { isPast, isToday, format } from 'date-fns';
 
 export default function ExecutionDashboard({ orgId }) {
   const { data: actions = [] } = useQuery({
-    queryKey: ['executeActions', orgId],
-    queryFn: () => base44.entities.ExecuteAction.filter({ organization_id: orgId }),
+    queryKey: ['actions'],
+    queryFn: () => base44.entities.Action.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
 

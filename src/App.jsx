@@ -9,7 +9,7 @@ import UserNotRegisteredError from '@/components/UserNotRegisteredError';
 import AppLayout from '@/components/layout/AppLayout';
 import Dashboard from '@/pages/Dashboard';
 import TeamDashboard from '@/pages/TeamDashboard';
-import StageWorkflow from '@/pages/StageWorkflow';
+
 import Assessments from '@/pages/Assessments';
 import Actions from '@/pages/Actions';
 import Sessions from '@/pages/Sessions';
@@ -51,7 +51,7 @@ const AuthenticatedApp = () => {
       <Route element={<AppLayout />}>
         <Route path="/" element={<Dashboard />} />
         <Route path="/team" element={<TeamDashboard />} />
-        <Route path="/stage/:stage" element={<StageWorkflow />} />
+
         <Route path="/stabilize" element={<Stabilize />} />
         <Route path="/align" element={<Align />} />
         <Route path="/execute" element={<Execute />} />
