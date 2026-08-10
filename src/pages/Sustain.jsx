@@ -22,15 +22,15 @@ export default function Sustain() {
       {/* Trend overview — full width */}
       <TrendDashboard orgId={orgId} />
 
-      {/* Discipline 7: Measurement */}
-      <DisciplineSection number={7} name="Measurement" description="Track trends, flag risks, and review quarterly">
+      {/* Discipline 12: Measurement */}
+      <DisciplineSection number={12} name="Measurement" description="Track trends, flag risks, and review quarterly">
         <MonthlyHealthPulse orgId={orgId} />
         <RiskFlagPanel orgId={orgId} />
         <QuarterlyReviewPanel orgId={orgId} />
       </DisciplineSection>
 
-      {/* Discipline 8: Renewal */}
-      <DisciplineSection number={8} name="Renewal" description="Reset and re-energize the team">
+      {/* Discipline 13: Renewal */}
+      <DisciplineSection number={13} name="Renewal" description="Reset and re-energize the team">
         <RenewalPrompts orgId={orgId} />
       </DisciplineSection>
 

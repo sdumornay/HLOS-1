@@ -5,6 +5,10 @@
     "organization_id": {
       "type": "string"
     },
+    "session_id": {
+      "type": "string",
+      "description": "Reference to session created from this meeting"
+    },
     "title": {
       "type": "string"
     },
@@ -65,6 +69,10 @@
     },
     "recap_notes": {
       "type": "string"
+    },
+    "meeting_summary": {
+      "type": "string",
+      "description": "Generated summary: decisions, actions, owners, deadlines, issues carried forward"
     }
   },
   "required": [

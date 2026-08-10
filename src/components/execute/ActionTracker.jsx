@@ -8,7 +8,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { CheckSquare, Plus, CheckCircle2, Circle, AlertCircle, Clock } from 'lucide-react';
+import { CheckSquare, Plus, CheckCircle2, Circle, AlertCircle, Clock, Link2 } from 'lucide-react';
 import { format, isPast, isToday } from 'date-fns';
 
 const PRIORITY_COLORS = { low: 'secondary', medium: 'outline', high: 'default', critical: 'destructive' };
@@ -19,7 +19,7 @@ const STATUS_ICONS = {
   overdue: <AlertCircle className="h-4 w-4 text-red-500" />,
   cancelled: <Circle className="h-4 w-4 text-muted-foreground/40" />,
 };
-const BLANK = { title: '', description: '', owner: '', due_date: '', priority: 'medium', plan_period: '30_day', status: 'pending', notes: '' };
+const BLANK = { title: '', description: '', owner: '', due_date: '', priority: 'medium', plan_period: '30_day', priority_id: '', status: 'pending', notes: '' };
 
 export default function ActionTracker({ orgId, compact = false }) {
   const queryClient = useQueryClient();
@@ -28,19 +28,31 @@ export default function ActionTracker({ orgId, compact = false }) {
   const [form, setForm] = useState({ ...BLANK });
 
   const { data: actions = [] } = useQuery({
-    queryKey: ['actions'],
+    queryKey: ['actions', orgId],
     queryFn: () => base44.entities.Action.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
+  const { data: priorities = [] } = useQuery({
+    queryKey: ['priorities', orgId],
+    queryFn: () => base44.entities.PriorityAlignment.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
+  const { data: issues = [] } = useQuery({
+    queryKey: ['issues-for-actions', orgId],
+    queryFn: () => base44.entities.Issue.filter({ organization_id: orgId, status: 'open' }),
     enabled: !!orgId,
   });
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Action.create({ ...data, organization_id: orgId, stage: 'execute' }),
-    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['actions'] }); setOpen(false); setForm({ ...BLANK }); },
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['actions', orgId] }); setOpen(false); setForm({ ...BLANK }); },
   });
 
   const updateMutation = useMutation({
     mutationFn: ({ id, status }) => base44.entities.Action.update(id, { status, ...(status === 'completed' ? { completed_date: new Date().toISOString().split('T')[0] } : {}) }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['actions'] }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['actions', orgId] }),
   });
 
   const withOverdue = actions.map(a => ({
@@ -57,12 +69,16 @@ export default function ActionTracker({ orgId, compact = false }) {
     return (order[a.effectiveStatus] ?? 5) - (order[b.effectiveStatus] ?? 5);
   });
 
+  const priorityMap = Object.fromEntries(priorities.map(p => [p.id, p.title]));
+  const issueMap = Object.fromEntries(issues.map(i => [i.id, i.title]));
+
   return (
-    <Card className="border-border/50 shadow-sm">
+    <Card className="border-border/50 shadow-sm col-span-full">
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
           <CheckSquare className="h-4 w-4 text-rose-500" />
           <CardTitle className="text-base font-semibold">Action Tracker</CardTitle>
+          {actions.length > 0 && <Badge variant="outline" className="text-xs">{actions.length}</Badge>}
         </div>
         <Button size="sm" onClick={() => setOpen(!open)}><Plus className="h-4 w-4 mr-1" /> Add Action</Button>
       </CardHeader>
@@ -106,6 +122,32 @@ export default function ActionTracker({ orgId, compact = false }) {
                 </Select>
               </div>
               <div className="col-span-2">
+                <Label className="text-xs">Linked Priority (optional)</Label>
+                <Select value={form.priority_id} onValueChange={v => setForm({ ...form, priority_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={null}>None</SelectItem>
+                    {priorities.filter(p => p.status === 'active').map(p => (
+                      <SelectItem key={p.id} value={p.id}>{p.title}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              {issues.length > 0 && (
+                <div className="col-span-2">
+                  <Label className="text-xs">Linked Issue (optional)</Label>
+                  <Select value={form.issue_id} onValueChange={v => setForm({ ...form, issue_id: v })}>
+                    <SelectTrigger><SelectValue placeholder="None" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={null}>None</SelectItem>
+                      {issues.map(i => (
+                        <SelectItem key={i.id} value={i.id}>{i.title}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              <div className="col-span-2">
                 <Label className="text-xs">Description / Notes</Label>
                 <Textarea value={form.description} onChange={e => setForm({ ...form, description: e.target.value })} rows={2} />
               </div>
@@ -144,7 +186,16 @@ export default function ActionTracker({ orgId, compact = false }) {
                     </span>
                   )}
                   <Badge variant={PRIORITY_COLORS[a.priority]} className="text-xs capitalize">{a.priority}</Badge>
-                  <span className="text-xs text-muted-foreground">{a.plan_period?.replace('_', '-')}</span>
+                  {a.priority_id && priorityMap[a.priority_id] && (
+                    <span className="text-xs text-emerald-600 flex items-center gap-0.5">
+                      <Link2 className="h-3 w-3" /> {priorityMap[a.priority_id]}
+                    </span>
+                  )}
+                  {a.issue_id && issueMap[a.issue_id] && (
+                    <span className="text-xs text-amber-600 flex items-center gap-0.5">
+                      <Link2 className="h-3 w-3" /> Issue: {issueMap[a.issue_id]}
+                    </span>
+                  )}
                 </div>
                 {a.description && <p className="text-xs text-muted-foreground mt-0.5">{a.description}</p>}
               </div>

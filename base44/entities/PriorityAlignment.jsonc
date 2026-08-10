@@ -12,6 +12,10 @@
     "description": {
       "type": "string"
     },
+    "desired_outcome": {
+      "type": "string",
+      "description": "What does success look like for this priority?"
+    },
     "timeframe": {
       "type": "string",
       "enum": [
@@ -35,6 +39,39 @@
     },
     "owner": {
       "type": "string"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "target_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "progress_percentage": {
+      "type": "number",
+      "default": 0,
+      "description": "0-100 manual progress indicator"
+    },
+    "milestones": {
+      "type": "array",
+      "description": "Key milestones for this priority",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "completed": {
+            "type": "boolean",
+            "default": false
+          },
+          "completed_date": {
+            "type": "string",
+            "format": "date"
+          }
+        }
+      }
     },
     "team_input": {
       "type": "string",

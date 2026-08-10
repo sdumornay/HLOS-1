@@ -64,6 +64,14 @@
       ],
       "description": "Which plan period this action belongs to"
     },
+    "priority_id": {
+      "type": "string",
+      "description": "Linked PriorityAlignment record"
+    },
+    "issue_id": {
+      "type": "string",
+      "description": "Linked Issue record"
+    },
     "completed_date": {
       "type": "string",
       "format": "date"

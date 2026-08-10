@@ -8,13 +8,20 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { BookOpen, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { BookOpen, Plus, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
 
-const CATEGORIES = { financial: 'Financial', staffing: 'Staffing', ministry: 'Ministry', strategy: 'Strategy', operations: 'Operations', communications: 'Communications', other: 'Other' };
+const CATEGORIES = {
+  financial: 'Financial', staffing: 'Staffing', ministry: 'Ministry',
+  strategy: 'Strategy', operations: 'Operations', communications: 'Communications', other: 'Other',
+};
 const IMPACT_COLORS = { low: 'secondary', medium: 'outline', high: 'default', critical: 'destructive' };
 const STATUS_COLORS = { active: 'default', reversed: 'destructive', superseded: 'secondary' };
-const BLANK = { decision: '', context: '', made_by: '', date: new Date().toISOString().split('T')[0], category: 'ministry', impact: 'medium', affected_teams: '', review_date: '', notes: '', status: 'active' };
+const BLANK = {
+  issue_question: '', decision: '', context: '', made_by: '', participants: '',
+  date: new Date().toISOString().split('T')[0], category: 'ministry', impact: 'medium',
+  affected_teams: '', resulting_actions: '', review_date: '', notes: '', status: 'active',
+};
 
 export default function DecisionLogPanel({ orgId }) {
   const queryClient = useQueryClient();
@@ -40,29 +47,42 @@ export default function DecisionLogPanel({ orgId }) {
   const sorted = [...decisions].sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
-    <Card className="border-border/50 shadow-sm">
+    <Card className="border-border/50 shadow-sm col-span-full">
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
           <BookOpen className="h-4 w-4 text-emerald-600" />
           <CardTitle className="text-base font-semibold">Decision Log</CardTitle>
+          {decisions.length > 0 && <Badge variant="outline" className="text-xs">{decisions.length}</Badge>}
         </div>
         <Button size="sm" onClick={() => setOpen(!open)}><Plus className="h-4 w-4 mr-1" /> Log Decision</Button>
       </CardHeader>
       <CardContent className="space-y-3">
         {open && (
           <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/30">
-            <div className="col-span-2">
-              <Label className="text-xs">Decision</Label>
-              <Textarea placeholder="Describe the decision made..." value={form.decision} onChange={e => setForm({ ...form, decision: e.target.value })} rows={2} />
+            <div>
+              <Label className="text-xs">Issue / Question</Label>
+              <Textarea placeholder="What issue or question needed a decision?" value={form.issue_question}
+                onChange={e => setForm({ ...form, issue_question: e.target.value })} rows={2} />
+            </div>
+            <div>
+              <Label className="text-xs">Decision Made</Label>
+              <Textarea placeholder="Describe the decision..." value={form.decision}
+                onChange={e => setForm({ ...form, decision: e.target.value })} rows={2} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs">Made By</Label>
-                <Input placeholder="Name or group" value={form.made_by} onChange={e => setForm({ ...form, made_by: e.target.value })} />
+                <Label className="text-xs">Decision Owner</Label>
+                <Input placeholder="Name or group" value={form.made_by}
+                  onChange={e => setForm({ ...form, made_by: e.target.value })} />
               </div>
               <div>
                 <Label className="text-xs">Date</Label>
                 <Input type="date" value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+              </div>
+              <div>
+                <Label className="text-xs">Participants</Label>
+                <Input placeholder="Who was involved?" value={form.participants}
+                  onChange={e => setForm({ ...form, participants: e.target.value })} />
               </div>
               <div>
                 <Label className="text-xs">Category</Label>
@@ -83,21 +103,19 @@ export default function DecisionLogPanel({ orgId }) {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="col-span-2">
-                <Label className="text-xs">Context / Rationale</Label>
-                <Textarea placeholder="Why was this decision made?" value={form.context} onChange={e => setForm({ ...form, context: e.target.value })} rows={2} />
-              </div>
-              <div>
-                <Label className="text-xs">Teams Affected</Label>
-                <Input value={form.affected_teams} onChange={e => setForm({ ...form, affected_teams: e.target.value })} />
-              </div>
               <div>
                 <Label className="text-xs">Review Date</Label>
                 <Input type="date" value={form.review_date} onChange={e => setForm({ ...form, review_date: e.target.value })} />
               </div>
               <div className="col-span-2">
-                <Label className="text-xs">Notes</Label>
-                <Textarea value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} rows={2} />
+                <Label className="text-xs">Context / Rationale</Label>
+                <Textarea placeholder="Why was this decision made?" value={form.context}
+                  onChange={e => setForm({ ...form, context: e.target.value })} rows={2} />
+              </div>
+              <div className="col-span-2">
+                <Label className="text-xs">Resulting Actions</Label>
+                <Textarea placeholder="What actions will follow from this decision?" value={form.resulting_actions}
+                  onChange={e => setForm({ ...form, resulting_actions: e.target.value })} rows={2} />
               </div>
             </div>
             <div className="flex gap-2 justify-end">
@@ -112,8 +130,12 @@ export default function DecisionLogPanel({ orgId }) {
             <div key={d.id} className="border border-border/50 rounded-lg overflow-hidden">
               <div className="flex items-start justify-between p-3 cursor-pointer hover:bg-muted/20" onClick={() => setExpanded(expanded === d.id ? null : d.id)}>
                 <div className="flex-1 min-w-0">
+                  {d.issue_question && <p className="text-xs text-muted-foreground italic mb-0.5">Q: {d.issue_question}</p>}
                   <p className="text-sm font-medium line-clamp-2">{d.decision}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{format(new Date(d.date), 'MMM d, yyyy')} · {d.made_by} · {CATEGORIES[d.category]}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    {format(new Date(d.date), 'MMM d, yyyy')} · {d.made_by}
+                    {d.participants && ` · w/ ${d.participants}`}
+                  </p>
                 </div>
                 <div className="flex items-center gap-1.5 ml-2 flex-shrink-0">
                   <Badge variant={IMPACT_COLORS[d.impact]} className="text-xs capitalize">{d.impact}</Badge>
@@ -124,6 +146,12 @@ export default function DecisionLogPanel({ orgId }) {
                 <div className="border-t border-border/50 p-3 bg-muted/20 space-y-1.5 text-sm">
                   {d.context && <p><span className="font-medium">Rationale:</span> {d.context}</p>}
                   {d.affected_teams && <p><span className="font-medium">Affects:</span> {d.affected_teams}</p>}
+                  {d.resulting_actions && (
+                    <p className="flex items-start gap-1.5">
+                      <ArrowRight className="h-3.5 w-3.5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                      <span><span className="font-medium">Actions:</span> {d.resulting_actions}</span>
+                    </p>
+                  )}
                   {d.review_date && <p><span className="font-medium">Review by:</span> {format(new Date(d.review_date), 'MMM d, yyyy')}</p>}
                   {d.notes && <p className="text-muted-foreground">{d.notes}</p>}
                   <Badge variant={STATUS_COLORS[d.status]} className="capitalize text-xs">{d.status}</Badge>

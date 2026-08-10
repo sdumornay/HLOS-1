@@ -1,4 +1,4 @@
-// Stage and discipline definitions for the 4-stage, 10-discipline framework.
+// Stage and discipline definitions for the 4-stage, 13-discipline framework.
 // Used by StageHero, DisciplineSection, StageJourney, and stage pages.
 
 export const STAGE_META = {
@@ -35,12 +35,15 @@ export const STAGE_META = {
     name: 'Execute',
     icon: 'Rocket',
     color: 'emerald',
-    what: 'Drive accountability, track decisions, and execute your 30/60/90-day plan',
-    why: 'Execution turns alignment into momentum. A clear rhythm of planning, meeting, and tracking keeps the team moving forward together.',
-    toolKeys: ['planning', 'meetings', 'actions', 'decisions'],
+    what: 'Turn priorities and decisions into completed action',
+    why: 'Execution is the operating engine. A simple rhythm of priorities, meetings, decisions, actions, and accountability turns alignment into momentum.',
+    toolKeys: ['priorities', 'meetings', 'decisions', 'actions', 'accountability'],
     disciplines: [
-      { number: 7, name: 'Execution Rhythm', description: 'Plan, meet, and execute with cadence' },
-      { number: 8, name: 'Accountability', description: 'Track actions and log decisions' },
+      { number: 7, name: 'Priorities', description: '3-5 active priorities with owners, milestones, and progress' },
+      { number: 8, name: 'Meetings', description: 'Review, decide, and assign in a clear rhythm' },
+      { number: 9, name: 'Decisions', description: 'Log decisions with context, participants, and resulting actions' },
+      { number: 10, name: 'Actions', description: 'Clear owners, due dates, and linked priorities' },
+      { number: 11, name: 'Accountability', description: 'Follow-through view grouped by owner' },
     ],
   },
   sustain: {
@@ -52,8 +55,8 @@ export const STAGE_META = {
     why: 'Sustaining health requires ongoing measurement and intentional renewal. Without it, teams drift back into old patterns.',
     toolKeys: ['health_pulse', 'risk_flags', 'quarterly_review', 'renewal'],
     disciplines: [
-      { number: 9, name: 'Measurement', description: 'Track trends, flag risks, and review quarterly' },
-      { number: 10, name: 'Renewal', description: 'Reset and re-energize the team' },
+      { number: 12, name: 'Measurement', description: 'Track trends, flag risks, and review quarterly' },
+      { number: 13, name: 'Renewal', description: 'Reset and re-energize the team' },
     ],
   },
 };

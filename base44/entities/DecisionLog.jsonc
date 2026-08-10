@@ -9,8 +9,13 @@
       "type": "string",
       "description": "Reference to session where decision was made"
     },
+    "issue_question": {
+      "type": "string",
+      "description": "The issue or question that prompted the decision"
+    },
     "decision": {
-      "type": "string"
+      "type": "string",
+      "description": "The decision made"
     },
     "context": {
       "type": "string",
@@ -19,6 +24,10 @@
     "made_by": {
       "type": "string",
       "description": "Person or group who made the decision"
+    },
+    "participants": {
+      "type": "string",
+      "description": "Who was involved in the decision discussion"
     },
     "date": {
       "type": "string",
@@ -49,6 +58,10 @@
     },
     "affected_teams": {
       "type": "string"
+    },
+    "resulting_actions": {
+      "type": "string",
+      "description": "What actions resulted from this decision"
     },
     "review_date": {
       "type": "string",
