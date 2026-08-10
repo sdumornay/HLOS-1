@@ -49,7 +49,9 @@
     "respondent_email"
   ],
   "rls": {
-    "create": {},
+    "create": {
+      "data.organization_id": "{{user.organization_id}}"
+    },
     "read": {
       "$or": [
         {
