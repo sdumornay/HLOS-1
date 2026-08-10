@@ -19,6 +19,7 @@ const NAV_ITEMS = [
   { type: 'divider', label: 'Tools' },
   { label: 'Assessments', path: '/assessments', icon: ClipboardCheck, roles: 'all' },
   { label: 'Org Health', path: '/org-health', icon: Activity, roles: 'all' },
+  { label: 'Momentum', path: '/momentum', icon: Rocket, roles: 'all' },
   { label: 'Actions', path: '/actions', icon: Target, roles: 'all' },
   { label: 'Sessions', path: '/sessions', icon: Calendar, roles: 'all' },
   { label: 'Reports & Analytics', path: '/reviews', icon: BarChart3, roles: 'all' },

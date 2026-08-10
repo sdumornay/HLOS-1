@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
-import { computeUnifiedHealthScore, computeMomentumScore } from '@/lib/healthMetrics';
+import { computeUnifiedHealthScore } from '@/lib/healthMetrics';
+import { computeMomentumIndicators, computeMomentumTrend } from '@/lib/momentumScoring';
+import { getRoundComparison } from '@/lib/scoreboardScoring';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Heart, TrendingUp, Target, Calendar, ArrowRight } from 'lucide-react';
@@ -20,6 +22,7 @@ import NextStepsPanel from '@/components/dashboard/NextStepsPanel';
 import RiskFlagSummary from '@/components/dashboard/RiskFlagSummary';
 import ResourceRecommendations from '@/components/dashboard/ResourceRecommendations';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
+import DualScoreboard from '@/components/dashboard/DualScoreboard';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach } = useCurrentUser();
@@ -89,11 +92,27 @@ export default function Dashboard() {
     enabled: !!orgId,
   });
 
+  const { data: priorities = [] } = useQuery({
+    queryKey: ['priorities', orgId],
+    queryFn: () => base44.entities.PriorityAlignment.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
   const currentOrg = organizations.find(o => o.id === orgId) || organizations[0];
   const currentStage = currentOrg?.current_stage || 'stabilize';
 
   const unifiedHealth = computeUnifiedHealthScore(assessments, healthPulses, tensionPulses);
-  const unifiedMomentum = computeMomentumScore(actions, decisions, stageProgress, planPeriods);
+  const momentumResult = computeMomentumIndicators(priorities, actions, decisions, stageProgress);
+  const unifiedMomentum = momentumResult.overall;
+
+  // Health trend from assessment rounds
+  const { current: healthCurrent, previous: healthPrevious } = getRoundComparison(assessments);
+  const healthTrend = !healthCurrent || !healthPrevious ? 'stable' :
+    healthCurrent.overall > healthPrevious.overall + 0.5 ? 'improving' :
+    healthCurrent.overall < healthPrevious.overall - 0.5 ? 'declining' : 'stable';
+
+  // Momentum trend from recent execution activity
+  const momentumTrend = computeMomentumTrend(actions, decisions).direction;
 
   const recentAssessments = assessments.slice(0, 20);
   const completedActions = actions.filter(a => a.status === 'completed').length;
@@ -129,13 +148,13 @@ export default function Dashboard() {
       {/* Next Steps — contextual guidance */}
       {orgId && <NextStepsPanel stage={currentStage} orgId={orgId} />}
 
-      {/* Score Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Link to="/assessments"><ScoreCard title="Overall Health" score={unifiedHealth} icon={Heart} variant="health" subtitle={`${recentAssessments.length} assessments`} /></Link>
-        <Link to="/actions"><ScoreCard title="Momentum Score" score={unifiedMomentum} icon={TrendingUp} variant="momentum" subtitle={`${completedActions}/${totalActions} actions done`} /></Link>
-        <Link to="/actions"><ScoreCard title="Overdue Items" score={overdueActions} maxScore={totalActions || 1} icon={Target} variant="health" subtitle="Needs attention" /></Link>
-        <Link to="/sessions"><ScoreCard title="Sessions" score={sessions.length} maxScore={20} icon={Calendar} variant="momentum" subtitle="Total meetings logged" /></Link>
-      </div>
+      {/* Dual Scoreboard — Health First. Momentum Next. */}
+      <DualScoreboard
+        healthScore={unifiedHealth}
+        healthTrend={healthTrend}
+        momentumScore={unifiedMomentum}
+        momentumTrend={momentumTrend}
+      />
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
