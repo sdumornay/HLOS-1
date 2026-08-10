@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, ClipboardCheck, Activity, Users, Heart } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ExportPDFButton from '@/components/shared/ExportPDFButton';
@@ -98,7 +99,7 @@ export default function Assessments() {
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl lg:text-3xl font-display font-bold">Assessments</h1>
-          <p className="text-muted-foreground mt-1">Pulse surveys and health check-ins</p>
+          <p className="text-muted-foreground mt-1">Leadership Health Scoreboard and pulse surveys</p>
         </div>
         <div className="flex items-center gap-2">
           <ExportPDFButton
@@ -119,11 +120,11 @@ export default function Assessments() {
           />
           <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4 mr-2" />New Assessment</Button>
+              <Button><Plus className="h-4 w-4 mr-2" />Take Scoreboard</Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Take Assessment</DialogTitle>
+                <DialogTitle>Leadership Health Scoreboard</DialogTitle>
               </DialogHeader>
               <div className="space-y-5 mt-4">
                 <div className="grid grid-cols-2 gap-3">
@@ -187,6 +188,22 @@ export default function Assessments() {
           </Dialog>
         </div>
       </div>
+
+      {/* Link to Organization Health view */}
+      <Card className="border-border/50 shadow-sm bg-gradient-to-r from-primary/5 to-secondary/5">
+        <CardContent className="p-5 flex items-center gap-4">
+          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <Activity className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold">Organization Health Dashboard</p>
+            <p className="text-xs text-muted-foreground mt-0.5">View aggregated scoreboard results, trends, interpretation, and recommended next steps</p>
+          </div>
+          <Link to="/org-health">
+            <Button size="sm" variant="outline">View Results</Button>
+          </Link>
+        </CardContent>
+      </Card>
 
       {/* Survey Launchers */}
       <div className="grid gap-3 sm:grid-cols-2">

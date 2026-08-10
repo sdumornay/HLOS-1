@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Shield, Compass, Rocket, Leaf,
   ClipboardCheck, Target, Calendar, BarChart3, BookOpen, Settings,
-  ChevronLeft, ChevronRight, Heart, Globe, Briefcase
+  ChevronLeft, ChevronRight, Heart, Globe, Briefcase, Activity
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -18,6 +18,7 @@ const NAV_ITEMS = [
   { label: 'Sustain', path: '/sustain', icon: Leaf, roles: 'all' },
   { type: 'divider', label: 'Tools' },
   { label: 'Assessments', path: '/assessments', icon: ClipboardCheck, roles: 'all' },
+  { label: 'Org Health', path: '/org-health', icon: Activity, roles: 'all' },
   { label: 'Actions', path: '/actions', icon: Target, roles: 'all' },
   { label: 'Sessions', path: '/sessions', icon: Calendar, roles: 'all' },
   { label: 'Reports & Analytics', path: '/reviews', icon: BarChart3, roles: 'all' },

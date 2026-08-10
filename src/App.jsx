@@ -11,6 +11,7 @@ import Dashboard from '@/pages/Dashboard';
 import TeamDashboard from '@/pages/TeamDashboard';
 
 import Assessments from '@/pages/Assessments';
+import OrgHealth from '@/pages/OrgHealth';
 import Actions from '@/pages/Actions';
 import Sessions from '@/pages/Sessions';
 import Reviews from '@/pages/Reviews';
@@ -57,6 +58,7 @@ const AuthenticatedApp = () => {
         <Route path="/execute" element={<Execute />} />
         <Route path="/sustain" element={<Sustain />} />
         <Route path="/assessments" element={<Assessments />} />
+        <Route path="/org-health" element={<OrgHealth />} />
         <Route path="/actions" element={<Actions />} />
         <Route path="/sessions" element={<Sessions />} />
         <Route path="/reviews" element={<Reviews />} />
