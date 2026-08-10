@@ -138,7 +138,6 @@ export default function OnboardingWizard({ open, onComplete }) {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="lead_pastor">Lead Pastor</SelectItem>
-                      <SelectItem value="coach">Coach</SelectItem>
                       <SelectItem value="team_member">Team Member</SelectItem>
                     </SelectContent>
                   </Select>

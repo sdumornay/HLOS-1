@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useOrgId } from '@/lib/useOrgId';
 import { useCurrentUser } from '@/lib/useCurrentUser';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -10,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Target, CheckCircle2, Clock, AlertCircle, MessageSquare } from 'lucide-react';
 import { format } from 'date-fns';
 import ActionComments from '@/components/actions/ActionComments';
@@ -18,6 +19,7 @@ import ExportPDFButton from '@/components/shared/ExportPDFButton';
 
 export default function Actions() {
   const { user, canManageAll } = useCurrentUser();
+  const orgId = useOrgId();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [filter, setFilter] = useState('all');
@@ -32,9 +34,18 @@ export default function Actions() {
     queryFn: () => base44.entities.Action.list('-created_date', 100),
   });
 
-  const orgId = user?.organization_id;
   const myActions = canManageAll ? actions : actions.filter(a => a.organization_id === orgId);
-  const filtered = filter === 'all' ? myActions : myActions.filter(a => a.status === filter);
+  const myAssignedActions = myActions.filter(a =>
+    a.owner_email === user?.email || a.owner === user?.full_name || a.created_by_id === user?.id
+  );
+
+  const getFilteredActions = () => {
+    let pool = filter === 'mine' ? myAssignedActions : myActions;
+    if (filter === 'all' || filter === 'mine') return pool;
+    return pool.filter(a => a.status === filter);
+  };
+
+  const filtered = getFilteredActions();
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Action.create(data),
@@ -55,6 +66,7 @@ export default function Actions() {
 
   const statusCounts = {
     all: myActions.length,
+    mine: myAssignedActions.length,
     pending: myActions.filter(a => a.status === 'pending').length,
     in_progress: myActions.filter(a => a.status === 'in_progress').length,
     completed: myActions.filter(a => a.status === 'completed').length,
@@ -165,6 +177,7 @@ export default function Actions() {
       <Tabs value={filter} onValueChange={setFilter}>
         <TabsList>
           <TabsTrigger value="all">All ({statusCounts.all})</TabsTrigger>
+          <TabsTrigger value="mine">My Actions ({statusCounts.mine})</TabsTrigger>
           <TabsTrigger value="pending">Pending ({statusCounts.pending})</TabsTrigger>
           <TabsTrigger value="in_progress">In Progress ({statusCounts.in_progress})</TabsTrigger>
           <TabsTrigger value="completed">Completed ({statusCounts.completed})</TabsTrigger>
@@ -219,7 +232,11 @@ export default function Actions() {
           <Card className="border-border/50">
             <CardContent className="py-12 text-center">
               <Target className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
-              <p className="text-muted-foreground">No actions found. Create your first action item.</p>
+              <p className="text-muted-foreground">
+                {filter === 'mine'
+                  ? 'No actions assigned to you yet. Actions assigned by your leader will appear here.'
+                  : 'No actions found. Create your first action item.'}
+              </p>
             </CardContent>
           </Card>
         )}

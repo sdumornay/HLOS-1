@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import { computeUnifiedHealthScore } from '@/lib/healthMetrics';
 import { computeMomentumIndicators, computeMomentumTrend } from '@/lib/momentumScoring';
 import { getRoundComparison } from '@/lib/scoreboardScoring';
@@ -19,13 +20,18 @@ import RecentProgress from '@/components/dashboard/RecentProgress';
 import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
+import TeamMemberWelcome from '@/components/dashboard/TeamMemberWelcome';
 
 import { ArrowLeft } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 
 export default function Dashboard({ orgId: overrideOrgId }) {
-  const { user, isAdmin, isCoach } = useCurrentUser();
-  const isConsultantView = !!overrideOrgId;
-  const orgId = overrideOrgId || user?.organization_id;
+  const { user, isAdmin, isCoach, isTeamMember } = useCurrentUser();
+  const orgIdFromUrl = useOrgId();
+  const [searchParams] = useSearchParams();
+  const orgParam = searchParams.get('org');
+  const isConsultantView = !!overrideOrgId || !!orgParam;
+  const orgId = overrideOrgId || orgIdFromUrl;
 
   const { data: organizations = [] } = useQuery({
     queryKey: ['organizations', overrideOrgId || 'me'],
@@ -226,6 +232,11 @@ export default function Dashboard({ orgId: overrideOrgId }) {
         stageProgress={stageProgress}
       />
 
+      {/* Team member welcome for first-time users */}
+      {isTeamMember && !isConsultantView && (
+        <TeamMemberWelcome userName={user?.full_name} hasAssessments={assessments.length > 0} />
+      )}
+
       {/* 2. Two primary cards: Leadership Health + Momentum */}
       <PrimaryScoreCards
         healthScore={unifiedHealth}
@@ -249,6 +260,7 @@ export default function Dashboard({ orgId: overrideOrgId }) {
           stageSteps={stageSteps}
           completedCount={completedCount}
           nextStep={nextStep}
+          orgId={orgId}
         />
         <UpcomingItems sessions={sessions} actions={actions} quarterlyReviews={quarterlyReviews} />
       </div>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import StabilizeProgress from '@/components/stabilize/StabilizeProgress';
 import ConflictIntakeForm from '@/components/stabilize/ConflictIntakeForm';
 import TensionPulseSurvey from '@/components/stabilize/TensionPulseSurvey';
@@ -10,12 +10,12 @@ import CommunicationAgreements from '@/components/stabilize/CommunicationAgreeme
 import ConflictTriggerTracker from '@/components/stabilize/ConflictTriggerTracker';
 import NVCConversationHelper from '@/components/stabilize/NVCConversationHelper';
 import StageHero from '@/components/stages/StageHero';
+import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
 
 export default function Stabilize() {
-  const { user } = useCurrentUser();
-  const orgId = user?.organization_id;
+  const orgId = useOrgId();
 
   const { data: intakes = [] } = useQuery({
     queryKey: ['conflictIntakes', orgId],
@@ -60,16 +60,17 @@ export default function Stabilize() {
   return (
     <div className="space-y-6">
       <StageHero stage="stabilize" orgId={orgId} counts={counts} />
+      <StageGuide stage="stabilize" counts={counts} />
       <StabilizeProgress counts={counts} />
 
       {/* Discipline 1: Leadership Health */}
-      <DisciplineSection number={1} name="Leadership Health" description="Baseline team tension, trust, and leadership health">
+      <DisciplineSection number={1} name="Leadership Health" description="Baseline team tension, trust, and leadership health" audience="team">
         <TensionPulseSurvey orgId={orgId} />
         <LeaderInterviewNotes orgId={orgId} />
       </DisciplineSection>
 
       {/* Discipline 2: Healthy Conflict */}
-      <DisciplineSection number={2} name="Healthy Conflict" description="Surface, understand, and resolve conflict constructively">
+      <DisciplineSection number={2} name="Healthy Conflict" description="Surface, understand, and resolve conflict constructively" audience="team">
         <ConflictIntakeForm orgId={orgId} />
         <CommunicationAgreements orgId={orgId} />
         <ConflictTriggerTracker orgId={orgId} />

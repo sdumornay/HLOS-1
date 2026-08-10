@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useOrgId } from '@/lib/useOrgId';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,7 @@ const WORKSTYLE_MAP = {
 
 export default function Assessments() {
   const { user, canManageAll } = useCurrentUser();
+  const orgId = useOrgId();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [workstyleOpen, setWorkstyleOpen] = useState(false);
@@ -50,8 +52,6 @@ export default function Assessments() {
     trust: 5, safety: 5, clarity: 5, accountability: 5, meeting_effectiveness: 5, conflict_intensity: 5,
     notes: '',
   });
-
-  const orgId = user?.organization_id;
 
   const { data: assessments = [] } = useQuery({
     queryKey: ['assessments'],
@@ -101,149 +101,98 @@ export default function Assessments() {
           <h1 className="text-2xl lg:text-3xl font-display font-bold">Assessments</h1>
           <p className="text-muted-foreground mt-1">Leadership Health Scoreboard and pulse surveys</p>
         </div>
-        <div className="flex items-center gap-2">
-          <ExportPDFButton
-            title="Assessments Report"
-            subtitle={`${myAssessments.length} assessments`}
-            filename="assessments.pdf"
-            sections={[{
-              heading: 'Assessment History',
-              table: {
-                headers: ['Date', 'Respondent', 'Type', 'Stage', 'Health Score'],
-                rows: myAssessments.map(a => [
-                  a.created_date ? format(new Date(a.created_date), 'MMM d, yyyy') : '—',
-                  a.respondent_email, a.type, a.stage || '—',
-                  a.overall_health?.toFixed(1) || '—'
-                ])
-              }
-            }]}
-          />
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button><Plus className="h-4 w-4 mr-2" />Take Scoreboard</Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Leadership Health Scoreboard</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-5 mt-4">
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <Label>Type</Label>
-                    <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="initial">Initial</SelectItem>
-                        <SelectItem value="pulse">Pulse</SelectItem>
-                        <SelectItem value="quarterly">Quarterly</SelectItem>
-                        <SelectItem value="exit">Exit</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label>Stage</Label>
-                    <Select value={form.stage} onValueChange={v => setForm(f => ({ ...f, stage: v }))}>
-                      <SelectTrigger><SelectValue /></SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="stabilize">Stabilize</SelectItem>
-                        <SelectItem value="align">Align</SelectItem>
-                        <SelectItem value="execute">Execute</SelectItem>
-                        <SelectItem value="sustain">Sustain</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-
-                {DIMENSIONS.map(dim => (
-                  <div key={dim.key} className="space-y-2">
-                    <div className="flex justify-between items-baseline">
-                      <Label>{dim.label}</Label>
-                      <span className="text-sm font-semibold text-primary">{form[dim.key]}/10</span>
+        {canManageAll && (
+          <div className="flex items-center gap-2">
+            <ExportPDFButton
+              title="Assessments Report"
+              subtitle={`${myAssessments.length} assessments`}
+              filename="assessments.pdf"
+              sections={[{
+                heading: 'Assessment History',
+                table: {
+                  headers: ['Date', 'Respondent', 'Type', 'Stage', 'Health Score'],
+                  rows: myAssessments.map(a => [
+                    a.created_date ? format(new Date(a.created_date), 'MMM d, yyyy') : '—',
+                    a.respondent_email, a.type, a.stage || '—',
+                    a.overall_health?.toFixed(1) || '—'
+                  ])
+                }
+              }]}
+            />
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button variant="outline"><Plus className="h-4 w-4 mr-2" />Manual Scoreboard</Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg max-h-[85vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Leadership Health Scoreboard</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-5 mt-4">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label>Type</Label>
+                      <Select value={form.type} onValueChange={v => setForm(f => ({ ...f, type: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="initial">Initial</SelectItem>
+                          <SelectItem value="pulse">Pulse</SelectItem>
+                          <SelectItem value="quarterly">Quarterly</SelectItem>
+                          <SelectItem value="exit">Exit</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </div>
-                    <p className="text-xs text-muted-foreground">{dim.desc}</p>
-                    <Slider
-                      value={[form[dim.key]]}
-                      min={1}
-                      max={10}
-                      step={1}
-                      onValueChange={([v]) => setForm(f => ({ ...f, [dim.key]: v }))}
+                    <div>
+                      <Label>Stage</Label>
+                      <Select value={form.stage} onValueChange={v => setForm(f => ({ ...f, stage: v }))}>
+                        <SelectTrigger><SelectValue /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="stabilize">Stabilize</SelectItem>
+                          <SelectItem value="align">Align</SelectItem>
+                          <SelectItem value="execute">Execute</SelectItem>
+                          <SelectItem value="sustain">Sustain</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {DIMENSIONS.map(dim => (
+                    <div key={dim.key} className="space-y-2">
+                      <div className="flex justify-between items-baseline">
+                        <Label>{dim.label}</Label>
+                        <span className="text-sm font-semibold text-primary">{form[dim.key]}/10</span>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{dim.desc}</p>
+                      <Slider
+                        value={[form[dim.key]]}
+                        min={1}
+                        max={10}
+                        step={1}
+                        onValueChange={([v]) => setForm(f => ({ ...f, [dim.key]: v }))}
+                      />
+                    </div>
+                  ))}
+
+                  <div>
+                    <Label>Notes</Label>
+                    <Textarea
+                      value={form.notes}
+                      onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
+                      placeholder="Any additional observations..."
                     />
                   </div>
-                ))}
 
-                <div>
-                  <Label>Notes</Label>
-                  <Textarea
-                    value={form.notes}
-                    onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
-                    placeholder="Any additional observations..."
-                  />
+                  <Button onClick={handleSubmit} className="w-full" disabled={createMutation.isPending}>
+                    {createMutation.isPending ? 'Submitting...' : 'Submit Assessment'}
+                  </Button>
                 </div>
-
-                <Button onClick={handleSubmit} className="w-full" disabled={createMutation.isPending}>
-                  {createMutation.isPending ? 'Submitting...' : 'Submit Assessment'}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
       </div>
 
-      {/* Link to Organization Health view */}
-      <Card className="border-border/50 shadow-sm bg-gradient-to-r from-primary/5 to-secondary/5">
-        <CardContent className="p-5 flex items-center gap-4">
-          <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-            <Activity className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold">Organization Health Dashboard</p>
-            <p className="text-xs text-muted-foreground mt-0.5">View aggregated scoreboard results, trends, interpretation, and recommended next steps</p>
-          </div>
-          <Link to="/org-health">
-            <Button size="sm" variant="outline">View Results</Button>
-          </Link>
-        </CardContent>
-      </Card>
-
-      {/* Survey Launchers */}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-5 flex items-start gap-4">
-            <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-              <Users className="h-5 w-5 text-secondary" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-semibold">Team Health &amp; Culture Assessment</p>
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30">5 Dysfunctions</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Based on Lencioni&#39;s Five Dysfunctions — rate trust, conflict, commitment, accountability, and results. Takes 3-5 minutes.</p>
-            </div>
-            <Button size="sm" variant="outline" onClick={() => setFiveDysOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-5 flex items-start gap-4">
-            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <Activity className="h-5 w-5 text-accent" />
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <p className="text-sm font-semibold">Workstyle Assessment</p>
-                <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">Workstyle</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Discover your natural leadership style — Head, Heart, Gut, or Feet. Results save to your profile and can be shared. ~3 minutes.
-              </p>
-            </div>
-            <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* F10: Guided Assessment for team members */}
-      <Card className="border-border/50 shadow-sm bg-gradient-to-r from-accent/5 to-primary/5">
+      {/* Primary CTA: Quick Health Check */}
+      <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5">
         <CardContent className="p-5 flex items-center gap-4">
           <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
             <Heart className="h-5 w-5 text-accent" />
@@ -255,6 +204,64 @@ export default function Assessments() {
           <Button size="sm" onClick={() => setGuidedOpen(true)}>Start</Button>
         </CardContent>
       </Card>
+
+      {/* Link to Organization Health view */}
+      {canManageAll && (
+        <Card className="border-border/50 shadow-sm bg-gradient-to-r from-primary/5 to-secondary/5">
+          <CardContent className="p-5 flex items-center gap-4">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+              <Activity className="h-5 w-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">Organization Health Dashboard</p>
+              <p className="text-xs text-muted-foreground mt-0.5">View aggregated scoreboard results, trends, interpretation, and recommended next steps</p>
+            </div>
+            <Link to="/org-health">
+              <Button size="sm" variant="outline">View Results</Button>
+            </Link>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Additional Assessments */}
+      <div>
+        <h2 className="text-base font-semibold mb-3">Additional Assessments</h2>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-5 flex items-start gap-4">
+              <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                <Users className="h-5 w-5 text-secondary" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-semibold">Team Health &amp; Culture</p>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30">5 Dysfunctions</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Based on Lencioni's Five Dysfunctions — rate trust, conflict, commitment, accountability, and results. Takes 3-5 minutes.</p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => setFiveDysOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
+            </CardContent>
+          </Card>
+
+          <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-5 flex items-start gap-4">
+              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                <Activity className="h-5 w-5 text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-semibold">Workstyle Assessment</p>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">Workstyle</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  Discover your natural leadership style — Head, Heart, Gut, or Feet. Results save to your profile and can be shared. ~3 minutes.
+                </p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
 
       <GuidedAssessment
         open={guidedOpen}
@@ -278,12 +285,12 @@ export default function Assessments() {
       />
 
       {/* Team Health Trends */}
-      {myAssessments.length > 0 && (
+      {canManageAll && myAssessments.length > 0 && (
         <TeamHealthTrends assessments={myAssessments} />
       )}
 
-      {/* F4: Participation Report */}
-      {orgId && <ParticipationReport orgId={orgId} />}
+      {/* Participation Report */}
+      {orgId && canManageAll && <ParticipationReport orgId={orgId} />}
 
       {/* Workstyle Results */}
       {workstyleResults.length > 0 && (
@@ -352,7 +359,7 @@ export default function Assessments() {
             <Card className="border-border/50">
               <CardContent className="py-12 text-center">
                 <ClipboardCheck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
-                <p className="text-muted-foreground">No assessments yet. Start your first pulse survey.</p>
+                <p className="text-muted-foreground">No assessments yet. Start with the Quick Health Check above.</p>
               </CardContent>
             </Card>
           )}

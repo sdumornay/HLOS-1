@@ -33,8 +33,9 @@ export default function TopPriorities({ orgId }) {
         {active.length === 0 ? (
           <div className="text-center py-6">
             <p className="text-sm text-muted-foreground mb-3">No active priorities yet.</p>
-            <Link to="/execute" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
-              <Plus className="h-3 w-3" /> Add priorities
+            <p className="text-xs text-muted-foreground mb-3">Define what matters most right now — your team needs 3-5 clear priorities.</p>
+            <Link to="/align" className="inline-flex items-center gap-1 text-xs text-primary hover:underline">
+              <Plus className="h-3 w-3" /> Set your priorities
             </Link>
           </div>
         ) : (

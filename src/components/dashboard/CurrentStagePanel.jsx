@@ -4,11 +4,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight, CheckCircle2, Circle } from 'lucide-react';
 import { STAGE_META } from '@/lib/stageMeta';
 import { cn } from '@/lib/utils';
+import AdvanceStageButton from '@/components/dashboard/AdvanceStageButton';
 
-export default function CurrentStagePanel({ currentStage, stageSteps = [], completedCount = 0, nextStep }) {
+export default function CurrentStagePanel({ currentStage, stageSteps = [], completedCount = 0, nextStep, orgId }) {
   const meta = STAGE_META[currentStage] || STAGE_META.stabilize;
   const totalSteps = stageSteps.length;
   const pct = totalSteps > 0 ? Math.round((completedCount / totalSteps) * 100) : 0;
+  const allStarted = !nextStep;
 
   return (
     <Card className="border-border/50 shadow-sm h-full">
@@ -71,9 +73,14 @@ export default function CurrentStagePanel({ currentStage, stageSteps = [], compl
             </div>
           </Link>
         ) : (
-          <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-3">
-            <p className="text-sm font-semibold text-emerald-700">All stage activities started!</p>
-            <p className="text-xs text-muted-foreground mt-0.5">Consider advancing to the next stage.</p>
+          <div className="space-y-3">
+            <div className="rounded-lg bg-emerald-50 border border-emerald-100 p-3">
+              <p className="text-sm font-semibold text-emerald-700">All stage activities started!</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Ready to advance to the next stage.</p>
+            </div>
+            {orgId && currentStage !== 'sustain' && (
+              <AdvanceStageButton orgId={orgId} currentStage={currentStage} />
+            )}
           </div>
         )}
       </CardContent>

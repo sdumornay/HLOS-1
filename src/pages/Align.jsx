@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import AlignProgress from '@/components/align/AlignProgress';
 import FiveDysfunctionsDiagnostic from '@/components/align/FiveDysfunctionsDiagnostic';
 import WorkstyleResults from '@/components/align/WorkstyleResults';
@@ -20,13 +20,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import StageHero from '@/components/stages/StageHero';
+import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
 
 export default function Align() {
-  const { user } = useCurrentUser();
   const [showWorkstyleModal, setShowWorkstyleModal] = useState(false);
-  const orgId = user?.organization_id;
+  const orgId = useOrgId();
 
   const { data: dysfunctions = [] } = useQuery({
     queryKey: ['fiveDysfunctions', orgId],
@@ -83,6 +83,7 @@ export default function Align() {
   return (
     <div className="space-y-6">
       <StageHero stage="align" orgId={orgId} counts={counts} />
+      <StageGuide stage="align" counts={counts} />
       <AlignProgress counts={counts} />
 
       {/* Assessment Launchers */}
@@ -130,26 +131,26 @@ export default function Align() {
           open={showWorkstyleModal}
           onClose={() => setShowWorkstyleModal(false)}
           orgId={orgId}
-          userName={user?.full_name || ''}
-          userEmail={user?.email || ''}
+          userName={''}
+          userEmail={''}
           onSaved={() => refetchWorkstyles()}
         />
       </div>
 
       {/* Area 1: Team Understanding */}
-      <DisciplineSection number={3} name="Team Understanding" description="Map workstyles, strengths, and team dynamics">
+      <DisciplineSection number={3} name="Team Understanding" description="Map workstyles, strengths, and team dynamics" audience="team">
         <TeamOperatingMap orgId={orgId} />
         <WorkstyleResults orgId={orgId} />
       </DisciplineSection>
 
       {/* Area 2: Team Health */}
-      <DisciplineSection number={4} name="Team Health" description="Identify trust gaps and dysfunction patterns">
+      <DisciplineSection number={4} name="Team Health" description="Identify trust gaps and dysfunction patterns" audience="team">
         <TeamHealthPanel orgId={orgId} />
         <FiveDysfunctionsDiagnostic orgId={orgId} />
       </DisciplineSection>
 
       {/* Area 3: Organizational Clarity */}
-      <DisciplineSection number={5} name="Organizational Clarity" description="Define mission, priorities, roles, and decisions">
+      <DisciplineSection number={5} name="Organizational Clarity" description="Define mission, priorities, roles, and decisions" audience="leader">
         <OrgClaritySummary orgId={orgId} />
         <PriorityAlignmentPage orgId={orgId} />
         <RoleClarityWorksheet orgId={orgId} />
@@ -157,7 +158,7 @@ export default function Align() {
       </DisciplineSection>
 
       {/* Area 4: Team Agreements */}
-      <DisciplineSection number={6} name="Team Agreements" description="Establish how the team will work together">
+      <DisciplineSection number={6} name="Team Agreements" description="Establish how the team will work together" audience="leader">
         <TeamAgreements orgId={orgId} />
         <LeadershipCovenant orgId={orgId} />
       </DisciplineSection>

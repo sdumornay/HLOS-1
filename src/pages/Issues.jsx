@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -12,7 +13,7 @@ import IssueCard from '@/components/issues/IssueCard';
 
 export default function Issues() {
   const { user, isAdmin, isCoach } = useCurrentUser();
-  const orgId = user?.organization_id;
+  const orgId = useOrgId();
   const canOverride = isAdmin || isCoach;
   const canDelete = isAdmin || isCoach || user?.role === 'lead_pastor';
   const { toast } = useToast();

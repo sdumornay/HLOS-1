@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -10,9 +11,11 @@ import { Users, UserCheck, Shield, Activity } from 'lucide-react';
 import ScoreCard from '@/components/dashboard/ScoreCard';
 import HealthRadar from '@/components/dashboard/HealthRadar';
 import TeamMemberAssignment from '@/components/team/TeamMemberAssignment';
+import InviteMembersButton from '@/components/team/InviteMembersButton';
 
 export default function TeamDashboard() {
   const { user, canManageAll } = useCurrentUser();
+  const orgId = useOrgId();
   const [selectedTeamId, setSelectedTeamId] = useState('all');
 
   const { data: teams = [] } = useQuery({
@@ -30,7 +33,6 @@ export default function TeamDashboard() {
     queryFn: () => base44.entities.User.list(),
   });
 
-  const orgId = user?.organization_id;
   const myTeams = canManageAll ? teams : teams.filter(t => t.organization_id === orgId);
   const selectedTeam = selectedTeamId !== 'all' ? myTeams.find(t => t.id === selectedTeamId) : null;
 
@@ -53,17 +55,20 @@ export default function TeamDashboard() {
           <h1 className="text-2xl lg:text-3xl font-display font-bold">Team Dashboard</h1>
           <p className="text-muted-foreground mt-1">Monitor team health and member engagement</p>
         </div>
-        <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
-          <SelectTrigger className="w-48">
-            <SelectValue placeholder="All Teams" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">All Teams</SelectItem>
-            {myTeams.map(t => (
-              <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <div className="flex items-center gap-3">
+          <Select value={selectedTeamId} onValueChange={setSelectedTeamId}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="All Teams" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Teams</SelectItem>
+              {myTeams.map(t => (
+                <SelectItem key={t.id} value={t.id}>{t.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {canManageAll && <InviteMembersButton />}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

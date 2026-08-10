@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
@@ -14,7 +15,7 @@ import {
 
 export default function Momentum() {
   const { user } = useCurrentUser();
-  const orgId = user?.organization_id;
+  const orgId = useOrgId();
 
   const { data: priorities = [], isLoading } = useQuery({
     queryKey: ['momentum-priorities', orgId],

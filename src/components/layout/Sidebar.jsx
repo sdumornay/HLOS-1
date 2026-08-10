@@ -1,16 +1,18 @@
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Shield, Compass, Rocket, Leaf,
   ClipboardCheck, Target, Calendar, BarChart3, BookOpen, Settings,
-  ChevronLeft, ChevronRight, Heart, Globe, Briefcase, Activity, AlertCircle
+  ChevronLeft, ChevronRight, Heart, Briefcase, Activity, AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 
+const LEADER_ROLES = ['super_admin', 'coach', 'lead_pastor'];
+const ADMIN_ROLES = ['super_admin', 'coach'];
+
 const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard, roles: 'all' },
-  { label: 'Team Dashboard', path: '/team', icon: Users, roles: 'all' },
   { type: 'divider', label: 'Framework' },
   { label: 'Stabilize', path: '/stabilize', icon: Shield, roles: 'all' },
   { label: 'Align', path: '/align', icon: Compass, roles: 'all' },
@@ -18,24 +20,38 @@ const NAV_ITEMS = [
   { label: 'Sustain', path: '/sustain', icon: Leaf, roles: 'all' },
   { type: 'divider', label: 'Tools' },
   { label: 'Assessments', path: '/assessments', icon: ClipboardCheck, roles: 'all' },
-  { label: 'Org Health', path: '/org-health', icon: Activity, roles: 'all' },
-  { label: 'Momentum', path: '/momentum', icon: Rocket, roles: 'all' },
   { label: 'Issues', path: '/issues', icon: AlertCircle, roles: 'all' },
   { label: 'Actions', path: '/actions', icon: Target, roles: 'all' },
-  { label: 'Sessions', path: '/sessions', icon: Calendar, roles: 'all' },
-  { label: 'Reports & Analytics', path: '/reviews', icon: BarChart3, roles: 'all' },
   { label: 'Resources', path: '/resources', icon: BookOpen, roles: 'all' },
-  { type: 'divider', label: 'Admin' },
+  { type: 'divider', label: 'Insights', roles: LEADER_ROLES },
+  { label: 'Team Dashboard', path: '/team', icon: Users, roles: LEADER_ROLES },
+  { label: 'Org Health', path: '/org-health', icon: Activity, roles: LEADER_ROLES },
+  { label: 'Momentum', path: '/momentum', icon: Rocket, roles: LEADER_ROLES },
+  { label: 'Sessions', path: '/sessions', icon: Calendar, roles: LEADER_ROLES },
+  { label: 'Reports', path: '/reviews', icon: BarChart3, roles: LEADER_ROLES },
+  { type: 'divider', label: 'Admin', roles: ADMIN_ROLES },
   { label: 'Coach Workspace', path: '/coach', icon: Briefcase, roles: ['coach'] },
-  { label: 'Organizations', path: '/organizations', icon: Settings, roles: ['super_admin', 'coach'] },
+  { label: 'Organizations', path: '/organizations', icon: Settings, roles: ADMIN_ROLES },
 ];
 
 export default function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
-  const { user, canManageAll } = useCurrentUser();
+  const [searchParams] = useSearchParams();
+  const { user } = useCurrentUser();
+
+  // Detect consultant viewing a specific org (from /coach/:orgId route or ?org= param)
+  const routeOrgMatch = location.pathname.match(/\/coach\/([^/]+)/);
+  const routeOrgId = routeOrgMatch?.[1];
+  const queryOrgId = searchParams.get('org');
+  const activeOrgId = routeOrgId || queryOrgId;
+  const isPortfolioList = location.pathname === '/coach';
+  const shouldCarryOrg = activeOrgId && !isPortfolioList;
 
   const visibleItems = NAV_ITEMS.filter(item => {
-    if (item.type === 'divider') return true;
+    if (item.type === 'divider') {
+      if (item.roles && !item.roles.includes(user?.role)) return false;
+      return true;
+    }
     if (item.roles === 'all') return true;
     return item.roles?.includes(user?.role);
   });
@@ -73,10 +89,15 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           const isActive = location.pathname === item.path ||
             (item.path !== '/' && location.pathname.startsWith(item.path));
 
+          // Carry org context via ?org= when consultant is viewing a specific org
+          const linkTo = shouldCarryOrg && item.path !== '/coach'
+            ? `${item.path}?org=${activeOrgId}`
+            : item.path;
+
           return (
             <Link
               key={item.path}
-              to={item.path}
+              to={linkTo}
               className={cn(
                 "flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-all duration-150",
                 isActive

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,6 +17,7 @@ import ExportPDFButton from '@/components/shared/ExportPDFButton';
 
 export default function Sessions() {
   const { user, canManageAll } = useCurrentUser();
+  const orgId = useOrgId();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
@@ -33,7 +35,6 @@ export default function Sessions() {
     queryFn: () => base44.entities.DecisionLog.list('-date', 100),
   });
 
-  const orgId = user?.organization_id;
   const mySessions = canManageAll ? sessions : sessions.filter(s => s.organization_id === orgId);
 
   const createMutation = useMutation({

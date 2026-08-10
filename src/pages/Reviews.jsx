@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgId } from '@/lib/useOrgId';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
@@ -12,7 +13,7 @@ import ScoreCard from '@/components/dashboard/ScoreCard';
 
 export default function Reviews() {
   const { user, canManageAll } = useCurrentUser();
-  const orgId = user?.organization_id;
+  const orgId = useOrgId();
 
   const { data: assessments = [] } = useQuery({
     queryKey: ['assessments'],
