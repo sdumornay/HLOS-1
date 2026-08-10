@@ -85,7 +85,26 @@
           ]
         },
         {
-          "data.organization_id": "{{user.organization_id}}"
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            },
+            {
+              "data.respondent_email": "{{user.email}}"
+            }
+          ]
         }
       ]
     },
@@ -109,7 +128,14 @@
           ]
         },
         {
-          "data.organization_id": "{{user.organization_id}}"
+          "$and": [
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            },
+            {
+              "data.respondent_email": "{{user.email}}"
+            }
+          ]
         }
       ]
     },
