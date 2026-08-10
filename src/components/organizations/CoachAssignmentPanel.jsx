@@ -98,7 +98,31 @@ export default function CoachAssignmentPanel({ organizations }) {
   const queryClient = useQueryClient();
 
   const updateMutation = useMutation({
-    mutationFn: ({ id, data }) => base44.functions.invoke('updateOrganization', { id, data }),
+    mutationFn: async ({ id, data }) => {
+      const result = await base44.functions.invoke('updateOrganization', { id, data });
+      // F5: Create Engagement record when a coach is assigned
+      if (data.coach_email) {
+        try {
+          const existing = await base44.entities.Engagement.filter({
+            organization_id: id,
+            coach_email: data.coach_email,
+            status: 'active',
+          });
+          if (existing.length === 0) {
+            await base44.entities.Engagement.create({
+              organization_id: id,
+              coach_email: data.coach_email,
+              start_date: new Date().toISOString().split('T')[0],
+              status: 'active',
+              current_stage: data.current_stage || 'stabilize',
+            });
+          }
+        } catch (e) {
+          // Engagement creation may fail due to RLS — non-critical
+        }
+      }
+      return result;
+    },
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['organizations'] }),
   });
 

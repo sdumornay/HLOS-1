@@ -29,6 +29,21 @@
         "general"
       ]
     },
+    "health_dimension": {
+      "type": "string",
+      "enum": [
+        "trust",
+        "safety",
+        "clarity",
+        "accountability",
+        "conflict",
+        "momentum",
+        "commitment",
+        "results",
+        "general"
+      ],
+      "description": "Which health dimension this resource addresses"
+    },
     "url": {
       "type": "string"
     },

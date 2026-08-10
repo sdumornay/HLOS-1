@@ -15,10 +15,21 @@ export default function MomentumChart({ assessments = [] }) {
     data.push({ date: 'No data', health: 0 });
   }
 
+  const delta = data.length >= 2
+    ? parseFloat((data[data.length - 1].health - data[data.length - 2].health).toFixed(1))
+    : null;
+
   return (
     <Card className="border-border/50 shadow-sm">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold">Health Trend</CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-base font-semibold">Health Trend</CardTitle>
+          {delta !== null && delta !== 0 && (
+            <span className={`text-xs font-semibold flex items-center gap-1 ${delta > 0 ? 'text-emerald-600' : 'text-red-500'}`}>
+              {delta > 0 ? '↑' : '↓'} {Math.abs(delta)} since last
+            </span>
+          )}
+        </div>
       </CardHeader>
       <CardContent>
         <ResponsiveContainer width="100%" height={280}>

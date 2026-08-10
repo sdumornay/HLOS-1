@@ -10,13 +10,15 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ClipboardCheck, Activity, Users } from 'lucide-react';
+import { Plus, ClipboardCheck, Activity, Users, Heart } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import ExportPDFButton from '@/components/shared/ExportPDFButton';
 import TeamHealthTrends from '@/components/assessments/TeamHealthTrends';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
 import FiveDysfunctionsModal from '@/components/shared/FiveDysfunctionsModal';
+import ParticipationReport from '@/components/assessments/ParticipationReport';
+import GuidedAssessment from '@/components/assessments/GuidedAssessment';
 
 const DIMENSIONS = [
   { key: 'trust', label: 'Trust', desc: 'How much do team members trust each other?' },
@@ -40,6 +42,7 @@ export default function Assessments() {
   const [open, setOpen] = useState(false);
   const [workstyleOpen, setWorkstyleOpen] = useState(false);
   const [fiveDysOpen, setFiveDysOpen] = useState(false);
+  const [guidedOpen, setGuidedOpen] = useState(false);
   const [form, setForm] = useState({
     type: 'pulse',
     stage: 'stabilize',
@@ -222,6 +225,27 @@ export default function Assessments() {
         </Card>
       </div>
 
+      {/* F10: Guided Assessment for team members */}
+      <Card className="border-border/50 shadow-sm bg-gradient-to-r from-accent/5 to-primary/5">
+        <CardContent className="p-5 flex items-center gap-4">
+          <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
+            <Heart className="h-5 w-5 text-accent" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold">Quick Health Check</p>
+            <p className="text-xs text-muted-foreground mt-0.5">A guided 6-question pulse survey. Takes less than 2 minutes.</p>
+          </div>
+          <Button size="sm" onClick={() => setGuidedOpen(true)}>Start</Button>
+        </CardContent>
+      </Card>
+
+      <GuidedAssessment
+        open={guidedOpen}
+        onClose={() => setGuidedOpen(false)}
+        orgId={orgId}
+        user={user}
+      />
+
       <FiveDysfunctionsModal
         open={fiveDysOpen}
         onClose={() => setFiveDysOpen(false)}
@@ -240,6 +264,9 @@ export default function Assessments() {
       {myAssessments.length > 0 && (
         <TeamHealthTrends assessments={myAssessments} />
       )}
+
+      {/* F4: Participation Report */}
+      {orgId && <ParticipationReport orgId={orgId} />}
 
       {/* Workstyle Results */}
       {workstyleResults.length > 0 && (

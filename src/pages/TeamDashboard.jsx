@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Users, UserCheck, Shield, Activity } from 'lucide-react';
 import ScoreCard from '@/components/dashboard/ScoreCard';
 import HealthRadar from '@/components/dashboard/HealthRadar';
+import TeamMemberAssignment from '@/components/team/TeamMemberAssignment';
 
 export default function TeamDashboard() {
   const { user, canManageAll } = useCurrentUser();
@@ -103,6 +104,9 @@ export default function TeamDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* F9: Team Member Assignment */}
+      {orgId && <TeamMemberAssignment orgId={orgId} />}
     </div>
   );
 }

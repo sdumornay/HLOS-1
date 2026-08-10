@@ -4,7 +4,8 @@ import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Building2, AlertTriangle, Calendar, Heart, ArrowRight } from 'lucide-react';
+import { Building2, AlertTriangle, Calendar, Heart, ArrowRight, Handshake } from 'lucide-react';
+import CrossOrgComparison from '@/components/coach/CrossOrgComparison';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 
@@ -42,6 +43,12 @@ export default function CoachWorkspace() {
     queryKey: ['all-sessions-coach'],
     queryFn: () => base44.entities.Session.list('-date', 50),
     enabled: orgIds.length > 0,
+  });
+
+  const { data: engagements = [] } = useQuery({
+    queryKey: ['engagements-coach', user?.email],
+    queryFn: () => base44.entities.Engagement.filter({ coach_email: user?.email }),
+    enabled: !!user?.email,
   });
 
   const myAssessments = assessments.filter(a => orgIds.includes(a.organization_id));
@@ -126,6 +133,39 @@ export default function CoachWorkspace() {
           </CardContent>
         </Card>
       </div>
+
+      {/* F3: Cross-org comparison */}
+      {orgs.length > 0 && (
+        <CrossOrgComparison orgs={orgs} assessments={myAssessments} risks={myRisks} sessions={mySessions} />
+      )}
+
+      {/* F5: Active Engagements */}
+      {engagements.length > 0 && (
+        <Card className="border-border/50 shadow-sm">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-base font-semibold flex items-center gap-2">
+              <Handshake className="h-4 w-4 text-primary" />
+              Active Engagements
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {engagements.map(eng => {
+              const org = orgs.find(o => o.id === eng.organization_id);
+              return (
+                <div key={eng.id} className="flex items-center justify-between py-2 border-b border-border/40 last:border-0">
+                  <div>
+                    <p className="text-sm font-medium">{org?.name || 'Unknown org'}</p>
+                    <p className="text-xs text-muted-foreground">Since {eng.start_date || '—'} · <span className="capitalize">{eng.status}</span></p>
+                  </div>
+                  <Badge className={`text-xs capitalize border-0 ${STAGE_COLORS[eng.current_stage] || 'bg-muted'}`}>
+                    {eng.current_stage}
+                  </Badge>
+                </div>
+              );
+            })}
+          </CardContent>
+        </Card>
+      )}
 
       {isLoading ? (
         <div className="flex items-center justify-center py-16">

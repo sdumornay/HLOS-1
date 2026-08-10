@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -18,6 +18,8 @@ import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 import WorkstyleCard from '@/components/dashboard/WorkstyleCard';
 import NextStepsPanel from '@/components/dashboard/NextStepsPanel';
 import RiskFlagSummary from '@/components/dashboard/RiskFlagSummary';
+import ResourceRecommendations from '@/components/dashboard/ResourceRecommendations';
+import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach } = useCurrentUser();
@@ -98,6 +100,11 @@ export default function Dashboard() {
   const totalActions = actions.length;
   const overdueActions = actions.filter(a => a.status !== 'completed' && a.due_date && new Date(a.due_date) < new Date()).length;
 
+  // F1: Generate system notifications on dashboard load
+  useEffect(() => {
+    if (orgId) base44.functions.invoke('generateNotifications', { organizationId: orgId });
+  }, [orgId]);
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -162,11 +169,17 @@ export default function Dashboard() {
       {/* Risk Flags */}
       {orgId && <RiskFlagSummary />}
 
+      {/* F2: Resource Recommendations based on health gaps */}
+      {orgId && <ResourceRecommendations orgId={orgId} />}
+
       {/* Benchmarking */}
       {orgId && <BenchmarkPanel orgId={orgId} />}
 
       {/* Admin Org Overview — super_admin and coach only */}
       {(isAdmin || isCoach) && <AdminOrgWidget />}
+
+      {/* F7: Stage Completion Matrix — super_admin only */}
+      {isAdmin && <StageCompletionMatrix />}
 
       {/* Security Audit — super_admin only */}
       {isAdmin && <SecurityAuditPanel />}
