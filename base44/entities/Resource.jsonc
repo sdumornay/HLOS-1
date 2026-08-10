@@ -44,27 +44,5 @@
   },
   "required": [
     "title"
-  ],
-  "rls": {
-    "create": {
-      "user_condition": {
-        "role": "super_admin"
-      }
-    },
-    "read": {
-      "user_condition": {
-        "$ne": "anonymous"
-      }
-    },
-    "update": {
-      "user_condition": {
-        "role": "super_admin"
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "super_admin"
-      }
-    }
-  }
+  ]
 }

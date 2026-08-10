@@ -39,5 +39,6 @@
     "avatar_url": {
       "type": "string"
     }
-  }
+  },
+  "required": []
 }

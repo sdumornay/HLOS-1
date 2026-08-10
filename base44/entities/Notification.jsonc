@@ -44,27 +44,7 @@
     "message"
   ],
   "rls": {
-    "create": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "$and": [
-            {
-              "user_condition": {
-                "role": "coach"
-              }
-            },
-            {
-              "data.organization_id": "{{user.organization_id}}"
-            }
-          ]
-        }
-      ]
-    },
+    "create": {},
     "read": {
       "$or": [
         {
@@ -74,18 +54,6 @@
           "user_condition": {
             "role": "super_admin"
           }
-        },
-        {
-          "$and": [
-            {
-              "user_condition": {
-                "role": "coach"
-              }
-            },
-            {
-              "data.organization_id": "{{user.organization_id}}"
-            }
-          ]
         }
       ]
     },
@@ -98,44 +66,13 @@
           "user_condition": {
             "role": "super_admin"
           }
-        },
-        {
-          "$and": [
-            {
-              "user_condition": {
-                "role": "coach"
-              }
-            },
-            {
-              "data.organization_id": "{{user.organization_id}}"
-            }
-          ]
         }
       ]
     },
     "delete": {
-      "$or": [
-        {
-          "data.user_email": "{{user.email}}"
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "$and": [
-            {
-              "user_condition": {
-                "role": "coach"
-              }
-            },
-            {
-              "data.organization_id": "{{user.organization_id}}"
-            }
-          ]
-        }
-      ]
+      "user_condition": {
+        "role": "super_admin"
+      }
     }
   }
 }

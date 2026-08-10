@@ -40,24 +40,6 @@
         "type": "string"
       }
     },
-    "decisions": {
-      "type": "array",
-      "description": "Decisions made during this session",
-      "items": {
-        "type": "object",
-        "properties": {
-          "description": {
-            "type": "string"
-          },
-          "owner": {
-            "type": "string"
-          },
-          "status": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "notes": {
       "type": "string"
     },

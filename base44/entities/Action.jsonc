@@ -17,6 +17,10 @@
     "owner_email": {
       "type": "string"
     },
+    "owner": {
+      "type": "string",
+      "description": "Owner name (free text, used by Execute module)"
+    },
     "status": {
       "type": "string",
       "enum": [
@@ -67,6 +71,9 @@
     "session_id": {
       "type": "string",
       "description": "Reference to session where action was created"
+    },
+    "notes": {
+      "type": "string"
     }
   },
   "required": [

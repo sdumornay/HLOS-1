@@ -44,19 +44,47 @@
   ],
   "rls": {
     "create": {
-      "user_condition": {
-        "role": "super_admin"
-      }
-    },
-    "read": {
       "$or": [
-        {
-          "data.coach_email": "{{user.email}}"
-        },
         {
           "user_condition": {
             "role": "super_admin"
           }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.coach_email": "{{user.email}}"
+            }
+          ]
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.coach_email": "{{user.email}}"
+            }
+          ]
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
         }
       ]
     },
@@ -78,13 +106,41 @@
               "data.coach_email": "{{user.email}}"
             }
           ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
         }
       ]
     },
     "delete": {
-      "user_condition": {
-        "role": "super_admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        }
+      ]
     }
   }
 }
