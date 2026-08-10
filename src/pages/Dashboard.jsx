@@ -23,6 +23,7 @@ import RiskFlagSummary from '@/components/dashboard/RiskFlagSummary';
 import ResourceRecommendations from '@/components/dashboard/ResourceRecommendations';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
 import DualScoreboard from '@/components/dashboard/DualScoreboard';
+import IssueSummary from '@/components/issues/IssueSummary';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach } = useCurrentUser();
@@ -98,6 +99,12 @@ export default function Dashboard() {
     enabled: !!orgId,
   });
 
+  const { data: issues = [] } = useQuery({
+    queryKey: ['issues-summary', orgId],
+    queryFn: () => base44.entities.Issue.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
   const currentOrg = organizations.find(o => o.id === orgId) || organizations[0];
   const currentStage = currentOrg?.current_stage || 'stabilize';
 
@@ -161,6 +168,9 @@ export default function Dashboard() {
         <HealthRadar assessments={recentAssessments} />
         <MomentumChart assessments={recentAssessments} />
       </div>
+
+      {/* Issues Summary */}
+      {orgId && <IssueSummary issues={issues} />}
 
       {/* Risk Flags */}
       {orgId && <RiskFlagSummary />}
