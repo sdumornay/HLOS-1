@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, Circle, ArrowRight, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-const STAGE_STEPS = {
+export const STAGE_STEPS = {
   stabilize: [
     { key: 'tension_pulse', label: 'Complete a Tension Pulse Survey', desc: 'Baseline your team tension and trust levels', link: '/stabilize' },
     { key: 'conflict_intake', label: 'Document any active conflicts', desc: 'Surface and categorize ongoing conflicts', link: '/stabilize' },

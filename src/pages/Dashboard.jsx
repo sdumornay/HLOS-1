@@ -5,25 +5,19 @@ import { useCurrentUser } from '@/lib/useCurrentUser';
 import { computeUnifiedHealthScore } from '@/lib/healthMetrics';
 import { computeMomentumIndicators, computeMomentumTrend } from '@/lib/momentumScoring';
 import { getRoundComparison } from '@/lib/scoreboardScoring';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Heart, TrendingUp, Target, Calendar, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { format } from 'date-fns';
-import ScoreCard from '@/components/dashboard/ScoreCard';
-import StageJourney from '@/components/dashboard/StageJourney';
-import HealthRadar from '@/components/dashboard/HealthRadar';
-import MomentumChart from '@/components/dashboard/MomentumChart';
+import { STAGE_STEPS } from '@/components/dashboard/NextStepsPanel';
+
+import CommandCenterHeader from '@/components/dashboard/CommandCenterHeader';
+import PrimaryScoreCards from '@/components/dashboard/PrimaryScoreCards';
+import TopPriorities from '@/components/dashboard/TopPriorities';
+import NeedsAttention from '@/components/dashboard/NeedsAttention';
+import CurrentStagePanel from '@/components/dashboard/CurrentStagePanel';
+import UpcomingItems from '@/components/dashboard/UpcomingItems';
+import RecentProgress from '@/components/dashboard/RecentProgress';
+
 import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
-import BenchmarkPanel from '@/components/dashboard/BenchmarkPanel';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
-import WorkstyleCard from '@/components/dashboard/WorkstyleCard';
-import NextStepsPanel from '@/components/dashboard/NextStepsPanel';
-import RiskFlagSummary from '@/components/dashboard/RiskFlagSummary';
-import ResourceRecommendations from '@/components/dashboard/ResourceRecommendations';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
-import DualScoreboard from '@/components/dashboard/DualScoreboard';
-import IssueSummary from '@/components/issues/IssueSummary';
 
 export default function Dashboard() {
   const { user, isAdmin, isCoach } = useCurrentUser();
@@ -105,144 +99,164 @@ export default function Dashboard() {
     enabled: !!orgId,
   });
 
+  const { data: quarterlyReviews = [] } = useQuery({
+    queryKey: ['quarterlyReviews-dash', orgId],
+    queryFn: () => base44.entities.QuarterlyReview.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
+  // Stabilize-stage data for next-steps logic
+  const { data: tensionPulsesNS = [] } = useQuery({
+    queryKey: ['tensionPulses-ns', orgId], queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: conflictIntakes = [] } = useQuery({
+    queryKey: ['conflictIntakes-ns', orgId], queryFn: () => base44.entities.ConflictIntake.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: commAgreements = [] } = useQuery({
+    queryKey: ['commAgreements-ns', orgId], queryFn: () => base44.entities.CommAgreement.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: dysfunctions = [] } = useQuery({
+    queryKey: ['fiveDysfunctions-ns', orgId], queryFn: () => base44.entities.FiveDysfunctions.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: workstyles = [] } = useQuery({
+    queryKey: ['workstyleAssessments-ns', orgId], queryFn: () => base44.entities.WorkstyleAssessment.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: roleClarity = [] } = useQuery({
+    queryKey: ['roleClarity-ns', orgId], queryFn: () => base44.entities.RoleClarity.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: decisionRights = [] } = useQuery({
+    queryKey: ['decisionRights-ns', orgId], queryFn: () => base44.entities.DecisionRight.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: covenants = [] } = useQuery({
+    queryKey: ['covenants-ns', orgId], queryFn: () => base44.entities.LeadershipCovenant.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: meetingAgendas = [] } = useQuery({
+    queryKey: ['meetingAgendas-ns', orgId], queryFn: () => base44.entities.MeetingAgenda.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+  const { data: riskFlags = [] } = useQuery({
+    queryKey: ['riskFlags-ns', orgId], queryFn: () => base44.entities.RiskFlag.filter({ organization_id: orgId }),
+    enabled: !!orgId,
+  });
+
   const currentOrg = organizations.find(o => o.id === orgId) || organizations[0];
   const currentStage = currentOrg?.current_stage || 'stabilize';
 
+  // Unified scores
   const unifiedHealth = computeUnifiedHealthScore(assessments, healthPulses, tensionPulses);
   const momentumResult = computeMomentumIndicators(priorities, actions, decisions, stageProgress);
   const unifiedMomentum = momentumResult.overall;
 
-  // Health trend from assessment rounds
+  // Health trend
   const { current: healthCurrent, previous: healthPrevious } = getRoundComparison(assessments);
   const healthTrend = !healthCurrent || !healthPrevious ? 'stable' :
     healthCurrent.overall > healthPrevious.overall + 0.5 ? 'improving' :
     healthCurrent.overall < healthPrevious.overall - 0.5 ? 'declining' : 'stable';
 
-  // Momentum trend from recent execution activity
+  // Momentum trend
   const momentumTrend = computeMomentumTrend(actions, decisions).direction;
 
-  const recentAssessments = assessments.slice(0, 20);
-  const completedActions = actions.filter(a => a.status === 'completed').length;
-  const totalActions = actions.length;
-  const overdueActions = actions.filter(a => a.status !== 'completed' && a.due_date && new Date(a.due_date) < new Date()).length;
+  // Last assessment date
+  const lastAssessmentDate = assessments.length > 0
+    ? assessments[0]?.created_date
+    : null;
 
-  // F1: Generate system notifications on dashboard load
+  // Current operating period
+  const activePlan = planPeriods.find(p => p.status === 'active');
+  const operatingPeriod = activePlan
+    ? `${activePlan.type?.replace('_', ' ') || 'Active'} plan`
+    : priorities.length > 0
+      ? `${priorities.filter(p => p.status === 'active').length} active priorities`
+      : null;
+
+  // Stage steps logic (from NextStepsPanel)
+  const stageSteps = STAGE_STEPS[currentStage] || [];
+  const stageCounts = {
+    tension_pulse: tensionPulsesNS.length,
+    conflict_intake: conflictIntakes.length,
+    leader_interviews: 0,
+    comm_agreements: commAgreements.length,
+    conflict_triggers: 0,
+    nvc_conversations: 0,
+    five_dysfunctions: dysfunctions.length,
+    workstyle: workstyles.length,
+    role_clarity: roleClarity.length,
+    priorities: priorities.length,
+    decision_rights: decisionRights.length,
+    covenant: covenants.length,
+    planning: planPeriods.length,
+    meetings: meetingAgendas.length,
+    decisions: decisions.length,
+    actions: actions.filter(a => a.status === 'completed').length,
+    health_pulse: healthPulses.length,
+    risk_flags: riskFlags.length,
+    quarterly_review: quarterlyReviews.length,
+    renewal: quarterlyReviews.filter(r => r.renewal_action).length,
+  };
+  const completedCount = stageSteps.filter(s => (stageCounts[s.key] || 0) > 0).length;
+  const nextStep = stageSteps.find(s => (stageCounts[s.key] || 0) === 0);
+
+  // Generate notifications on load
   useEffect(() => {
     if (orgId) base44.functions.invoke('generateNotifications', { organizationId: orgId });
   }, [orgId]);
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-1">Healthy Leadership OS</p>
-          <h1 className="text-2xl lg:text-3xl font-barlow font-bold text-foreground tracking-tight">
-            Leadership Health Dashboard
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">Health First. Momentum Next.</p>
-        </div>
-        {currentOrg && (
-          <Badge className="text-sm px-3 py-1.5 w-fit bg-primary text-primary-foreground border-0 font-semibold">
-            {currentOrg.name} — <span className="capitalize ml-1">{currentStage}</span>
-          </Badge>
-        )}
-      </div>
-
-      {/* Visual four-stage journey */}
-      <StageJourney currentStage={currentStage} orgId={orgId} />
-
-      {/* Next Steps — contextual guidance */}
-      {orgId && <NextStepsPanel stage={currentStage} orgId={orgId} />}
-
-      {/* Dual Scoreboard — Health First. Momentum Next. */}
-      <DualScoreboard
-        healthScore={unifiedHealth}
-        healthTrend={healthTrend}
-        momentumScore={unifiedMomentum}
-        momentumTrend={momentumTrend}
+    <div className="space-y-5">
+      {/* 1. Header: Org name, stage, progress */}
+      <CommandCenterHeader
+        org={currentOrg}
+        currentStage={currentStage}
+        stageProgress={stageProgress}
       />
 
-      {/* Charts */}
+      {/* 2. Two primary cards: Leadership Health + Momentum */}
+      <PrimaryScoreCards
+        healthScore={unifiedHealth}
+        healthTrend={healthTrend}
+        lastAssessmentDate={lastAssessmentDate}
+        momentumScore={unifiedMomentum}
+        momentumTrend={momentumTrend}
+        operatingPeriod={operatingPeriod}
+      />
+
+      {/* 3. Top Priorities + Needs Attention */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <HealthRadar assessments={recentAssessments} />
-        <MomentumChart assessments={recentAssessments} />
+        <TopPriorities orgId={orgId} />
+        <NeedsAttention issues={issues} actions={actions} healthTrend={healthTrend} />
       </div>
 
-      {/* Issues Summary */}
-      {orgId && <IssueSummary issues={issues} />}
+      {/* 4. Current Stage + Upcoming */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <CurrentStagePanel
+          currentStage={currentStage}
+          stageSteps={stageSteps}
+          completedCount={completedCount}
+          nextStep={nextStep}
+        />
+        <UpcomingItems sessions={sessions} actions={actions} quarterlyReviews={quarterlyReviews} />
+      </div>
 
-      {/* Risk Flags */}
-      {orgId && <RiskFlagSummary />}
+      {/* 5. Recent Progress */}
+      <RecentProgress
+        priorities={priorities}
+        issues={issues}
+        actions={actions}
+        healthTrend={healthTrend}
+      />
 
-      {/* F2: Resource Recommendations based on health gaps */}
-      {orgId && <ResourceRecommendations orgId={orgId} />}
-
-      {/* Benchmarking */}
-      {orgId && <BenchmarkPanel orgId={orgId} />}
-
-      {/* Admin Org Overview — super_admin and coach only */}
+      {/* Admin panels — below the command center, only for admins/coaches */}
       {(isAdmin || isCoach) && <AdminOrgWidget />}
-
-      {/* F7: Stage Completion Matrix — super_admin only */}
       {isAdmin && <StageCompletionMatrix />}
-
-      {/* Security Audit — super_admin only */}
       {isAdmin && <SecurityAuditPanel />}
-
-      {/* Workstyle + Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <WorkstyleCard userEmail={user?.email} />
-        {/* Recent Actions */}
-        <Card className="border-border/50 shadow-sm">
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-semibold">Recent Actions</CardTitle>
-            <Link to="/actions" className="text-xs text-primary hover:underline flex items-center gap-1">
-              View all <ArrowRight className="h-3 w-3" />
-            </Link>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {actions.slice(0, 5).map(action => (
-              <div key={action.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{action.title}</p>
-                  <p className="text-xs text-muted-foreground">{action.owner_email || action.owner}</p>
-                </div>
-                <Badge variant={action.status === 'completed' ? 'default' : action.status === 'overdue' ? 'destructive' : 'secondary'} className="text-xs ml-2">
-                  {action.status?.replace('_', ' ')}
-                </Badge>
-              </div>
-            ))}
-            {actions.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-6">No actions yet. Start by creating your first action item.</p>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Upcoming Sessions */}
-        <Card className="border-border/50 shadow-sm">
-          <CardHeader className="pb-3 flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-semibold">Recent Sessions</CardTitle>
-            <Link to="/sessions" className="text-xs text-primary hover:underline flex items-center gap-1">
-              View all <ArrowRight className="h-3 w-3" />
-            </Link>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {sessions.slice(0, 5).map(session => (
-              <div key={session.id} className="flex items-center justify-between py-2 border-b border-border/50 last:border-0">
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{session.title}</p>
-                  <p className="text-xs text-muted-foreground">{session.date ? format(new Date(session.date), 'MMM d, yyyy') : 'No date'}</p>
-                </div>
-                <Badge variant="outline" className="text-xs capitalize ml-2">{session.stage}</Badge>
-              </div>
-            ))}
-            {sessions.length === 0 && (
-              <p className="text-sm text-muted-foreground text-center py-6">No sessions logged yet.</p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
