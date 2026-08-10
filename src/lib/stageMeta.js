@@ -1,4 +1,4 @@
-// Stage and discipline definitions for the 4-stage, 8-discipline framework.
+// Stage and discipline definitions for the 4-stage, 10-discipline framework.
 // Used by StageHero, DisciplineSection, StageJourney, and stage pages.
 
 export const STAGE_META = {
@@ -22,10 +22,12 @@ export const STAGE_META = {
     color: 'amber',
     what: 'Establish shared understanding, clarify roles, and build team cohesion',
     why: 'Alignment ensures everyone knows their role, shares the same priorities, and commits to the same decisions. Without it, execution creates friction.',
-    toolKeys: ['five_dysfunctions', 'workstyle', 'role_clarity', 'priorities', 'decision_rights', 'covenant'],
+    toolKeys: ['five_dysfunctions', 'workstyle', 'role_clarity', 'priorities', 'decision_rights', 'covenant', 'comm_agreements', 'mission'],
     disciplines: [
-      { number: 3, name: 'Team Understanding', description: 'Map team dynamics and leadership styles' },
-      { number: 4, name: 'Organizational Clarity', description: 'Define roles, priorities, and decision rights' },
+      { number: 3, name: 'Team Understanding', description: 'Map workstyles, strengths, and team dynamics' },
+      { number: 4, name: 'Team Health', description: 'Identify trust gaps and dysfunction patterns' },
+      { number: 5, name: 'Organizational Clarity', description: 'Define mission, priorities, roles, and decisions' },
+      { number: 6, name: 'Team Agreements', description: 'Establish how the team will work together' },
     ],
   },
   execute: {
@@ -37,8 +39,8 @@ export const STAGE_META = {
     why: 'Execution turns alignment into momentum. A clear rhythm of planning, meeting, and tracking keeps the team moving forward together.',
     toolKeys: ['planning', 'meetings', 'actions', 'decisions'],
     disciplines: [
-      { number: 5, name: 'Execution Rhythm', description: 'Plan, meet, and execute with cadence' },
-      { number: 6, name: 'Accountability', description: 'Track actions and log decisions' },
+      { number: 7, name: 'Execution Rhythm', description: 'Plan, meet, and execute with cadence' },
+      { number: 8, name: 'Accountability', description: 'Track actions and log decisions' },
     ],
   },
   sustain: {
@@ -50,8 +52,8 @@ export const STAGE_META = {
     why: 'Sustaining health requires ongoing measurement and intentional renewal. Without it, teams drift back into old patterns.',
     toolKeys: ['health_pulse', 'risk_flags', 'quarterly_review', 'renewal'],
     disciplines: [
-      { number: 7, name: 'Measurement', description: 'Track trends, flag risks, and review quarterly' },
-      { number: 8, name: 'Renewal', description: 'Reset and re-energize the team' },
+      { number: 9, name: 'Measurement', description: 'Track trends, flag risks, and review quarterly' },
+      { number: 10, name: 'Renewal', description: 'Reset and re-energize the team' },
     ],
   },
 };

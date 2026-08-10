@@ -3,12 +3,14 @@ import { CheckCircle2, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MODULES = [
-  { key: 'five_dysfunctions', label: 'Team Health Diagnostic' },
   { key: 'workstyle', label: 'Workstyle Assessments' },
-  { key: 'role_clarity', label: 'Role Clarity Worksheets' },
+  { key: 'five_dysfunctions', label: 'Team Health Diagnostic' },
+  { key: 'mission', label: 'Mission & Outcomes' },
   { key: 'priorities', label: 'Priority Alignment' },
+  { key: 'role_clarity', label: 'Role Clarity' },
   { key: 'decision_rights', label: 'Decision-Rights Map' },
   { key: 'covenant', label: 'Leadership Covenant' },
+  { key: 'comm_agreements', label: 'Team Agreements' },
 ];
 
 export default function AlignProgress({ counts = {} }) {

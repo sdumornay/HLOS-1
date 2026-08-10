@@ -32,6 +32,14 @@
       ],
       "default": "stabilize"
     },
+    "mission": {
+      "type": "string",
+      "description": "Current mission or ministry focus"
+    },
+    "desired_outcomes": {
+      "type": "string",
+      "description": "Desired outcomes for the current season"
+    },
     "health_score": {
       "type": "number",
       "default": 0
