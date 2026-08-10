@@ -9,7 +9,7 @@ import { Heart, TrendingUp, Target, Calendar, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { format } from 'date-fns';
 import ScoreCard from '@/components/dashboard/ScoreCard';
-import StageProgressBar from '@/components/dashboard/StageProgressBar';
+import StageJourney from '@/components/dashboard/StageJourney';
 import HealthRadar from '@/components/dashboard/HealthRadar';
 import MomentumChart from '@/components/dashboard/MomentumChart';
 import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
@@ -123,31 +123,8 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Brand banner */}
-      <div className="rounded-xl bg-gradient-to-r from-primary via-primary to-secondary/80 p-px shadow-lg">
-        <div className="rounded-xl bg-gradient-to-r from-primary to-[hsl(220,65%,14%)] px-6 py-4 flex items-center gap-4">
-          <div className="h-10 w-10 rounded-full bg-accent/20 border border-accent/40 flex items-center justify-center flex-shrink-0">
-            <Heart className="h-5 w-5 text-accent" />
-          </div>
-          <div className="flex-1">
-            <p className="text-white font-barlow font-bold text-lg tracking-wide">STABILIZE → ALIGN → EXECUTE → SUSTAIN</p>
-            <p className="text-white/60 text-xs mt-0.5">Moving teams from friction to momentum through a reproducible system for team health</p>
-          </div>
-          {currentOrg && (
-            <div className="hidden sm:flex items-center gap-2 flex-shrink-0">
-              <div className="h-2 w-2 rounded-full bg-accent animate-pulse" />
-              <span className="text-accent text-xs font-semibold uppercase tracking-wider capitalize">{currentStage} Stage</span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Stage Progress */}
-      <Card className="border-border/50 shadow-sm">
-        <CardContent className="py-6 px-4 lg:px-8">
-          <StageProgressBar currentStage={currentStage} completedStages={[]} />
-        </CardContent>
-      </Card>
+      {/* Visual four-stage journey */}
+      <StageJourney currentStage={currentStage} orgId={orgId} />
 
       {/* Next Steps — contextual guidance */}
       {orgId && <NextStepsPanel stage={currentStage} orgId={orgId} />}

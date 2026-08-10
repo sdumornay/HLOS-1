@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -9,14 +9,15 @@ import RoleClarityWorksheet from '@/components/align/RoleClarityWorksheet';
 import PriorityAlignmentPage from '@/components/align/PriorityAlignmentPage';
 import DecisionRightsMap from '@/components/align/DecisionRightsMap';
 import LeadershipCovenant from '@/components/align/LeadershipCovenant';
-import { Compass, Users, Footprints } from 'lucide-react';
-import NumberedTool from '@/components/stages/NumberedTool';
+import { Users, Footprints } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import StageHero from '@/components/stages/StageHero';
+import DisciplineSection from '@/components/stages/DisciplineSection';
+import StagePriorities from '@/components/stages/StagePriorities';
 
 export default function Align() {
   const { user } = useCurrentUser();
@@ -65,21 +66,10 @@ export default function Align() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center">
-          <Compass className="h-5 w-5 text-secondary" />
-        </div>
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-accent mb-0.5">Step 2</p>
-          <h1 className="text-xl font-barlow font-bold tracking-tight">Align Module</h1>
-          <p className="text-sm text-muted-foreground">Establish shared understanding, clarify roles, and build team cohesion</p>
-        </div>
-      </div>
-
+      <StageHero stage="align" orgId={orgId} counts={counts} />
       <AlignProgress counts={counts} />
 
-      {/* External Survey Launchers */}
+      {/* Assessment Launchers */}
       <div className="grid gap-3 sm:grid-cols-2">
         <Card className="border-border/50 shadow-sm">
           <CardContent className="p-4 flex flex-col gap-3">
@@ -130,26 +120,21 @@ export default function Align() {
         />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <NumberedTool number={1} title="Team Health Diagnostic" description="Assess trust, conflict, commitment, accountability, results">
-          <FiveDysfunctionsDiagnostic orgId={orgId} />
-        </NumberedTool>
-        <NumberedTool number={2} title="Workstyle Assessments" description="Map team leadership styles (Head, Heart, Gut, Feet)">
-          <WorkstyleResults orgId={orgId} />
-        </NumberedTool>
-        <NumberedTool number={3} title="Role Clarity Worksheets" description="Define responsibilities and decision authority">
-          <RoleClarityWorksheet orgId={orgId} />
-        </NumberedTool>
-        <NumberedTool number={4} title="Priority Alignment" description="Agree on what matters most right now">
-          <PriorityAlignmentPage orgId={orgId} />
-        </NumberedTool>
-        <NumberedTool number={5} title="Decision-Rights Map" description="Clarify who decides, who is consulted, who is informed">
-          <DecisionRightsMap orgId={orgId} />
-        </NumberedTool>
-        <NumberedTool number={6} title="Leadership Covenant" description="Document team commitments and sign together" className="col-span-full">
-          <LeadershipCovenant orgId={orgId} />
-        </NumberedTool>
-      </div>
+      {/* Discipline 3: Team Understanding */}
+      <DisciplineSection number={3} name="Team Understanding" description="Map team dynamics and leadership styles">
+        <FiveDysfunctionsDiagnostic orgId={orgId} />
+        <WorkstyleResults orgId={orgId} />
+      </DisciplineSection>
+
+      {/* Discipline 4: Organizational Clarity */}
+      <DisciplineSection number={4} name="Organizational Clarity" description="Define roles, priorities, and decision rights">
+        <RoleClarityWorksheet orgId={orgId} />
+        <PriorityAlignmentPage orgId={orgId} />
+        <DecisionRightsMap orgId={orgId} />
+        <LeadershipCovenant orgId={orgId} />
+      </DisciplineSection>
+
+      <StagePriorities stage="align" orgId={orgId} />
     </div>
   );
 }
