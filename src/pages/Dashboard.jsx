@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -19,25 +20,28 @@ import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
 
-export default function Dashboard() {
+import { ArrowLeft } from 'lucide-react';
+
+export default function Dashboard({ orgId: overrideOrgId }) {
   const { user, isAdmin, isCoach } = useCurrentUser();
-  const orgId = user?.organization_id;
+  const isConsultantView = !!overrideOrgId;
+  const orgId = overrideOrgId || user?.organization_id;
 
   const { data: organizations = [] } = useQuery({
-    queryKey: ['organizations'],
-    queryFn: () => isAdmin
-      ? base44.entities.Organization.list()
-      : isCoach
-        ? base44.entities.Organization.filter({ coach_email: user?.email })
-        : base44.entities.Organization.filter({ id: orgId }),
-    enabled: !!user,
+    queryKey: ['organizations', overrideOrgId || 'me'],
+    queryFn: () => isConsultantView
+      ? base44.entities.Organization.filter({ id: orgId })
+      : isAdmin
+        ? base44.entities.Organization.list()
+        : isCoach
+          ? base44.entities.Organization.filter({ coach_email: user?.email })
+          : base44.entities.Organization.filter({ id: orgId }),
+    enabled: !!user || isConsultantView,
   });
 
   const { data: assessments = [] } = useQuery({
     queryKey: ['assessments', orgId],
-    queryFn: () => isAdmin
-      ? base44.entities.Assessment.list('-created_date', 50)
-      : base44.entities.Assessment.filter({ organization_id: orgId }),
+    queryFn: () => base44.entities.Assessment.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
 
@@ -55,17 +59,13 @@ export default function Dashboard() {
 
   const { data: actions = [] } = useQuery({
     queryKey: ['actions', orgId],
-    queryFn: () => isAdmin
-      ? base44.entities.Action.list('-created_date', 50)
-      : base44.entities.Action.filter({ organization_id: orgId }),
+    queryFn: () => base44.entities.Action.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
 
   const { data: sessions = [] } = useQuery({
     queryKey: ['sessions', orgId],
-    queryFn: () => isAdmin
-      ? base44.entities.Session.list('-date', 10)
-      : base44.entities.Session.filter({ organization_id: orgId }),
+    queryFn: () => base44.entities.Session.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
 
@@ -211,6 +211,14 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-5">
+      {/* Back link for consultant view */}
+      {isConsultantView && (
+        <Link to="/coach" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
+          <ArrowLeft className="h-4 w-4" />
+          Back to Portfolio
+        </Link>
+      )}
+
       {/* 1. Header: Org name, stage, progress */}
       <CommandCenterHeader
         org={currentOrg}
@@ -253,10 +261,10 @@ export default function Dashboard() {
         healthTrend={healthTrend}
       />
 
-      {/* Admin panels — below the command center, only for admins/coaches */}
-      {(isAdmin || isCoach) && <AdminOrgWidget />}
-      {isAdmin && <StageCompletionMatrix />}
-      {isAdmin && <SecurityAuditPanel />}
+      {/* Admin panels — only on the consultant's own dashboard, not when viewing a specific org */}
+      {!isConsultantView && (isAdmin || isCoach) && <AdminOrgWidget />}
+      {!isConsultantView && isAdmin && <StageCompletionMatrix />}
+      {!isConsultantView && isAdmin && <SecurityAuditPanel />}
     </div>
   );
 }
