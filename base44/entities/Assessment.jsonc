@@ -97,14 +97,7 @@
           ]
         },
         {
-          "$and": [
-            {
-              "data.organization_id": "{{user.organization_id}}"
-            },
-            {
-              "data.respondent_email": "{{user.email}}"
-            }
-          ]
+          "data.respondent_email": "{{user.email}}"
         }
       ]
     },
