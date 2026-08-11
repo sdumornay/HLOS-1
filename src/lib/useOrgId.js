@@ -19,7 +19,7 @@ export function useOrgId() {
     queryFn: async () => {
       try {
         const res = await base44.functions.invoke('resolveOrgContext', { organization_id: orgParam });
-        return res?.organization_id || null;
+        return res?.data?.organization_id || res?.organization_id || null;
       } catch {
         return null;
       }
