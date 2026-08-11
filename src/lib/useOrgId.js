@@ -5,27 +5,27 @@ import { useCurrentUser } from '@/lib/useCurrentUser';
 
 /**
  * Returns the active organization ID.
- * Checks for ?org= query param first (consultant viewing a specific org),
- * falls back to the current user's organization_id.
- * If that org_id doesn't match a real organization (e.g. stale value),
- * falls back to the first available organization.
+ * Resolves via a backend function that uses the service role to bypass RLS,
+ * so users with a stale or missing organization_id still get the correct org.
+ * Checks for ?org= query param first (consultant viewing a specific org).
  */
 export function useOrgId() {
   const { user } = useCurrentUser();
   const [searchParams] = useSearchParams();
   const orgParam = searchParams.get('org');
-  const rawOrgId = orgParam || user?.organization_id;
 
-  const { data: organizations = [] } = useQuery({
-    queryKey: ['organizations'],
-    queryFn: () => base44.entities.Organization.list(),
+  const { data: resolvedOrgId } = useQuery({
+    queryKey: ['resolveOrgContext', orgParam, user?.id],
+    queryFn: async () => {
+      try {
+        const res = await base44.functions.invoke('resolveOrgContext', { organization_id: orgParam });
+        return res?.organization_id || null;
+      } catch {
+        return null;
+      }
+    },
     enabled: !!user,
   });
 
-  // If the user's org_id doesn't match a real org, fall back to the first available org
-  if (organizations.length > 0 && !organizations.find(o => o.id === rawOrgId)) {
-    return organizations[0]?.id || rawOrgId;
-  }
-
-  return rawOrgId;
+  return resolvedOrgId || undefined;
 }
