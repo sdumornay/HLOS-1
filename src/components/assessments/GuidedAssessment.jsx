@@ -28,7 +28,7 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
   const currentValue = scores[currentStep.key] ?? 5;
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.Assessment.create(data),
+    mutationFn: (data) => base44.functions.invoke('submitAssessment', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assessments'] });
       setDone(true);
