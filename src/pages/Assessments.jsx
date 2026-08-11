@@ -64,7 +64,7 @@ export default function Assessments() {
     enabled: !!orgId,
   });
 
-  const myAssessments = canManageAll ? assessments : assessments.filter(a => a.organization_id === orgId);
+  const myAssessments = canManageAll ? assessments : assessments.filter(a => a.respondent_email === user?.email || a.organization_id === orgId);
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.entities.Assessment.create(data),
