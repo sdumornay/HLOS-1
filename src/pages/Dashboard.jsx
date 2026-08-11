@@ -31,19 +31,26 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   const [searchParams] = useSearchParams();
   const orgParam = searchParams.get('org');
   const isConsultantView = !!overrideOrgId || !!orgParam;
-  const orgId = overrideOrgId || orgIdFromUrl;
+  const rawOrgId = overrideOrgId || orgIdFromUrl;
 
   const { data: organizations = [] } = useQuery({
     queryKey: ['organizations', overrideOrgId || 'me'],
     queryFn: () => isConsultantView
-      ? base44.entities.Organization.filter({ id: orgId })
+      ? base44.entities.Organization.filter({ id: rawOrgId })
       : isAdmin
         ? base44.entities.Organization.list()
         : isCoach
           ? base44.entities.Organization.filter({ coach_email: user?.email })
-          : base44.entities.Organization.filter({ id: orgId }),
+          : base44.entities.Organization.filter({ id: rawOrgId }),
     enabled: !!user || isConsultantView,
   });
+
+  const currentOrg = organizations.find(o => o.id === rawOrgId) || organizations[0];
+  // If the user's own org_id doesn't match a real org (e.g. super_admin with a stale org_id),
+  // fall back to the org we're actually displaying so data queries match the header.
+  const orgId = organizations.length > 0 && !organizations.find(o => o.id === rawOrgId)
+    ? currentOrg?.id || rawOrgId
+    : rawOrgId;
 
   const { data: assessments = [] } = useQuery({
     queryKey: ['assessments', orgId],
@@ -153,7 +160,6 @@ export default function Dashboard({ orgId: overrideOrgId }) {
     enabled: !!orgId,
   });
 
-  const currentOrg = organizations.find(o => o.id === orgId) || organizations[0];
   const currentStage = currentOrg?.current_stage || 'stabilize';
 
   // Unified scores
