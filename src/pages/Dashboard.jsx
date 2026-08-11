@@ -21,6 +21,7 @@ import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
 import TeamMemberWelcome from '@/components/dashboard/TeamMemberWelcome';
+import AssessmentStatusPanel from '@/components/dashboard/AssessmentStatusPanel';
 
 import { ArrowLeft } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
@@ -251,6 +252,13 @@ export default function Dashboard({ orgId: overrideOrgId }) {
         momentumScore={unifiedMomentum}
         momentumTrend={momentumTrend}
         operatingPeriod={operatingPeriod}
+      />
+
+      {/* Assessment status: Quick Health Check, Team Health & Culture, Workstyle */}
+      <AssessmentStatusPanel
+        assessments={assessments}
+        dysfunctions={dysfunctions}
+        workstyles={workstyles}
       />
 
       {/* 3. Top Priorities + Needs Attention */}
