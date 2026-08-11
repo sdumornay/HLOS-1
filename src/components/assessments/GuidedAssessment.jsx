@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowRight, ArrowLeft, Check, Heart } from 'lucide-react';
-import { toast } from 'sonner';
+import { useToast } from '@/components/ui/use-toast';
 
 const STEPS = [
   { key: 'trust', label: 'Trust', question: 'How much do team members trust each other?', hint: '10 = complete trust, 1 = no trust' },
@@ -19,6 +19,7 @@ const STEPS = [
 
 export default function GuidedAssessment({ open, onClose, orgId, user }) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [step, setStep] = useState(0);
   const [scores, setScores] = useState({});
   const [done, setDone] = useState(false);
@@ -32,7 +33,11 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
       queryClient.invalidateQueries({ queryKey: ['assessments'] });
       setDone(true);
     },
-    onError: (err) => toast.error('Failed to save: ' + (err?.message || 'Unknown error')),
+    onError: (err) => toast({
+      title: 'Failed to save',
+      description: err?.message || 'Unknown error',
+      variant: 'destructive',
+    }),
   });
 
   const handleNext = () => {
@@ -42,6 +47,22 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
       // Submit
       const allScores = STEPS.map(s => scores[s.key] ?? 5);
       const overall = parseFloat((allScores.reduce((s, v) => s + v, 0) / allScores.length).toFixed(1));
+      if (!orgId) {
+        toast({
+          title: 'No organization found',
+          description: 'Please complete onboarding first.',
+          variant: 'destructive',
+        });
+        return;
+      }
+      if (!user?.email) {
+        toast({
+          title: 'Unable to identify your account',
+          description: 'Please refresh and try again.',
+          variant: 'destructive',
+        });
+        return;
+      }
       createMutation.mutate({
         organization_id: orgId,
         respondent_email: user?.email,
