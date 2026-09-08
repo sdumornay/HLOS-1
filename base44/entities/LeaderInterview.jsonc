@@ -6,12 +6,10 @@
       "type": "string"
     },
     "interviewee_name": {
-      "type": "string"
+      "type": "string",
+      "description": "Leader's name (self-assessment)"
     },
     "interviewee_role": {
-      "type": "string"
-    },
-    "interviewer": {
       "type": "string"
     },
     "date": {
@@ -19,7 +17,12 @@
       "format": "date"
     },
     "strengths_observed": {
-      "type": "string"
+      "type": "string",
+      "description": "Perceived strengths"
+    },
+    "weaknesses": {
+      "type": "string",
+      "description": "Perceived weaknesses"
     },
     "tensions_perceived": {
       "type": "string"
@@ -31,12 +34,6 @@
       "type": "string"
     },
     "concerns": {
-      "type": "string"
-    },
-    "notable_quotes": {
-      "type": "string"
-    },
-    "coach_observations": {
       "type": "string"
     }
   },

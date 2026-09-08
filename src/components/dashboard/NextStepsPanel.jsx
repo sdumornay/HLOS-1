@@ -10,7 +10,7 @@ export const STAGE_STEPS = {
   stabilize: [
     { key: 'tension_pulse', label: 'Complete a Tension Pulse Survey', desc: 'Baseline your team tension and trust levels', link: '/stabilize' },
     { key: 'conflict_intake', label: 'Document any active conflicts', desc: 'Surface and categorize ongoing conflicts', link: '/stabilize' },
-    { key: 'leader_interviews', label: 'Conduct leader interviews', desc: 'Gather 1-on-1 perspectives from key leaders', link: '/stabilize' },
+    { key: 'leader_interviews', label: 'Complete a leader self-assessment', desc: 'Reflect on your strengths, weaknesses, and leadership gaps', link: '/stabilize' },
     { key: 'comm_agreements', label: 'Establish communication agreements', desc: 'Agree on how the team will communicate', link: '/stabilize' },
     { key: 'conflict_triggers', label: 'Identify conflict triggers', desc: 'Map recurring patterns that spark conflict', link: '/stabilize' },
     { key: 'nvc_conversations', label: 'Practice NVC conversations', desc: 'Use nonviolent communication to resolve tension', link: '/stabilize' },
