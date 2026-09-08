@@ -7,9 +7,11 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Activity, Plus } from 'lucide-react';
+import { Activity, Plus, Download } from 'lucide-react';
 import { format } from 'date-fns';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
+import TensionPulseInterpretation, { interpretTensionPulse } from '@/components/stabilize/TensionPulseInterpretation';
+import { exportToPDF } from '@/lib/exportPDF';
 
 const METRICS = [
   { key: 'trust_level', label: 'Trust', invert: false },
@@ -51,6 +53,41 @@ export default function TensionPulseSurvey({ orgId }) {
     return { subject: m.label, value: m.invert ? 10 - avg : avg };
   });
 
+  // Find the current user's most recent submission
+  const myLatest = user?.email
+    ? pulses.find(p => p.respondent_email === user.email)
+    : null;
+
+  const handleExport = () => {
+    const target = myLatest || pulses[0];
+    if (!target) return;
+    const interp = interpretTensionPulse(target);
+    exportToPDF({
+      title: 'Team Tension Pulse Report',
+      subtitle: `Submitted ${format(new Date(target.created_date), 'MMM d, yyyy')} by ${target.respondent_email}`,
+      filename: 'tension-pulse-report.pdf',
+      sections: [
+        {
+          heading: 'Scores',
+          table: {
+            headers: ['Dimension', 'Score (1-10)'],
+            rows: METRICS.map(m => [m.label, String(target[m.key] ?? '—')]),
+          },
+        },
+        { heading: 'Open Responses', items: [
+          { label: 'Biggest source of tension', value: target.biggest_tension || '—' },
+          { label: 'One change that would help', value: target.one_change || '—' },
+        ]},
+        { heading: 'Interpretation', items: [
+          { label: 'Overall health', value: interp ? `${interp.overall.toFixed(1)}/10` : '—' },
+          { label: 'Strengths', value: interp ? interp.strongest.map(s => s.label).join(', ') : '—' },
+          { label: 'Needs attention', value: interp && interp.risks.length ? interp.risks.map(r => r.label).join(', ') : 'None flagged' },
+          { label: 'Recommended focus', value: interp ? `${interp.focusDiscipline} (${interp.focusStage})` : '—' },
+        ]},
+      ],
+    });
+  };
+
   return (
     <Card className="border-border/50 shadow-sm">
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
@@ -58,9 +95,16 @@ export default function TensionPulseSurvey({ orgId }) {
           <Activity className="h-4 w-4 text-blue-500" />
           <CardTitle className="text-base font-semibold">Team Tension Pulse</CardTitle>
         </div>
-        <Button size="sm" onClick={() => setOpen(!open)}>
-          <Plus className="h-4 w-4 mr-1" /> Take Survey
-        </Button>
+        <div className="flex items-center gap-2">
+          {pulses.length > 0 && (
+            <Button size="sm" variant="outline" onClick={handleExport}>
+              <Download className="h-4 w-4 mr-1" /> Export
+            </Button>
+          )}
+          <Button size="sm" onClick={() => setOpen(!open)}>
+            <Plus className="h-4 w-4 mr-1" /> Take Survey
+          </Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {open && (
@@ -107,14 +151,21 @@ export default function TensionPulseSurvey({ orgId }) {
           </ResponsiveContainer>
         )}
 
+        {myLatest && !open && <TensionPulseInterpretation pulse={myLatest} />}
+
         <div className="space-y-1.5">
-          {pulses.slice(0, 5).map(p => (
-            <div key={p.id} className="flex items-center justify-between text-xs py-1.5 border-b border-border/40 last:border-0">
-              <span className="text-muted-foreground">{p.respondent_email}</span>
-              <span className="text-muted-foreground">{format(new Date(p.created_date), 'MMM d')}</span>
-              <span className="font-medium">Tension: {p.team_tension}/10 • Trust: {p.trust_level}/10</span>
-            </div>
-          ))}
+          {pulses.slice(0, 5).map(p => {
+            const isMine = user?.email && p.respondent_email === user.email;
+            return (
+              <div key={p.id} className={`flex items-center justify-between text-xs py-1.5 border-b border-border/40 last:border-0 rounded px-1.5 ${isMine ? 'bg-accent/10 border-accent/30' : ''}`}>
+                <span className={isMine ? 'font-semibold text-foreground' : 'text-muted-foreground'}>
+                  {p.respondent_email}{isMine && ' (You)'}
+                </span>
+                <span className="text-muted-foreground">{format(new Date(p.created_date), 'MMM d')}</span>
+                <span className="font-medium">Tension: {p.team_tension}/10 • Trust: {p.trust_level}/10</span>
+              </div>
+            );
+          })}
           {pulses.length === 0 && !open && <p className="text-sm text-muted-foreground text-center py-4">No pulse surveys yet.</p>}
         </div>
       </CardContent>
