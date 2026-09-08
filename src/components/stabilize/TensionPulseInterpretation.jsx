@@ -32,8 +32,10 @@ export function interpretTensionPulse(pulse) {
 
   const overall = scored.reduce((sum, s) => sum + s.healthy, 0) / scored.length;
   const sorted = [...scored].sort((a, b) => b.healthy - a.healthy);
-  const strongest = sorted.slice(0, 2);
-  const risks = sorted.slice(-2).filter(r => r.healthy < 6);
+  // Strength = healthy value >= 7 (raw >= 7 for positive metrics, raw <= 4 for inverted)
+  const strongest = sorted.filter(s => s.healthy >= 7);
+  // Needs attention = healthy value <= 4 (raw <= 4 for positive, raw >= 7 for inverted)
+  const risks = sorted.filter(s => s.healthy <= 4).reverse();
 
   // Per-dimension commentary (always rendered for all six metrics)
   const dimensionCommentary = scored.map(s => {
@@ -114,19 +116,21 @@ export default function TensionPulseInterpretation({ pulse }) {
             : ' The team is under significant strain — consider prioritizing a stabilization conversation.'}
       </p>
 
-      <div>
-        <div className="flex items-center gap-2 mb-1.5">
-          <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
-          <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Strengths</p>
+      {strongest.length > 0 && (
+        <div>
+          <div className="flex items-center gap-2 mb-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+            <p className="text-xs font-semibold uppercase tracking-wider text-emerald-600">Strengths</p>
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {strongest.map(s => (
+              <Badge key={s.key} className="bg-emerald-100 text-emerald-700 border-0">
+                {s.label} ({s.raw}/10)
+              </Badge>
+            ))}
+          </div>
         </div>
-        <div className="flex flex-wrap gap-1.5">
-          {strongest.map(s => (
-            <Badge key={s.key} className="bg-emerald-100 text-emerald-700 border-0">
-              {s.label} ({s.raw}/10)
-            </Badge>
-          ))}
-        </div>
-      </div>
+      )}
 
       {risks.length > 0 && (
         <div>
