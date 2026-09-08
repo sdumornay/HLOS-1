@@ -10,7 +10,6 @@ import PriorityAlignmentPage from '@/components/align/PriorityAlignmentPage';
 import DecisionRightsMap from '@/components/align/DecisionRightsMap';
 import LeadershipCovenant from '@/components/align/LeadershipCovenant';
 import TeamOperatingMap from '@/components/align/TeamOperatingMap';
-import TeamHealthPanel from '@/components/align/TeamHealthPanel';
 import OrgClaritySummary from '@/components/align/OrgClaritySummary';
 import TeamAgreements from '@/components/align/TeamAgreements';
 import { Users, Footprints } from 'lucide-react';
@@ -145,7 +144,6 @@ export default function Align() {
 
       {/* Area 2: Team Health */}
       <DisciplineSection number={4} name="Team Health" description="Identify trust gaps and dysfunction patterns" audience="team">
-        <TeamHealthPanel orgId={orgId} />
         <FiveDysfunctionsDiagnostic orgId={orgId} />
       </DisciplineSection>
 
