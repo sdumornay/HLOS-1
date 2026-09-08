@@ -1,6 +1,6 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, AlertTriangle, Eye, Lightbulb } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Eye, Lightbulb, Info } from 'lucide-react';
 
 const METRIC_LABELS = {
   trust_level: 'Trust',
@@ -35,6 +35,34 @@ export function interpretTensionPulse(pulse) {
   const strongest = sorted.slice(0, 2);
   const risks = sorted.slice(-2).filter(r => r.healthy < 6);
 
+  // Per-dimension commentary (always rendered for all six metrics)
+  const dimensionCommentary = scored.map(s => {
+    const h = s.healthy;
+    let level, note;
+    if (h >= 8) {
+      level = 'strong';
+      note = INVERTED.includes(s.key)
+        ? `${s.label} is well-managed — keep monitoring.`
+        : `${s.label} is a clear strength — protect and build on it.`;
+    } else if (h >= 6) {
+      level = 'stable';
+      note = INVERTED.includes(s.key)
+        ? `${s.label} is manageable but worth watching.`
+        : `${s.label} is solid, with room to grow.`;
+    } else if (h >= 4) {
+      level = 'watch';
+      note = INVERTED.includes(s.key)
+        ? `${s.label} is elevated — consider a structured conversation.`
+        : `${s.label} needs focused attention.`;
+    } else {
+      level = 'risk';
+      note = INVERTED.includes(s.key)
+        ? `${s.label} is high — prioritize intervention.`
+        : `${s.label} is low — address before pushing forward.`;
+    }
+    return { ...s, level, note };
+  });
+
   const patterns = [];
   if (pulse.team_tension >= 7) patterns.push('Team tension is running high — consider a structured conflict intake to surface root causes.');
   if (pulse.trust_level <= 4) patterns.push('Trust scores are low — relational safety needs attention before pushing for alignment.');
@@ -60,14 +88,14 @@ export function interpretTensionPulse(pulse) {
     focusDiscipline = 'Renewal & Rhythm';
   }
 
-  return { overall, strongest, risks, patterns, focusStage, focusDiscipline };
+  return { overall, strongest, risks, patterns, focusStage, focusDiscipline, dimensionCommentary };
 }
 
 export default function TensionPulseInterpretation({ pulse }) {
   const interpretation = interpretTensionPulse(pulse);
   if (!interpretation) return null;
 
-  const { overall, strongest, risks, patterns, focusStage, focusDiscipline } = interpretation;
+  const { overall, strongest, risks, patterns, focusStage, focusDiscipline, dimensionCommentary } = interpretation;
 
   return (
     <div className="rounded-lg border border-border/60 bg-muted/20 p-4 space-y-3">
@@ -119,6 +147,29 @@ export default function TensionPulseInterpretation({ pulse }) {
       <div>
         <div className="flex items-center gap-2 mb-1.5">
           <Eye className="h-3.5 w-3.5 text-blue-500" />
+          <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">Dimension Commentary</p>
+        </div>
+        <ul className="space-y-1.5">
+          {dimensionCommentary.map(d => (
+            <li key={d.key} className="text-xs leading-relaxed flex items-start gap-2">
+              <span className={`mt-1 h-1.5 w-1.5 rounded-full shrink-0 ${
+                d.level === 'strong' ? 'bg-emerald-500'
+                : d.level === 'stable' ? 'bg-blue-400'
+                : d.level === 'watch' ? 'bg-amber-500'
+                : 'bg-red-500'
+              }`} />
+              <span>
+                <span className="font-medium text-foreground">{d.label} ({d.raw}/10):</span>{' '}
+                <span className="text-muted-foreground">{d.note}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <div className="flex items-center gap-2 mb-1.5">
+          <Info className="h-3.5 w-3.5 text-blue-500" />
           <p className="text-xs font-semibold uppercase tracking-wider text-blue-600">Observations</p>
         </div>
         <ul className="space-y-1">
