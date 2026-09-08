@@ -12,8 +12,7 @@ import LeadershipCovenant from '@/components/align/LeadershipCovenant';
 import TeamOperatingMap from '@/components/align/TeamOperatingMap';
 import OrgClaritySummary from '@/components/align/OrgClaritySummary';
 import TeamAgreements from '@/components/align/TeamAgreements';
-import { Users, Footprints } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Footprints } from 'lucide-react';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -87,25 +86,6 @@ export default function Align() {
 
       {/* Assessment Launchers */}
       <div className="grid gap-3 sm:grid-cols-2">
-        <Card className="border-border/50 shadow-sm">
-          <CardContent className="p-4 flex flex-col gap-3">
-            <div className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded-lg bg-secondary/10 flex items-center justify-center shrink-0">
-                <Users className="h-4 w-4 text-secondary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-semibold">Team Health &amp; Culture Assessment</p>
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">5 Dysfunctions</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">Identify gaps in trust, conflict, commitment, accountability, and results. 15 questions, 5-7 minutes.</p>
-              </div>
-            </div>
-            <Link to="/assessments">
-              <Button size="sm" className="w-full">Go to Assessments</Button>
-            </Link>
-          </CardContent>
-        </Card>
         <Card className="border-border/50 shadow-sm">
           <CardContent className="p-4 flex flex-col gap-3">
             <div className="flex items-start gap-3">
