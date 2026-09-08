@@ -7,8 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { UserCheck, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { UserCheck, Plus, ChevronDown, ChevronUp, Download } from 'lucide-react';
 import { format } from 'date-fns';
+import { exportToPDF } from '@/lib/exportPDF';
 
 const FIELDS = [
   { key: 'strengths_observed', label: 'Perceived Strengths', placeholder: "What strengths do you see in yourself as a leader?" },
@@ -20,6 +21,21 @@ const FIELDS = [
 ];
 
 const BLANK = { interviewee_name: '', interviewee_role: '', date: '', strengths_observed: '', weaknesses: '', tensions_perceived: '', leadership_gaps: '', hopes_for_team: '', concerns: '' };
+
+function exportReflection(iv) {
+  exportToPDF({
+    title: 'Leader Self-Assessment',
+    subtitle: `${iv.interviewee_name}${iv.interviewee_role ? ` — ${iv.interviewee_role}` : ''}${iv.date ? ` • ${format(new Date(iv.date), 'MMM d, yyyy')}` : ''}`,
+    filename: `leader-self-assessment-${iv.interviewee_name || 'reflection'}.pdf`,
+    sections: [
+      {
+        items: FIELDS
+          .filter(f => iv[f.key])
+          .map(f => ({ label: f.label, value: iv[f.key] })),
+      },
+    ],
+  });
+}
 
 export default function LeaderInterviewNotes({ orgId }) {
   const { user } = useCurrentUser();
@@ -35,7 +51,11 @@ export default function LeaderInterviewNotes({ orgId }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.LeaderInterview.create({ ...data, organization_id: orgId }),
+    mutationFn: (data) => base44.entities.LeaderInterview.create({
+      ...data,
+      organization_id: orgId,
+      respondent_email: user?.email || '',
+    }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['leaderInterviews', orgId] });
       setOpen(false);
@@ -43,12 +63,20 @@ export default function LeaderInterviewNotes({ orgId }) {
     },
   });
 
+  const uniqueRespondents = new Set(interviews.map(iv => iv.respondent_email).filter(Boolean)).size;
+
   return (
     <Card className="border-border/50 shadow-sm">
       <CardHeader className="pb-3 flex flex-row items-center justify-between">
         <div className="flex items-center gap-2">
           <UserCheck className="h-4 w-4 text-indigo-500" />
           <CardTitle className="text-base font-semibold">Leader Self-Assessment</CardTitle>
+          {interviews.length > 0 && (
+            <span className="text-xs text-muted-foreground ml-1">
+              {interviews.length} {interviews.length === 1 ? 'submission' : 'submissions'}
+              {uniqueRespondents > 0 && ` · ${uniqueRespondents} ${uniqueRespondents === 1 ? 'leader' : 'leaders'}`}
+            </span>
+          )}
         </div>
         <Button size="sm" onClick={() => setOpen(!open)}>
           <Plus className="h-4 w-4 mr-1" /> New Reflection
@@ -86,28 +114,45 @@ export default function LeaderInterviewNotes({ orgId }) {
         )}
 
         <div className="space-y-2">
-          {interviews.map(iv => (
-            <div key={iv.id} className="border border-border/50 rounded-lg overflow-hidden">
-              <div className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/30"
-                onClick={() => setExpanded(expanded === iv.id ? null : iv.id)}>
-                <div>
-                  <p className="text-sm font-medium">{iv.interviewee_name}</p>
-                  <p className="text-xs text-muted-foreground">{iv.interviewee_role} {iv.date && `• ${format(new Date(iv.date), 'MMM d, yyyy')}`}</p>
+          {interviews.map(iv => {
+            const isMine = iv.respondent_email && user?.email && iv.respondent_email === user.email;
+            return (
+              <div key={iv.id} className="border border-border/50 rounded-lg overflow-hidden">
+                <div className="flex items-center justify-between p-3 cursor-pointer hover:bg-muted/30"
+                  onClick={() => setExpanded(expanded === iv.id ? null : iv.id)}>
+                  <div>
+                    <p className="text-sm font-medium flex items-center gap-1.5">
+                      {iv.interviewee_name}
+                      {isMine && <span className="text-xs font-normal text-indigo-500">(You)</span>}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{iv.interviewee_role} {iv.date && `• ${format(new Date(iv.date), 'MMM d, yyyy')}`}</p>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={(e) => { e.stopPropagation(); exportReflection(iv); }}
+                      title="Export PDF"
+                    >
+                      <Download className="h-3.5 w-3.5" />
+                    </Button>
+                    {expanded === iv.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                  </div>
                 </div>
-                {expanded === iv.id ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {expanded === iv.id && (
+                  <div className="border-t border-border/50 p-3 bg-muted/20 space-y-2 text-sm">
+                    {FIELDS.filter(f => iv[f.key]).map(f => (
+                      <div key={f.key}>
+                        <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">{f.label}</p>
+                        <p className="mt-0.5">{iv[f.key]}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              {expanded === iv.id && (
-                <div className="border-t border-border/50 p-3 bg-muted/20 space-y-2 text-sm">
-                  {FIELDS.filter(f => iv[f.key]).map(f => (
-                    <div key={f.key}>
-                      <p className="font-medium text-xs text-muted-foreground uppercase tracking-wider">{f.label}</p>
-                      <p className="mt-0.5">{iv[f.key]}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
           {interviews.length === 0 && !open && <p className="text-sm text-muted-foreground text-center py-4">No reflections logged yet.</p>}
         </div>
       </CardContent>
