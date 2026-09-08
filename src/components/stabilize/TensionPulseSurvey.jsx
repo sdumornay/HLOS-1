@@ -37,7 +37,7 @@ export default function TensionPulseSurvey({ orgId }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.TensionPulse.create({ ...data, organization_id: orgId, respondent_email: user?.email }),
+    mutationFn: (data) => base44.functions.invoke('submitTensionPulse', { ...data, organization_id: orgId }),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tensionPulses', orgId] });
       setOpen(false);
@@ -82,9 +82,16 @@ export default function TensionPulseSurvey({ orgId }) {
               <Textarea placeholder="What would make the biggest difference?" value={form.one_change}
                 onChange={e => setForm({ ...form, one_change: e.target.value })} rows={2} />
             </div>
+            {createMutation.isError && (
+              <p className="text-xs text-destructive">
+                {createMutation.error?.message || 'Failed to submit. Please try again.'}
+              </p>
+            )}
             <div className="flex gap-2 justify-end">
               <Button variant="outline" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
-              <Button size="sm" onClick={() => createMutation.mutate(form)}>Submit Survey</Button>
+              <Button size="sm" onClick={() => createMutation.mutate(form)} disabled={createMutation.isPending}>
+                {createMutation.isPending ? 'Submitting...' : 'Submit Survey'}
+              </Button>
             </div>
           </div>
         )}
