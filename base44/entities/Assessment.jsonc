@@ -47,6 +47,14 @@
     "notes": {
       "type": "string"
     },
+    "biggest_tension": {
+      "type": "string",
+      "description": "Open-ended: biggest source of tension right now"
+    },
+    "one_change": {
+      "type": "string",
+      "description": "Open-ended: one change that would most improve team health"
+    },
     "stage": {
       "type": "string",
       "enum": [

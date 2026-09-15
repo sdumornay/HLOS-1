@@ -8,7 +8,7 @@ import { cn } from '@/lib/utils';
 
 export const STAGE_STEPS = {
   stabilize: [
-    { key: 'tension_pulse', label: 'Complete a Tension Pulse Survey', desc: 'Baseline your team tension and trust levels', link: '/stabilize' },
+    { key: 'tension_pulse', label: 'Complete a Quick Health Check', desc: 'Baseline your team tension and trust levels', link: '/stabilize' },
     { key: 'conflict_intake', label: 'Document any active conflicts', desc: 'Surface and categorize ongoing conflicts', link: '/stabilize' },
     { key: 'leader_interviews', label: 'Complete a leader self-assessment', desc: 'Reflect on your strengths, weaknesses, and leadership gaps', link: '/stabilize' },
     { key: 'comm_agreements', label: 'Establish communication agreements', desc: 'Agree on how the team will communicate', link: '/stabilize' },

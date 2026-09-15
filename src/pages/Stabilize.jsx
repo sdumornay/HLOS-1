@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useOrgId } from '@/lib/useOrgId';
 import StabilizeProgress from '@/components/stabilize/StabilizeProgress';
 import ConflictIntakeForm from '@/components/stabilize/ConflictIntakeForm';
-import TensionPulseSurvey from '@/components/stabilize/TensionPulseSurvey';
+import HealthCheckCard from '@/components/stabilize/HealthCheckCard';
 import LeaderInterviewNotes from '@/components/stabilize/LeaderInterviewNotes';
 import CommunicationAgreements from '@/components/stabilize/CommunicationAgreements';
 import ConflictTriggerTracker from '@/components/stabilize/ConflictTriggerTracker';
@@ -65,7 +65,7 @@ export default function Stabilize() {
 
       {/* Discipline 1: Leadership Health */}
       <DisciplineSection number={1} name="Leadership Health" description="Baseline team tension, trust, and leadership health" audience="team">
-        <TensionPulseSurvey orgId={orgId} />
+        <HealthCheckCard orgId={orgId} />
         <LeaderInterviewNotes orgId={orgId} />
       </DisciplineSection>
 

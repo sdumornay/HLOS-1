@@ -4,11 +4,12 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
+import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowRight, ArrowLeft, Check, Heart } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 
-const STEPS = [
+const SLIDER_STEPS = [
   { key: 'trust', label: 'Trust', question: 'How much do team members trust each other?', hint: '10 = complete trust, 1 = no trust' },
   { key: 'safety', label: 'Psychological Safety', question: 'Do people feel safe to speak honestly?', hint: '10 = completely safe, 1 = not safe' },
   { key: 'clarity', label: 'Clarity', question: 'Is the vision and direction clear?', hint: '10 = crystal clear, 1 = very unclear' },
@@ -16,6 +17,13 @@ const STEPS = [
   { key: 'meeting_effectiveness', label: 'Meeting Quality', question: 'Are meetings productive and well-run?', hint: '10 = very productive, 1 = waste of time' },
   { key: 'conflict_intensity', label: 'Conflict Level', question: 'How intense is unresolved conflict?', hint: '1 = no conflict (healthy), 10 = very intense' },
 ];
+
+const TEXT_STEPS = [
+  { key: 'biggest_tension', label: 'Biggest Tension', question: 'What is the biggest source of tension on your team right now?', hint: 'Describe in your own words' },
+  { key: 'one_change', label: 'One Change', question: 'What one change would most improve your team\'s health?', hint: 'What would make the biggest difference?' },
+];
+
+const STEPS = [...SLIDER_STEPS, ...TEXT_STEPS];
 
 export default function GuidedAssessment({ open, onClose, orgId, user }) {
   const queryClient = useQueryClient();
@@ -25,12 +33,14 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
   const [done, setDone] = useState(false);
 
   const currentStep = STEPS[step];
-  const currentValue = scores[currentStep.key] ?? 5;
+  const currentValue = scores[currentStep.key] ?? (currentStep.type === 'text' ? '' : 5);
+  const isText = step >= SLIDER_STEPS.length;
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.functions.invoke('submitAssessment', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assessments'] });
+      queryClient.invalidateQueries({ queryKey: ['tensionPulses'] });
       setDone(true);
     },
     onError: (err) => toast({
@@ -45,7 +55,7 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
       setStep(step + 1);
     } else {
       // Submit
-      const allScores = STEPS.map(s => scores[s.key] ?? 5);
+      const allScores = SLIDER_STEPS.map(s => scores[s.key] ?? 5);
       const overall = parseFloat((allScores.reduce((s, v) => s + v, 0) / allScores.length).toFixed(1));
       if (!orgId) {
         toast({
@@ -104,7 +114,7 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
             </div>
             <div>
               <p className="text-lg font-bold">
-                {STEPS.map(s => scores[s.key] ?? 5).reduce((sum, v) => sum + v, 0) / STEPS.length}
+                {SLIDER_STEPS.map(s => scores[s.key] ?? 5).reduce((sum, v) => sum + v, 0) / SLIDER_STEPS.length}
               </p>
               <p className="text-sm text-muted-foreground">Your overall health score</p>
             </div>
@@ -132,22 +142,33 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
                   <p className="text-base font-medium leading-snug">{currentStep.question}</p>
                 </div>
 
-                <div className="space-y-3">
-                  <div className="flex justify-between items-baseline">
-                    <span className="text-xs text-muted-foreground">{currentStep.hint}</span>
-                    <span className="text-2xl font-bold text-primary">{currentValue}</span>
+                {isText ? (
+                  <div className="space-y-2">
+                    <Textarea
+                      value={currentValue}
+                      onChange={(e) => setScores(s => ({ ...s, [currentStep.key]: e.target.value }))}
+                      placeholder={currentStep.hint}
+                      rows={4}
+                    />
                   </div>
-                  <Slider
-                    value={[currentValue]}
-                    min={1}
-                    max={10}
-                    step={1}
-                    onValueChange={([v]) => setScores(s => ({ ...s, [currentStep.key]: v }))}
-                  />
-                  <div className="flex justify-between text-xs text-muted-foreground/60">
-                    <span>1</span><span>5</span><span>10</span>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-baseline">
+                      <span className="text-xs text-muted-foreground">{currentStep.hint}</span>
+                      <span className="text-2xl font-bold text-primary">{currentValue}</span>
+                    </div>
+                    <Slider
+                      value={[currentValue]}
+                      min={1}
+                      max={10}
+                      step={1}
+                      onValueChange={([v]) => setScores(s => ({ ...s, [currentStep.key]: v }))}
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground/60">
+                      <span>1</span><span>5</span><span>10</span>
+                    </div>
                   </div>
-                </div>
+                )}
               </CardContent>
             </Card>
 

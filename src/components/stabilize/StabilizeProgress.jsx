@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 const MODULES = [
   { key: 'conflict_intake', label: 'Conflict Intake' },
-  { key: 'tension_pulse', label: 'Tension Pulse Survey' },
+  { key: 'tension_pulse', label: 'Quick Health Check' },
   { key: 'leader_interviews', label: 'Leader Self-Assessment' },
   { key: 'comm_agreements', label: 'Communication Agreements' },
   { key: 'conflict_triggers', label: 'Conflict Trigger Tracker' },
