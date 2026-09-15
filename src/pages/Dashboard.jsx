@@ -216,6 +216,7 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   };
   const completedCount = stageSteps.filter(s => (stageCounts[s.key] || 0) > 0).length;
   const nextStep = stageSteps.find(s => (stageCounts[s.key] || 0) === 0);
+  const currentStagePct = stageSteps.length > 0 ? Math.round((completedCount / stageSteps.length) * 100) : 0;
 
   // Generate notifications on load
   useEffect(() => {
@@ -237,6 +238,7 @@ export default function Dashboard({ orgId: overrideOrgId }) {
         org={currentOrg}
         currentStage={currentStage}
         stageProgress={stageProgress}
+        currentStagePct={currentStagePct}
       />
 
       {/* Team member welcome for first-time users */}

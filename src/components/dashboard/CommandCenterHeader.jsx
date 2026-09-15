@@ -11,10 +11,14 @@ const STAGE_COLORS = {
   purple: 'bg-purple-500',
 };
 
-export default function CommandCenterHeader({ org, currentStage, stageProgress = [] }) {
+export default function CommandCenterHeader({ org, currentStage, stageProgress = [], currentStagePct = 0 }) {
   const meta = STAGE_META[currentStage] || STAGE_META.stabilize;
   const stageIdx = STAGE_ORDER.indexOf(currentStage);
-  const overallProgress = Math.round(((stageIdx + 1) / STAGE_ORDER.length) * 100);
+  // Completed stages count fully; the current stage contributes proportionally
+  // to how many of its activities have been started. Upcoming stages contribute 0.
+  const overallProgress = Math.round(
+    ((stageIdx + currentStagePct / 100) / STAGE_ORDER.length) * 100
+  );
 
   const counts = {};
   if (stageProgress.length > 0) {
