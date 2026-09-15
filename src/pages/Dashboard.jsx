@@ -177,10 +177,13 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   // Momentum trend
   const momentumTrend = computeMomentumTrend(actions, decisions).direction;
 
-  // Last assessment date
-  const lastAssessmentDate = assessments.length > 0
-    ? assessments[0]?.created_date
-    : null;
+  // Last assessment date — consider all health data sources, not just Assessment entity
+  const allHealthDates = [
+    ...assessments.map(a => a.created_date),
+    ...healthPulses.map(p => p.created_date),
+    ...tensionPulses.map(p => p.created_date),
+  ].filter(Boolean).sort((a, b) => new Date(b) - new Date(a));
+  const lastAssessmentDate = allHealthDates.length > 0 ? allHealthDates[0] : null;
 
   // Current operating period
   const activePlan = planPeriods.find(p => p.status === 'active');
