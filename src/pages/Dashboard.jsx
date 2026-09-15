@@ -254,6 +254,8 @@ export default function Dashboard({ orgId: overrideOrgId }) {
         momentumScore={unifiedMomentum}
         momentumTrend={momentumTrend}
         operatingPeriod={operatingPeriod}
+        orgId={orgId}
+        user={user}
       />
 
       {/* Assessment status: Quick Health Check, Team Health & Culture, Workstyle */}

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Heart, Rocket, ArrowUp, ArrowDown, Minus, ChevronRight, Calendar } from 'lucide-react';
@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { getScoreColor } from '@/lib/scoreboardScoring';
 import { getMomentumColor } from '@/lib/momentumScoring';
 import { format } from 'date-fns';
+import GuidedAssessment from '@/components/assessments/GuidedAssessment';
 
 function TrendBadge({ direction }) {
   const icon = direction === 'improving' ? <ArrowUp className="h-3.5 w-3.5" />
@@ -29,14 +30,16 @@ function TrendBadge({ direction }) {
 export default function PrimaryScoreCards({
   healthScore, healthTrend, lastAssessmentDate,
   momentumScore, momentumTrend, operatingPeriod,
+  orgId, user,
 }) {
   const healthColor = getScoreColor(healthScore);
   const momentumColor = getMomentumColor(momentumScore);
+  const [guidedOpen, setGuidedOpen] = useState(false);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
       {/* LEADERSHIP HEALTH */}
-      <Link to="/org-health" className="block">
+      <div onClick={() => setGuidedOpen(true)} className="block">
         <Card className={cn(
           'border-border/50 shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer h-full',
           healthColor.bg
@@ -72,7 +75,7 @@ export default function PrimaryScoreCards({
             </div>
           </CardContent>
         </Card>
-      </Link>
+      </div>
 
       {/* MOMENTUM */}
       <Link to="/momentum" className="block">
@@ -110,6 +113,13 @@ export default function PrimaryScoreCards({
           </CardContent>
         </Card>
       </Link>
+
+      <GuidedAssessment
+        open={guidedOpen}
+        onClose={() => setGuidedOpen(false)}
+        orgId={orgId}
+        user={user}
+      />
     </div>
   );
 }
