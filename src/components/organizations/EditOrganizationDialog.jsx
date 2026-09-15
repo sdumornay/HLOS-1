@@ -28,6 +28,7 @@ export default function EditOrganizationDialog({ org }) {
         type: org.type || 'church',
         city: org.city || '',
         state: org.state || '',
+        lead_pastor_name: org.lead_pastor_name || '',
         mission: org.mission || '',
         desired_outcomes: org.desired_outcomes || '',
       });
@@ -104,6 +105,14 @@ export default function EditOrganizationDialog({ org }) {
                   </SelectContent>
                 </Select>
               </div>
+            </div>
+            <div>
+              <Label>Lead Pastor Name</Label>
+              <Input
+                value={form.lead_pastor_name || ''}
+                onChange={e => setForm(f => ({ ...f, lead_pastor_name: e.target.value }))}
+                placeholder="Name of the lead pastor"
+              />
             </div>
             <div>
               <Label>Mission</Label>

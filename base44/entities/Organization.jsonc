@@ -40,6 +40,10 @@
       "type": "string",
       "description": "Desired outcomes for the current season"
     },
+    "lead_pastor_name": {
+      "type": "string",
+      "description": "Name of the lead pastor"
+    },
     "health_score": {
       "type": "number",
       "default": 0
