@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { STAGE_META, STAGE_ORDER, computeStageProgress } from '@/lib/stageMeta';
 import { CheckCircle2, ChevronRight } from 'lucide-react';
+import EditOrganizationDialog from '@/components/organizations/EditOrganizationDialog';
 
 const STAGE_COLORS = {
   blue: 'bg-blue-500',
@@ -35,9 +36,12 @@ export default function CommandCenterHeader({ org, currentStage, stageProgress =
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-widest text-accent mb-0.5">Healthy Leadership OS</p>
-            <h1 className="text-xl lg:text-2xl font-barlow font-bold text-white tracking-tight">
-              {org?.name || 'Your Organization'}
-            </h1>
+            <div className="flex items-center gap-3 flex-wrap">
+              <h1 className="text-xl lg:text-2xl font-barlow font-bold text-white tracking-tight">
+                {org?.name || 'Your Organization'}
+              </h1>
+              <EditOrganizationDialog org={org} />
+            </div>
           </div>
           <Link
             to={`/${currentStage}`}
