@@ -6,8 +6,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowRight, ArrowLeft, Check, Heart } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Heart, Download } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { exportToPDF } from '@/lib/exportPDF';
+import { format } from 'date-fns';
 
 const SLIDER_STEPS = [
   { key: 'trust', label: 'Trust', question: 'How much do team members trust each other?', hint: '10 = complete trust, 1 = no trust' },
@@ -95,6 +97,35 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
     onClose();
   };
 
+  const handleExport = () => {
+    const overall = parseFloat((SLIDER_STEPS.map(s => scores[s.key] ?? 5).reduce((sum, v) => sum + v, 0) / SLIDER_STEPS.length).toFixed(1));
+    exportToPDF({
+      title: 'Quick Health Check Results',
+      subtitle: `Submitted ${format(new Date(), 'MMM d, yyyy')} by ${user?.email || 'Unknown'}`,
+      filename: 'health-check-results.pdf',
+      sections: [
+        {
+          heading: 'Scores',
+          table: {
+            headers: ['Dimension', 'Score (1-10)'],
+            rows: SLIDER_STEPS.map(s => [s.label, String(scores[s.key] ?? 5)]),
+          },
+        },
+        {
+          heading: 'Overall Health Score',
+          items: [{ label: 'Overall', value: `${overall}/10` }],
+        },
+        {
+          heading: 'Open Responses',
+          items: [
+            { label: 'Biggest source of tension', value: scores.biggest_tension || '—' },
+            { label: 'One change that would help', value: scores.one_change || '—' },
+          ],
+        },
+      ],
+    });
+  };
+
   const progress = ((step + 1) / STEPS.length) * 100;
 
   return (
@@ -119,7 +150,12 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
               <p className="text-sm text-muted-foreground">Your overall health score</p>
             </div>
             <p className="text-sm text-muted-foreground">Thank you! Your responses have been saved.</p>
-            <Button onClick={handleClose} className="w-full">Done</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleExport} className="flex-1">
+                <Download className="h-4 w-4 mr-1" /> Export PDF
+              </Button>
+              <Button onClick={handleClose} className="flex-1">Done</Button>
+            </div>
           </div>
         ) : (
           <div className="space-y-5 pt-2">
