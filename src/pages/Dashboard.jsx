@@ -163,8 +163,26 @@ export default function Dashboard({ orgId: overrideOrgId }) {
 
   const currentStage = currentOrg?.current_stage || 'stabilize';
 
+  // Org-wide health score computed via the service role (computeOrgScores) so every
+  // role sees the SAME value. Client-side computation is RLS-filtered: admins see all
+  // org submissions while team members only see their own, which produced different
+  // scores for the same organization depending on who was viewing.
+  const { data: orgScores } = useQuery({
+    queryKey: ['orgScores', orgId],
+    queryFn: async () => {
+      try {
+        const res = await base44.functions.invoke('computeOrgScores', { organizationId: orgId });
+        const healthScore = res?.data?.healthScore ?? res?.healthScore;
+        return healthScore != null ? healthScore : null;
+      } catch {
+        return null;
+      }
+    },
+    enabled: !!orgId,
+  });
+
   // Unified scores
-  const unifiedHealth = computeUnifiedHealthScore(assessments, healthPulses, tensionPulses);
+  const unifiedHealth = orgScores != null ? orgScores : computeUnifiedHealthScore(assessments, healthPulses, tensionPulses);
   const momentumResult = computeMomentumIndicators(priorities, actions, decisions, stageProgress);
   const unifiedMomentum = momentumResult.overall;
 
