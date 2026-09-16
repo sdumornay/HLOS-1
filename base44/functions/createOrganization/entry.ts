@@ -19,6 +19,7 @@ export default async function(req) {
     const org = await base44.asServiceRole.entities.Organization.create({
       name: name.trim(),
       city: (city || '').trim(),
+      lead_pastor_name: (leaderName || '').trim(),
       current_stage: 'stabilize',
       health_score: 0,
       momentum_score: 0,
