@@ -11,6 +11,7 @@ import { STAGE_STEPS } from '@/components/dashboard/NextStepsPanel';
 
 import CommandCenterHeader from '@/components/dashboard/CommandCenterHeader';
 import PrimaryScoreCards from '@/components/dashboard/PrimaryScoreCards';
+import OrganizationProfileCard from '@/components/dashboard/OrganizationProfileCard';
 import TopPriorities from '@/components/dashboard/TopPriorities';
 import NeedsAttention from '@/components/dashboard/NeedsAttention';
 import CurrentStagePanel from '@/components/dashboard/CurrentStagePanel';
@@ -278,6 +279,9 @@ export default function Dashboard({ orgId: overrideOrgId }) {
         orgId={orgId}
         user={user}
       />
+
+      {/* Organization profile: view and update the info entered during setup */}
+      <OrganizationProfileCard org={currentOrg} />
 
       {/* Assessment status: Quick Health Check, Team Health & Culture, Workstyle */}
       <AssessmentStatusPanel
