@@ -46,7 +46,8 @@ export default function OrganizationProfileCard({ org }) {
           </div>
           <EditOrganizationDialog
             org={org}
-            buttonClassName="text-muted-foreground hover:text-foreground hover:bg-muted gap-1.5"
+            buttonVariant="outline"
+            buttonClassName="text-foreground hover:bg-muted gap-1.5"
           />
         </div>
 
