@@ -15,11 +15,21 @@ export default async function(req) {
 
     const orgId = await resolveOrgId(base44, providedOrgId, user);
 
+    // Look up the authoritative role from the User entity (service role bypasses
+    // any stale session-token role) so the frontend always sees the current role.
+    let role = user?.role;
+    try {
+      const users = await base44.asServiceRole.entities.User.filter({ id: user.id });
+      if (users && users.length > 0) role = users[0].role;
+    } catch {
+      // keep me() role as fallback
+    }
+
     if (!orgId) {
       return Response.json({ error: 'No organization found for this user' }, { status: 404 });
     }
 
-    return Response.json({ organization_id: orgId });
+    return Response.json({ organization_id: orgId, role });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
