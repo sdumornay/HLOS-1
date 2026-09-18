@@ -25,6 +25,7 @@ import Stabilize from '@/pages/Stabilize';
 import Align from '@/pages/Align';
 import Execute from '@/pages/Execute';
 import Sustain from '@/pages/Sustain';
+import Scoreboard from '@/pages/Scoreboard';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -60,6 +61,7 @@ const AuthenticatedApp = () => {
         <Route path="/align" element={<Align />} />
         <Route path="/execute" element={<Execute />} />
         <Route path="/sustain" element={<Sustain />} />
+        <Route path="/scoreboard" element={<Scoreboard />} />
         <Route path="/assessments" element={<Assessments />} />
         <Route path="/org-health" element={<OrgHealth />} />
         <Route path="/momentum" element={<Momentum />} />

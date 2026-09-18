@@ -23,6 +23,8 @@ import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
 import TeamMemberWelcome from '@/components/dashboard/TeamMemberWelcome';
 import AssessmentStatusPanel from '@/components/dashboard/AssessmentStatusPanel';
+import PreBaselineDashboard from '@/components/dashboard/PreBaselineDashboard';
+import { useBaselineStatus } from '@/lib/useBaselineStatus';
 
 import { ArrowLeft } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
@@ -244,6 +246,16 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   useEffect(() => {
     if (orgId) base44.functions.invoke('generateNotifications', { organizationId: orgId });
   }, [orgId]);
+
+  // Baseline check — new orgs must complete the Leadership Health Scoreboard before stages unlock.
+  // Existing orgs already past stabilize are exempt (preserve their progress).
+  const { baselineCompleted } = useBaselineStatus(orgId);
+  const isExistingOrg = currentStage !== 'stabilize' || stageProgress.length > 0;
+  const needsBaseline = !baselineCompleted && !isExistingOrg && !isConsultantView;
+
+  if (needsBaseline) {
+    return <PreBaselineDashboard org={currentOrg} orgId={orgId} />;
+  }
 
   return (
     <div className="space-y-5">

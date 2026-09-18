@@ -1,0 +1,201 @@
+{
+  "name": "LeadershipHealthScoreboard",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "respondent_email": {
+      "type": "string",
+      "description": "Email of the person who completed the scoreboard"
+    },
+    "respondent_name": {
+      "type": "string",
+      "description": "Full name of the respondent"
+    },
+    "q1": {
+      "type": "number",
+      "description": "Stabilize Q1: addresses conflict directly and respectfully (1-5)"
+    },
+    "q2": {
+      "type": "number",
+      "description": "Stabilize Q2: strong level of trust among key leaders (1-5)"
+    },
+    "q3": {
+      "type": "number",
+      "description": "Stabilize Q3: leaders feel emotionally safe to raise concerns (1-5)"
+    },
+    "q4": {
+      "type": "number",
+      "description": "Stabilize Q4: unresolved tension not quietly slowing work (1-5)"
+    },
+    "q5": {
+      "type": "number",
+      "description": "Align Q1: leaders clear about mission and priorities (1-5)"
+    },
+    "q6": {
+      "type": "number",
+      "description": "Align Q2: roles and responsibilities clearly understood (1-5)"
+    },
+    "q7": {
+      "type": "number",
+      "description": "Align Q3: leadership team aligned around major decisions (1-5)"
+    },
+    "q8": {
+      "type": "number",
+      "description": "Align Q4: shared understanding of what success looks like (1-5)"
+    },
+    "q9": {
+      "type": "number",
+      "description": "Execute Q1: leaders take ownership of commitments (1-5)"
+    },
+    "q10": {
+      "type": "number",
+      "description": "Execute Q2: important decisions made timely and healthy (1-5)"
+    },
+    "q11": {
+      "type": "number",
+      "description": "Execute Q3: clear rhythms for follow-up and accountability (1-5)"
+    },
+    "q12": {
+      "type": "number",
+      "description": "Execute Q4: team follows through on agreed priorities (1-5)"
+    },
+    "q13": {
+      "type": "number",
+      "description": "Sustain Q1: developing future leaders intentionally (1-5)"
+    },
+    "q14": {
+      "type": "number",
+      "description": "Sustain Q2: leadership rhythms sustainable, not reactive (1-5)"
+    },
+    "q15": {
+      "type": "number",
+      "description": "Sustain Q3: leaders have space for reflection and renewal (1-5)"
+    },
+    "q16": {
+      "type": "number",
+      "description": "Sustain Q4: current leadership system supports long-term growth (1-5)"
+    },
+    "stabilize_score": {
+      "type": "number",
+      "description": "Stabilize stage score (1-10)"
+    },
+    "align_score": {
+      "type": "number",
+      "description": "Align stage score (1-10)"
+    },
+    "execute_score": {
+      "type": "number",
+      "description": "Execute stage score (1-10)"
+    },
+    "sustain_score": {
+      "type": "number",
+      "description": "Sustain stage score (1-10)"
+    },
+    "overall_score": {
+      "type": "number",
+      "description": "Overall leadership health score (1-10)"
+    },
+    "biggest_challenge": {
+      "type": "string",
+      "description": "Optional: biggest leadership challenge"
+    },
+    "timeline": {
+      "type": "string",
+      "description": "Optional: timeline for seeking support"
+    },
+    "is_baseline": {
+      "type": "boolean",
+      "default": true,
+      "description": "True if this is the org's baseline assessment"
+    }
+  },
+  "required": [
+    "organization_id",
+    "respondent_email"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "data.respondent_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

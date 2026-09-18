@@ -7,19 +7,22 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useBaselineStatus } from '@/lib/useBaselineStatus';
+import { useOrgId } from '@/lib/useOrgId';
+import { Lock } from 'lucide-react';
 
 const LEADER_ROLES = ['super_admin', 'coach', 'lead_pastor'];
 const ADMIN_ROLES = ['super_admin', 'coach'];
 
 const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard, roles: 'all' },
-  { type: 'divider', label: 'Framework' },
-  { label: 'Stabilize', path: '/stabilize', icon: Shield, roles: 'all' },
-  { label: 'Align', path: '/align', icon: Compass, roles: 'all' },
-  { label: 'Execute', path: '/execute', icon: Rocket, roles: 'all' },
-  { label: 'Sustain', path: '/sustain', icon: Leaf, roles: 'all' },
+  { type: 'divider', label: 'Journey' },
+  { label: 'Health Scoreboard', path: '/scoreboard', icon: Heart, roles: 'all' },
+  { label: 'Stabilize', path: '/stabilize', icon: Shield, roles: 'all', stage: 'stabilize' },
+  { label: 'Align', path: '/align', icon: Compass, roles: 'all', stage: 'align' },
+  { label: 'Execute', path: '/execute', icon: Rocket, roles: 'all', stage: 'execute' },
+  { label: 'Sustain', path: '/sustain', icon: Leaf, roles: 'all', stage: 'sustain' },
   { type: 'divider', label: 'Tools' },
-  { label: 'Assessments', path: '/assessments', icon: ClipboardCheck, roles: 'all' },
   { label: 'Issues', path: '/issues', icon: AlertCircle, roles: 'all' },
   { label: 'Actions', path: '/actions', icon: Target, roles: 'all' },
   { label: 'Resources', path: '/resources', icon: BookOpen, roles: 'all' },
@@ -38,6 +41,8 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
   const { user } = useCurrentUser();
+  const orgId = useOrgId();
+  const { baselineCompleted } = useBaselineStatus(orgId);
 
   // Detect consultant viewing a specific org (from /coach/:orgId route or ?org= param)
   const routeOrgMatch = location.pathname.match(/\/coach\/([^/]+)/);
@@ -46,6 +51,10 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const activeOrgId = routeOrgId || queryOrgId;
   const isPortfolioList = location.pathname === '/coach';
   const shouldCarryOrg = activeOrgId && !isPortfolioList;
+
+  // Coaches and admins can always access all stages
+  const canBypassLock = user?.role === 'super_admin' || user?.role === 'coach' || user?.role === 'admin';
+  const stagesLocked = !baselineCompleted && !canBypassLock;
 
   const visibleItems = NAV_ITEMS.filter(item => {
     if (item.type === 'divider') {
@@ -89,10 +98,27 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           const isActive = location.pathname === item.path ||
             (item.path !== '/' && location.pathname.startsWith(item.path));
 
+          // Stage items are locked until baseline is complete (coaches/admins bypass)
+          const isLocked = item.stage && stagesLocked;
+
           // Carry org context via ?org= when consultant is viewing a specific org
           const linkTo = shouldCarryOrg && item.path !== '/coach'
             ? `${item.path}?org=${activeOrgId}`
             : item.path;
+
+          if (isLocked) {
+            return (
+              <div
+                key={item.path}
+                className="flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground/30 cursor-not-allowed"
+                title="Complete the Leadership Health Scoreboard to unlock"
+              >
+                <Icon className="h-4 w-4 flex-shrink-0" />
+                {!collapsed && <span className="truncate">{item.label}</span>}
+                {!collapsed && <Lock className="h-3 w-3 ml-auto flex-shrink-0" />}
+              </div>
+            );
+          }
 
           return (
             <Link

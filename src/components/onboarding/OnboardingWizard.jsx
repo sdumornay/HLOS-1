@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -7,7 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
-import { CheckCircle2, Building2, Users, ChevronRight, Heart, Plus, X, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Building2, Users, ChevronRight, Plus, X, AlertCircle } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const STEPS = [
@@ -16,17 +17,34 @@ const STEPS = [
   { id: 'done',   title: "You're All Set!",    icon: CheckCircle2 },
 ];
 
+const ORG_TYPES = [
+  { value: 'church', label: 'Church' },
+  { value: 'ministry', label: 'Ministry' },
+  { value: 'nonprofit', label: 'Nonprofit' },
+  { value: 'other', label: 'Other' },
+];
+
+const US_STATES = [
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA','KS','KY','LA','ME','MD',
+  'MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ','NM','NY','NC','ND','OH','OK','OR','PA','RI','SC',
+  'SD','TN','TX','UT','VT','VA','WA','WV','WI','WY',
+];
+
 export default function OnboardingWizard({ open, onComplete }) {
   const { user } = useCurrentUser();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const [errorMsg, setErrorMsg] = React.useState('');
+  const [errorMsg, setErrorMsg] = useState('');
 
   const [step, setStep] = useState(0);
   const [orgName, setOrgName] = useState('');
+  const [orgType, setOrgType] = useState('church');
   const [role, setRole] = useState('lead_pastor');
-  const [leaderName, setLeaderName] = useState('');
+  const [leaderName, setLeaderName] = useState(user?.full_name || '');
+  const [leaderEmail, setLeaderEmail] = useState(user?.email || '');
   const [city, setCity] = useState('');
+  const [state, setState] = useState('');
   const [members, setMembers] = useState([{ name: '', email: '' }]);
 
   // ── Step 1: create org + link user via backend function ──────────────────
@@ -36,8 +54,11 @@ export default function OnboardingWizard({ open, onComplete }) {
       const response = await base44.functions.invoke('createOrganization', {
         name: orgName.trim(),
         city: city.trim(),
+        state: state.trim(),
+        orgType,
         role,
         leaderName: leaderName.trim(),
+        leaderEmail: leaderEmail.trim(),
       });
       if (response.data?.error) {
         throw new Error(response.data.error);
@@ -75,11 +96,19 @@ export default function OnboardingWizard({ open, onComplete }) {
 
   const progress = (step / (STEPS.length - 1)) * 100;
 
+  const handleDone = () => {
+    // After onboarding, go straight to the Scoreboard
+    if (onComplete) {
+      onComplete(true);
+    }
+    navigate('/scoreboard');
+  };
+
   return (
     <Dialog open={open} onOpenChange={() => {}}>
-      <DialogContent className="max-w-lg p-0 overflow-hidden [&>button]:hidden">
+      <DialogContent className="max-w-lg p-0 overflow-hidden [&>button]:hidden max-h-[90vh] overflow-y-auto">
         {/* Progress bar */}
-        <div className="h-1 bg-muted">
+        <div className="h-1 bg-muted sticky top-0 z-10">
           <div className="h-1 bg-accent transition-all duration-500" style={{ width: `${progress}%` }} />
         </div>
 
@@ -100,7 +129,7 @@ export default function OnboardingWizard({ open, onComplete }) {
         </div>
 
         {/* Content */}
-        <div className="px-8 py-6 space-y-4 min-h-[300px]">
+        <div className="px-8 py-6 space-y-4">
 
           {/* ── Step 0: Organization info ── */}
           {step === 0 && (
@@ -122,12 +151,33 @@ export default function OnboardingWizard({ open, onComplete }) {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="leader-name">Your Name *</Label>
+                  <Label>Organization Type *</Label>
+                  <Select value={orgType} onValueChange={setOrgType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {ORG_TYPES.map(t => <SelectItem key={t.value} value={t.value}>{t.label}</SelectItem>)}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="leader-name">Primary Leader Name *</Label>
                   <Input
                     id="leader-name"
                     value={leaderName}
                     onChange={e => setLeaderName(e.target.value)}
                     placeholder="Pastor John Smith"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="leader-email">Leader Email *</Label>
+                  <Input
+                    id="leader-email"
+                    type="email"
+                    value={leaderEmail}
+                    onChange={e => setLeaderEmail(e.target.value)}
+                    placeholder="pastor@church.org"
                   />
                 </div>
                 <div>
@@ -142,14 +192,27 @@ export default function OnboardingWizard({ open, onComplete }) {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="city">City</Label>
-                  <Input
-                    id="city"
-                    value={city}
-                    onChange={e => setCity(e.target.value)}
-                    placeholder="Nashville"
-                  />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="city">City</Label>
+                    <Input
+                      id="city"
+                      value={city}
+                      onChange={e => setCity(e.target.value)}
+                      placeholder="Nashville"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="state">State</Label>
+                    <Select value={state} onValueChange={setState}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select state" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {US_STATES.map(s => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
@@ -163,16 +226,10 @@ export default function OnboardingWizard({ open, onComplete }) {
               <Button
                 className="w-full"
                 onClick={() => createOrgMutation.mutate()}
-                disabled={!orgName.trim() || !leaderName.trim() || createOrgMutation.isPending}
+                disabled={!orgName.trim() || !leaderName.trim() || !leaderEmail.trim() || createOrgMutation.isPending}
               >
                 {createOrgMutation.isPending ? 'Setting up...' : <>Continue <ChevronRight className="h-4 w-4 ml-1" /></>}
               </Button>
-              <button
-                onClick={onComplete}
-                className="w-full text-xs text-muted-foreground hover:underline pt-1"
-              >
-                Skip for now
-              </button>
             </div>
           )}
 
@@ -180,7 +237,7 @@ export default function OnboardingWizard({ open, onComplete }) {
           {step === 1 && (
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Add your team members. They'll receive an email invitation to join your organization.
+                Add your leadership team members. They'll receive an email invitation to join your organization.
               </p>
 
               <div className="space-y-2 max-h-52 overflow-y-auto pr-1">
@@ -237,19 +294,13 @@ export default function OnboardingWizard({ open, onComplete }) {
                 <CheckCircle2 className="h-8 w-8 text-emerald-600" />
               </div>
               <div>
-                <p className="font-barlow font-bold text-xl">You're ready to go!</p>
+                <p className="font-barlow font-bold text-xl">Your organization is ready!</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Your organization is live. Start by taking a health assessment to baseline where your team is today.
+                  Next, you'll take the Leadership Health Scoreboard — a 16-question diagnostic that creates your baseline and unlocks Stage 1.
                 </p>
               </div>
-              <div className="rounded-lg bg-muted/50 p-4 flex items-center gap-3 text-left">
-                <Heart className="h-5 w-5 text-accent shrink-0" />
-                <p className="text-xs text-muted-foreground">
-                  <span className="font-semibold text-foreground">Next step:</span> Head to Assessments and run your first Health Pulse to see where your team stands.
-                </p>
-              </div>
-              <Button className="w-full" onClick={() => onComplete(true)}>
-                Go to My Dashboard
+              <Button className="w-full" onClick={handleDone}>
+                Continue to Scoreboard <ChevronRight className="h-4 w-4 ml-1" />
               </Button>
             </div>
           )}
