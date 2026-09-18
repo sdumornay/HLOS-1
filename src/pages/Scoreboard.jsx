@@ -9,7 +9,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ArrowRight, ArrowLeft, Check, Heart, Shield, Compass, Rocket, Leaf, Download } from 'lucide-react';
+import { ArrowRight, ArrowLeft, Check, Heart, Shield, Compass, Rocket, Leaf, Download, X } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { exportToPDF } from '@/lib/exportPDF';
 import { format } from 'date-fns';
@@ -173,7 +173,14 @@ export default function Scoreboard() {
   // ── Step 0: Context ──
   if (step === 0) {
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 relative">
+        <button
+          onClick={() => navigate('/')}
+          className="absolute -top-2 right-0 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Close questionnaire"
+        >
+          <X className="h-5 w-5" />
+        </button>
         <div className="text-center space-y-2">
           <div className="h-14 w-14 rounded-2xl bg-accent/15 flex items-center justify-center mx-auto">
             <Heart className="h-7 w-7 text-accent" />
@@ -223,7 +230,14 @@ export default function Scoreboard() {
   if (step >= 1 && step <= 4) {
     const StageIcon = currentStage.icon;
     return (
-      <div className="max-w-2xl mx-auto space-y-6">
+      <div className="max-w-2xl mx-auto space-y-6 relative">
+        <button
+          onClick={() => navigate('/')}
+          className="absolute -top-2 right-0 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Close questionnaire"
+        >
+          <X className="h-5 w-5" />
+        </button>
         {/* Progress */}
         <div className="space-y-1.5">
           <div className="flex justify-between text-xs text-muted-foreground">
