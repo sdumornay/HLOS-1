@@ -12,6 +12,7 @@ import StageHero from '@/components/stages/StageHero';
 import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
+import StageGate from '@/components/stages/StageGate';
 
 export default function Execute() {
   const orgId = useOrgId();
@@ -51,39 +52,12 @@ export default function Execute() {
   };
 
   return (
+    <StageGate stage="execute">
     <div className="space-y-6">
       <StageHero stage="execute" orgId={orgId} counts={counts} />
-      <StageGuide stage="execute" counts={counts} />
-
-      {/* Execution overview — full width */}
-      <ExecutionDashboard orgId={orgId} />
-
-      {/* Pillar 1: Priorities */}
-      <DisciplineSection number={7} name="Priorities" description="3-5 active priorities with owners, milestones, and progress" audience="leader">
-        <PriorityTracker orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Pillar 2: Meetings */}
-      <DisciplineSection number={8} name="Meetings" description="Review, decide, and assign in a clear rhythm" audience="leader">
-        <MeetingConsole orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Pillar 3: Decisions */}
-      <DisciplineSection number={9} name="Decisions" description="Log decisions with context, participants, and resulting actions" audience="leader">
-        <DecisionLogPanel orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Pillar 4: Actions */}
-      <DisciplineSection number={10} name="Actions" description="Clear owners, due dates, and linked priorities" audience="team">
-        <ActionTracker orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Pillar 5: Accountability */}
-      <DisciplineSection number={11} name="Accountability" description="Follow-through view grouped by owner" audience="leader">
-        <AccountabilityView orgId={orgId} />
-      </DisciplineSection>
-
+...
       <StagePriorities stage="execute" orgId={orgId} />
     </div>
+    </StageGate>
   );
 }

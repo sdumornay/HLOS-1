@@ -21,6 +21,7 @@ import StageHero from '@/components/stages/StageHero';
 import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
+import StageGate from '@/components/stages/StageGate';
 
 export default function Align() {
   const [showWorkstyleModal, setShowWorkstyleModal] = useState(false);
@@ -79,69 +80,12 @@ export default function Align() {
   };
 
   return (
+    <StageGate stage="align">
     <div className="space-y-6">
       <StageHero stage="align" orgId={orgId} counts={counts} />
-      <StageGuide stage="align" counts={counts} />
-      <AlignProgress counts={counts} />
-
-      {/* Assessment Launchers */}
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Card className="border-border/50 shadow-sm">
-          <CardContent className="p-4 flex flex-col gap-3">
-            <div className="flex items-start gap-3">
-              <div className="h-9 w-9 rounded-lg bg-accent/10 flex items-center justify-center shrink-0">
-                <Footprints className="h-4 w-4 text-accent" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-semibold">Workstyle Assessment</p>
-                  <Badge variant="outline" className="text-[10px] px-1.5 py-0">Workstyle</Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">Map your team's natural leadership styles across Head, Heart, Gut, and Feet. ~5 minutes.</p>
-              </div>
-            </div>
-            <Button size="sm" className="w-full" onClick={() => setShowWorkstyleModal(true)}>
-              Launch
-            </Button>
-          </CardContent>
-        </Card>
-
-        <WorkstyleSurveyModal
-          open={showWorkstyleModal}
-          onClose={() => setShowWorkstyleModal(false)}
-          orgId={orgId}
-          userName={''}
-          userEmail={''}
-          onSaved={() => refetchWorkstyles()}
-        />
-      </div>
-
-      {/* Area 1: Team Understanding */}
-      <DisciplineSection number={3} name="Team Understanding" description="Map workstyles, strengths, and team dynamics" audience="team">
-        <TeamOperatingMap orgId={orgId} />
-        <WorkstyleResults orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Area 2: Team Health */}
-      <DisciplineSection number={4} name="Team Health" description="Identify trust gaps and dysfunction patterns" audience="team">
-        <FiveDysfunctionsDiagnostic orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Area 3: Organizational Clarity */}
-      <DisciplineSection number={5} name="Organizational Clarity" description="Define mission, priorities, roles, and decisions" audience="leader">
-        <OrgClaritySummary orgId={orgId} />
-        <PriorityAlignmentPage orgId={orgId} />
-        <RoleClarityWorksheet orgId={orgId} />
-        <DecisionRightsMap orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Area 4: Team Agreements */}
-      <DisciplineSection number={6} name="Team Agreements" description="Establish how the team will work together" audience="leader">
-        <TeamAgreements orgId={orgId} />
-        <LeadershipCovenant orgId={orgId} />
-      </DisciplineSection>
-
+...
       <StagePriorities stage="align" orgId={orgId} />
     </div>
+    </StageGate>
   );
 }

@@ -11,6 +11,7 @@ import StageHero from '@/components/stages/StageHero';
 import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
+import StageGate from '@/components/stages/StageGate';
 
 export default function Sustain() {
   const orgId = useOrgId();
@@ -39,30 +40,12 @@ export default function Sustain() {
   };
 
   return (
+    <StageGate stage="sustain">
     <div className="space-y-6">
       <StageHero stage="sustain" orgId={orgId} counts={counts} />
-      <StageGuide stage="sustain" counts={counts} />
-
-      {/* Trend overview + pattern detection — full width */}
-      <TrendDashboard orgId={orgId} />
-
-      {/* Rhythm 1: Monthly Health + Momentum Review */}
-      <DisciplineSection number={12} name="Monthly Health + Momentum Review" description="Current health, momentum, priorities, issues, and commitments at a glance" audience="leader">
-        <MonthlyReviewDashboard orgId={orgId} />
-        <RiskFlagPanel orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Rhythm 2: Quarterly Reset */}
-      <DisciplineSection number={13} name="Quarterly Reset" description="Guided review: what improved, what declined, what to stop, continue, and prioritize next" audience="leader">
-        <QuarterlyReviewPanel orgId={orgId} />
-      </DisciplineSection>
-
-      {/* Rhythm 3: Renewal */}
-      <DisciplineSection number={14} name="Renewal" description="Reflect on leadership sustainability, team relationships, and areas requiring renewal" audience="team">
-        <RenewalReflection orgId={orgId} />
-      </DisciplineSection>
-
+...
       <StagePriorities stage="sustain" orgId={orgId} />
     </div>
+    </StageGate>
   );
 }

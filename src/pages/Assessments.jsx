@@ -20,7 +20,6 @@ import TeamHealthTrends from '@/components/assessments/TeamHealthTrends';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
 import FiveDysfunctionsModal from '@/components/shared/FiveDysfunctionsModal';
 import ParticipationReport from '@/components/assessments/ParticipationReport';
-import GuidedAssessment from '@/components/assessments/GuidedAssessment';
 
 const DIMENSIONS = [
   { key: 'trust', label: 'Trust', desc: 'How much do team members trust each other?' },
@@ -45,7 +44,6 @@ export default function Assessments() {
   const [open, setOpen] = useState(false);
   const [workstyleOpen, setWorkstyleOpen] = useState(false);
   const [fiveDysOpen, setFiveDysOpen] = useState(false);
-  const [guidedOpen, setGuidedOpen] = useState(false);
   const [form, setForm] = useState({
     type: 'pulse',
     stage: 'stabilize',
@@ -191,17 +189,19 @@ export default function Assessments() {
         )}
       </div>
 
-      {/* Primary CTA: Quick Health Check */}
+      {/* Primary CTA: Leadership Health Scoreboard */}
       <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5">
         <CardContent className="p-5 flex items-center gap-4">
           <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
             <Heart className="h-5 w-5 text-accent" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold">Quick Health Check</p>
-            <p className="text-xs text-muted-foreground mt-0.5">A guided 6-question pulse survey. Takes less than 2 minutes.</p>
+            <p className="text-sm font-semibold">Leadership Health Scoreboard</p>
+            <p className="text-xs text-muted-foreground mt-0.5">The 16-question baseline assessment across all four stages. Required before unlocking Stage 1.</p>
           </div>
-          <Button size="sm" onClick={() => setGuidedOpen(true)}>Start</Button>
+          <Link to="/scoreboard">
+            <Button size="sm">Take Scoreboard</Button>
+          </Link>
         </CardContent>
       </Card>
 
@@ -262,13 +262,6 @@ export default function Assessments() {
           </Card>
         </div>
       </div>
-
-      <GuidedAssessment
-        open={guidedOpen}
-        onClose={() => setGuidedOpen(false)}
-        orgId={orgId}
-        user={user}
-      />
 
       <FiveDysfunctionsModal
         open={fiveDysOpen}
@@ -359,7 +352,7 @@ export default function Assessments() {
             <Card className="border-border/50">
               <CardContent className="py-12 text-center">
                 <ClipboardCheck className="h-10 w-10 mx-auto text-muted-foreground/50 mb-3" />
-                <p className="text-muted-foreground">No assessments yet. Start with the Quick Health Check above.</p>
+                <p className="text-muted-foreground">No assessments yet. Start with the Leadership Health Scoreboard above.</p>
               </CardContent>
             </Card>
           )}
