@@ -20,6 +20,7 @@ import TeamHealthTrends from '@/components/assessments/TeamHealthTrends';
 import WorkstyleSurveyModal from '@/components/shared/WorkstyleSurveyModal';
 import FiveDysfunctionsModal from '@/components/shared/FiveDysfunctionsModal';
 import ParticipationReport from '@/components/assessments/ParticipationReport';
+import { useStageAccess } from '@/lib/useStageAccess';
 
 const DIMENSIONS = [
   { key: 'trust', label: 'Trust', desc: 'How much do team members trust each other?' },
@@ -40,6 +41,7 @@ const WORKSTYLE_MAP = {
 export default function Assessments() {
   const { user, canManageAll } = useCurrentUser();
   const orgId = useOrgId();
+  const { canAccessStage } = useStageAccess();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [workstyleOpen, setWorkstyleOpen] = useState(false);
@@ -223,43 +225,55 @@ export default function Assessments() {
         </Card>
       )}
 
-      {/* Additional Assessments */}
+      {/* Additional Assessments — gated by stage access */}
       <div>
         <h2 className="text-base font-semibold mb-3">Additional Assessments</h2>
         <div className="grid gap-3 sm:grid-cols-2">
-          <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-5 flex items-start gap-4">
-              <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
-                <Users className="h-5 w-5 text-secondary" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-semibold">Team Health &amp; Culture</p>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30">5 Dysfunctions</span>
+          {canAccessStage('stabilize') && (
+            <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="p-5 flex items-start gap-4">
+                <div className="h-10 w-10 rounded-xl bg-secondary/10 flex items-center justify-center flex-shrink-0">
+                  <Users className="h-5 w-5 text-secondary" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Based on Lencioni's Five Dysfunctions — rate trust, conflict, commitment, accountability, and results. Takes 3-5 minutes.</p>
-              </div>
-              <Button size="sm" variant="outline" onClick={() => setFiveDysOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
-            </CardContent>
-          </Card>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold">Team Health &amp; Culture</p>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-secondary/15 text-secondary border border-secondary/30">5 Dysfunctions</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">Based on Lencioni's Five Dysfunctions — rate trust, conflict, commitment, accountability, and results. Takes 3-5 minutes.</p>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => setFiveDysOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
+              </CardContent>
+            </Card>
+          )}
 
-          <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
-            <CardContent className="p-5 flex items-start gap-4">
-              <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <Activity className="h-5 w-5 text-accent" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <p className="text-sm font-semibold">Workstyle Assessment</p>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">Workstyle</span>
+          {canAccessStage('align') && (
+            <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+              <CardContent className="p-5 flex items-start gap-4">
+                <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Activity className="h-5 w-5 text-accent" />
                 </div>
-                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                  Discover your natural leadership style — Head, Heart, Gut, or Feet. Results save to your profile and can be shared. ~3 minutes.
-                </p>
-              </div>
-              <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
-            </CardContent>
-          </Card>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="text-sm font-semibold">Workstyle Assessment</p>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">Workstyle</span>
+                  </div>
+                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                    Discover your natural leadership style — Head, Heart, Gut, or Feet. Results save to your profile and can be shared. ~3 minutes.
+                  </p>
+                </div>
+                <Button size="sm" variant="outline" onClick={() => setWorkstyleOpen(true)} className="flex-shrink-0 gap-1.5">Start</Button>
+              </CardContent>
+            </Card>
+          )}
+
+          {!canAccessStage('stabilize') && !canAccessStage('align') && (
+            <Card className="border-border/50 border-dashed">
+              <CardContent className="py-8 text-center">
+                <p className="text-sm text-muted-foreground">Additional assessments unlock as you progress through the HLOS stages.</p>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
 

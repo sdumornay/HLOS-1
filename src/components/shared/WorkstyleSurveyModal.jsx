@@ -165,14 +165,18 @@ export default function WorkstyleSurveyModal({ open, onClose, orgId, userName, u
   }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const saveMutation = useMutation({
-    mutationFn: (data) => base44.entities.WorkstyleAssessment.create(data),
-    onSuccess: () => {
+    mutationFn: (data) => base44.functions.invoke('submitWorkstyle', data),
+    onSuccess: (res) => {
+      if (res?.data?.error) {
+        toast.error(res.data.error);
+        return;
+      }
       queryClient.invalidateQueries({ queryKey: ['workstyleAssessments'] });
       queryClient.invalidateQueries({ queryKey: ['workstyle-mine'] });
       if (onSaved) onSaved();
       toast.success('Workstyle saved!');
     },
-    onError: (err) => toast.error('Failed to save: ' + (err?.message || 'Unknown error')),
+    onError: (err) => toast.error('Failed to save: ' + (err?.response?.data?.error || err?.message || 'Unknown error')),
   });
 
   const currentQIndex = Object.keys(answers).length;

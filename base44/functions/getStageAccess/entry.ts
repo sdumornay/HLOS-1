@@ -12,8 +12,18 @@ export default async function(req) {
     const user = await base44.auth.me();
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
+    // Read organizationId from query params (GET) or body (POST via SDK)
     const url = new URL(req.url);
-    const organizationId = url.searchParams.get('organizationId') || user?.data?.organization_id;
+    let organizationId = url.searchParams.get('organizationId');
+    if (!organizationId) {
+      try {
+        const body = await req.json();
+        organizationId = body?.organizationId;
+      } catch { /* no body */ }
+    }
+    if (!organizationId) {
+      organizationId = user?.data?.organization_id;
+    }
     if (!organizationId) {
       return Response.json({ error: 'Missing organizationId' }, { status: 400 });
     }

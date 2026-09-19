@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Heart, CheckCircle, Plus } from 'lucide-react';
 import { format } from 'date-fns';
+import { toast } from 'sonner';
 
 const currentMonth = format(new Date(), 'yyyy-MM');
 
@@ -38,8 +39,16 @@ export default function MonthlyHealthPulse({ orgId }) {
   });
 
   const createMutation = useMutation({
-    mutationFn: (data) => base44.entities.HealthPulse.create(data),
-    onSuccess: () => { queryClient.invalidateQueries(['healthPulses', orgId]); setOpen(false); },
+    mutationFn: (data) => base44.functions.invoke('submitHealthPulse', data),
+    onSuccess: (res) => {
+      if (res?.data?.error) {
+        toast.error(res.data.error);
+        return;
+      }
+      queryClient.invalidateQueries(['healthPulses', orgId]);
+      setOpen(false);
+    },
+    onError: (err) => toast.error(err?.response?.data?.error || err?.message || 'Failed to submit'),
   });
 
   const alreadySubmitted = pulses.some(p => p.month === currentMonth && p.respondent_email === user?.email);
