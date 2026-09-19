@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/lib/useCurrentUser';
-import { useBaselineStatus } from '@/lib/useBaselineStatus';
+import { useStageAccess } from '@/lib/useStageAccess';
 import { useOrgId } from '@/lib/useOrgId';
 import { Lock } from 'lucide-react';
 
@@ -42,7 +42,7 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const [searchParams] = useSearchParams();
   const { user } = useCurrentUser();
   const orgId = useOrgId();
-  const { baselineCompleted } = useBaselineStatus(orgId);
+  const { canAccessStage } = useStageAccess();
 
   // Detect consultant viewing a specific org (from /coach/:orgId route or ?org= param)
   const routeOrgMatch = location.pathname.match(/\/coach\/([^/]+)/);
@@ -54,7 +54,6 @@ export default function Sidebar({ collapsed, setCollapsed }) {
 
   // Coaches and admins can always access all stages
   const canBypassLock = user?.role === 'super_admin' || user?.role === 'coach' || user?.role === 'admin';
-  const stagesLocked = !baselineCompleted && !canBypassLock;
 
   const visibleItems = NAV_ITEMS.filter(item => {
     if (item.type === 'divider') {
@@ -98,8 +97,8 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           const isActive = location.pathname === item.path ||
             (item.path !== '/' && location.pathname.startsWith(item.path));
 
-          // Stage items are locked until baseline is complete (coaches/admins bypass)
-          const isLocked = item.stage && stagesLocked;
+          // Stage items are locked based on sequential progression (coaches/admins bypass)
+          const isLocked = item.stage && !canBypassLock && !canAccessStage(item.stage);
 
           // Carry org context via ?org= when consultant is viewing a specific org
           const linkTo = shouldCarryOrg && item.path !== '/coach'

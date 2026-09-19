@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.41';
 import { resolveOrgId } from '../../shared/resolveOrg.ts';
+import { validateStageAccess } from '../../shared/validateStageAccess.ts';
 
 export default async function(req) {
   try {
@@ -16,6 +17,12 @@ export default async function(req) {
     const orgId = await resolveOrgId(base44, organization_id, user);
     if (!orgId) {
       return Response.json({ error: 'Could not determine your organization. Please contact your coach.' }, { status: 400 });
+    }
+
+    // Enforce stage gating: Team Health & Culture (Five Dysfunctions) is a Stage 1 (Stabilize) assessment
+    const access = await validateStageAccess(base44, orgId, 'five_dysfunctions');
+    if (!access.allowed) {
+      return Response.json({ error: access.reason }, { status: 403 });
     }
 
     const record = await base44.asServiceRole.entities.FiveDysfunctions.create({

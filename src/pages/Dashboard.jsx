@@ -22,7 +22,9 @@ import SecurityAuditPanel from '@/components/dashboard/SecurityAuditPanel';
 import AdminOrgWidget from '@/components/dashboard/AdminOrgWidget';
 import StageCompletionMatrix from '@/components/dashboard/StageCompletionMatrix';
 import TeamMemberWelcome from '@/components/dashboard/TeamMemberWelcome';
-import AssessmentStatusPanel from '@/components/dashboard/AssessmentStatusPanel';
+import ContinueJourneyCard from '@/components/dashboard/ContinueJourneyCard';
+import StageJourneyDashboard from '@/components/stages/StageJourneyDashboard';
+import StageApprovalPanel from '@/components/stages/StageApprovalPanel';
 import PreBaselineDashboard from '@/components/dashboard/PreBaselineDashboard';
 import { useBaselineStatus } from '@/lib/useBaselineStatus';
 
@@ -295,12 +297,11 @@ export default function Dashboard({ orgId: overrideOrgId }) {
       {/* Organization profile: view and update the info entered during setup */}
       <OrganizationProfileCard org={currentOrg} />
 
-      {/* Assessment status: Quick Health Check, Team Health & Culture, Workstyle */}
-      <AssessmentStatusPanel
-        assessments={assessments}
-        dysfunctions={dysfunctions}
-        workstyles={workstyles}
-      />
+      {/* Continue Your HLOS Journey — replaces the old assessment status panel */}
+      <ContinueJourneyCard />
+
+      {/* Stage journey dashboard — shows all 4 stages with status and progress */}
+      <StageJourneyDashboard />
 
       {/* 3. Top Priorities + Needs Attention */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -329,6 +330,7 @@ export default function Dashboard({ orgId: overrideOrgId }) {
       />
 
       {/* Admin panels — only on the consultant's own dashboard, not when viewing a specific org */}
+      {!isConsultantView && (isAdmin || isCoach) && <StageApprovalPanel />}
       {!isConsultantView && (isAdmin || isCoach) && <AdminOrgWidget />}
       {!isConsultantView && isAdmin && <StageCompletionMatrix />}
       {!isConsultantView && isAdmin && <SecurityAuditPanel />}

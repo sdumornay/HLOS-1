@@ -1,0 +1,106 @@
+{
+  "name": "StageOverrideLog",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "admin_email": {
+      "type": "string",
+      "description": "Email of the administrator who performed the override"
+    },
+    "action": {
+      "type": "string",
+      "enum": [
+        "approve",
+        "unlock",
+        "complete",
+        "correct",
+        "relock",
+        "reset"
+      ],
+      "description": "Type of override action"
+    },
+    "stage": {
+      "type": "string",
+      "enum": [
+        "stabilize",
+        "align",
+        "execute",
+        "sustain"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "description": "Required justification for the override"
+    },
+    "previous_status": {
+      "type": "string",
+      "description": "Status before the override"
+    },
+    "new_status": {
+      "type": "string",
+      "description": "Status after the override"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "admin_email",
+    "action",
+    "stage",
+    "reason"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    }
+  }
+}

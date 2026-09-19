@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { useOrgId } from '@/lib/useOrgId';
 import StabilizeProgress from '@/components/stabilize/StabilizeProgress';
 import ConflictIntakeForm from '@/components/stabilize/ConflictIntakeForm';
-import HealthCheckCard from '@/components/stabilize/HealthCheckCard';
+import TensionPulseSurvey from '@/components/stabilize/TensionPulseSurvey';
 import LeaderInterviewNotes from '@/components/stabilize/LeaderInterviewNotes';
 import CommunicationAgreements from '@/components/stabilize/CommunicationAgreements';
 import ConflictTriggerTracker from '@/components/stabilize/ConflictTriggerTracker';
@@ -13,6 +13,7 @@ import StageHero from '@/components/stages/StageHero';
 import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
+import StageGate from '@/components/stages/StageGate';
 
 export default function Stabilize() {
   const orgId = useOrgId();
@@ -58,26 +59,28 @@ export default function Stabilize() {
   };
 
   return (
-    <div className="space-y-6">
-      <StageHero stage="stabilize" orgId={orgId} counts={counts} />
-      <StageGuide stage="stabilize" counts={counts} />
-      <StabilizeProgress counts={counts} />
+    <StageGate stage="stabilize">
+      <div className="space-y-6">
+        <StageHero stage="stabilize" orgId={orgId} counts={counts} />
+        <StageGuide stage="stabilize" counts={counts} />
+        <StabilizeProgress counts={counts} />
 
-      {/* Discipline 1: Leadership Health */}
-      <DisciplineSection number={1} name="Leadership Health" description="Baseline team tension, trust, and leadership health" audience="team">
-        <HealthCheckCard orgId={orgId} />
-        <LeaderInterviewNotes orgId={orgId} />
-      </DisciplineSection>
+        {/* Discipline 1: Leadership Health */}
+        <DisciplineSection number={1} name="Leadership Health" description="Baseline team tension, trust, and leadership health" audience="team">
+          <TensionPulseSurvey orgId={orgId} />
+          <LeaderInterviewNotes orgId={orgId} />
+        </DisciplineSection>
 
-      {/* Discipline 2: Healthy Conflict */}
-      <DisciplineSection number={2} name="Healthy Conflict" description="Surface, understand, and resolve conflict constructively" audience="team">
-        <ConflictIntakeForm orgId={orgId} />
-        <CommunicationAgreements orgId={orgId} />
-        <ConflictTriggerTracker orgId={orgId} />
-        <NVCConversationHelper orgId={orgId} />
-      </DisciplineSection>
+        {/* Discipline 2: Healthy Conflict */}
+        <DisciplineSection number={2} name="Healthy Conflict" description="Surface, understand, and resolve conflict constructively" audience="team">
+          <ConflictIntakeForm orgId={orgId} />
+          <CommunicationAgreements orgId={orgId} />
+          <ConflictTriggerTracker orgId={orgId} />
+          <NVCConversationHelper orgId={orgId} />
+        </DisciplineSection>
 
-      <StagePriorities stage="stabilize" orgId={orgId} />
-    </div>
+        <StagePriorities stage="stabilize" orgId={orgId} />
+      </div>
+    </StageGate>
   );
 }

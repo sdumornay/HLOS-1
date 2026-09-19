@@ -1,4 +1,10 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.40';
+import {
+  STAGE_ORDER,
+  STAGE_LABELS,
+  STAGE_DELIVERABLES,
+  evaluateDeliverables,
+} from '../../shared/stageDeliverables.ts';
 
 export default async function(req) {
   try {
@@ -7,7 +13,7 @@ export default async function(req) {
     if (!user) return Response.json({ error: 'Unauthorized' }, { status: 401 });
 
     const role = user?.data?.role || user?.role;
-    if (!['super_admin', 'coach', 'lead_pastor'].includes(role)) {
+    if (!['super_admin', 'coach', 'lead_pastor', 'admin'].includes(role)) {
       return Response.json({ error: 'Forbidden' }, { status: 403 });
     }
 
@@ -20,11 +26,17 @@ export default async function(req) {
     const stage = org.current_stage || 'stabilize';
     if (stage === 'sustain') return Response.json({ stage, complete: false, reason: 'Sustain is the final stage' });
 
-    const [tensionPulses, commAgreements, conflictIntakes, dysfunctions, workstyles, roleClarity, priorities, decisionRights, covenants, planPeriods, meetingAgendas, actions, stageProgress] = await Promise.all([
+    // Fetch all data needed for deliverable checks
+    const [
+      tensionPulses, fiveDysfunctions, commAgreements, conflictIntakes,
+      workstyles, roleClarity, priorities, decisionRights, covenants,
+      planPeriods, meetingAgendas, actions, healthPulses,
+      quarterlyReviews, renewalReflections, scoreboards, existingProgress,
+    ] = await Promise.all([
       base44.asServiceRole.entities.TensionPulse.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.FiveDysfunctions.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.CommAgreement.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.ConflictIntake.filter({ organization_id: organizationId }),
-      base44.asServiceRole.entities.FiveDysfunctions.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.WorkstyleAssessment.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.RoleClarity.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.PriorityAlignment.filter({ organization_id: organizationId }),
@@ -33,76 +45,62 @@ export default async function(req) {
       base44.asServiceRole.entities.PlanningPeriod.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.MeetingAgenda.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.Action.filter({ organization_id: organizationId }),
-      base44.asServiceRole.entities.StageProgress.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.HealthPulse.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.QuarterlyReview.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.RenewalReflection.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.LeadershipHealthScoreboard.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.OrganizationStageProgress.filter({ organization_id: organizationId }),
     ]);
 
-    let results = [];
-    let nextStage = null;
+    const data = {
+      tensionPulses, fiveDysfunctions, commAgreements, conflictIntakes,
+      workstyles, roleClarity, priorities, decisionRights, covenants,
+      planPeriods, meetingAgendas, actions, healthPulses,
+      quarterlyReviews, renewalReflections,
+    };
 
-    if (stage === 'stabilize') {
-      const avgTension = tensionPulses.length > 0
-        ? tensionPulses.reduce((s, p) => s + (p.team_tension || 0), 0) / tensionPulses.length
-        : 10;
-      results = [
-        { label: 'At least 1 Tension Pulse submitted', met: tensionPulses.length > 0 },
-        { label: 'At least 1 active Communication Agreement', met: commAgreements.some(a => a.status === 'active') },
-        { label: 'No open (unresolved) conflicts', met: !conflictIntakes.some(c => c.status === 'open') },
-        { label: 'Average team tension below 4', met: avgTension < 4 },
-      ];
-      nextStage = 'align';
-    } else if (stage === 'align') {
-      results = [
-        { label: 'Team Health Diagnostic completed', met: dysfunctions.length > 0 },
-        { label: 'Workstyle Assessment completed', met: workstyles.length > 0 },
-        { label: 'At least 1 Role Clarity agreed', met: roleClarity.some(r => r.status === 'agreed') },
-        { label: 'At least 1 Priority active', met: priorities.some(p => p.status === 'active') },
-        { label: 'At least 1 Decision Right clear', met: decisionRights.some(d => d.clarity_status === 'clear') },
-        { label: 'Leadership Covenant active', met: covenants.some(c => c.status === 'active') },
-      ];
-      nextStage = 'execute';
-    } else if (stage === 'execute') {
-      const completedActions = actions.filter(a => a.status === 'completed');
-      results = [
-        { label: 'At least 1 Planning Period created', met: planPeriods.length > 0 },
-        { label: 'At least 1 Meeting Agenda created', met: meetingAgendas.length > 0 },
-        { label: 'At least 5 actions completed', met: completedActions.length >= 5 },
-        { label: 'Action completion rate above 60%', met: actions.length > 0 && (completedActions.length / actions.length) >= 0.6 },
-      ];
-      nextStage = 'sustain';
+    const baselineCompleted = scoreboards.length > 0 || org.baseline_completed === true;
+    if (stage === 'stabilize' && !baselineCompleted) {
+      return Response.json({
+        stage, complete: false,
+        reason: 'Complete the Leadership Health Scoreboard baseline first.',
+        results: [],
+      });
     }
 
-    const complete = results.every(r => r.met);
+    const evalResult = evaluateDeliverables(stage, data);
+    const nextStage = STAGE_ORDER[STAGE_ORDER.indexOf(stage) + 1] || null;
 
-    if (complete && nextStage) {
-      await base44.asServiceRole.entities.Organization.update(organizationId, { current_stage: nextStage });
-
-      const existingProgress = stageProgress.find(sp => sp.stage === stage);
-      if (existingProgress) {
-        await base44.asServiceRole.entities.StageProgress.update(existingProgress.id, {
-          status: 'completed',
-          completed_date: new Date().toISOString().split('T')[0],
-        });
-      } else {
-        await base44.asServiceRole.entities.StageProgress.create({
-          organization_id: organizationId,
-          stage,
-          status: 'completed',
-          completed_date: new Date().toISOString().split('T')[0],
+    if (evalResult.allMet) {
+      // All deliverables met — mark as awaiting approval (do NOT auto-advance)
+      const progress = existingProgress.find((p) => p.stage === stage);
+      if (progress && progress.status !== 'completed' && progress.status !== 'awaiting_approval') {
+        await base44.asServiceRole.entities.OrganizationStageProgress.update(progress.id, {
+          status: 'awaiting_approval',
+          completion_percentage: 100,
+          completed_deliverables: evalResult.completed,
         });
       }
 
-      const nextProgress = stageProgress.find(sp => sp.stage === nextStage);
-      if (!nextProgress) {
-        await base44.asServiceRole.entities.StageProgress.create({
-          organization_id: organizationId,
-          stage: nextStage,
-          status: 'in_progress',
-          started_date: new Date().toISOString().split('T')[0],
-        });
-      }
+      return Response.json({
+        stage,
+        complete: true,
+        results: evalResult.results,
+        nextStage,
+        advanced: false,
+        awaitingApproval: true,
+        message: `All ${STAGE_LABELS[stage]} deliverables complete. Stage is awaiting administrator approval.`,
+      });
     }
 
-    return Response.json({ stage, complete, results, nextStage, advanced: complete });
+    return Response.json({
+      stage,
+      complete: false,
+      results: evalResult.results,
+      nextStage,
+      advanced: false,
+      awaitingApproval: false,
+    });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
   }
