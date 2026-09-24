@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Slider } from '@/components/ui/slider';
-import { Activity, Plus, Download } from 'lucide-react';
+import { Activity, Plus, Download, CheckCircle2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
 import TensionPulseInterpretation, { interpretTensionPulse } from '@/components/stabilize/TensionPulseInterpretation';
@@ -26,6 +26,8 @@ export default function TensionPulseSurvey({ orgId }) {
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
+  const [submittedPulse, setSubmittedPulse] = useState(null);
+  const [showResults, setShowResults] = useState(false);
   const [form, setForm] = useState({
     team_tension: 5, trust_level: 5, communication_safety: 5,
     unresolved_conflicts: 5, leadership_confidence: 5, team_morale: 5,
@@ -40,9 +42,10 @@ export default function TensionPulseSurvey({ orgId }) {
 
   const createMutation = useMutation({
     mutationFn: (data) => base44.functions.invoke('submitTensionPulse', { ...data, organization_id: orgId }),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['tensionPulses', orgId] });
-      setOpen(false);
+      setSubmittedPulse(data?.record || data);
+      setShowResults(false);
     },
   });
 
@@ -58,8 +61,8 @@ export default function TensionPulseSurvey({ orgId }) {
     ? pulses.find(p => p.respondent_email === user.email)
     : null;
 
-  const handleExport = () => {
-    const target = myLatest || pulses[0];
+  const handleExport = (targetPulse) => {
+    const target = targetPulse || myLatest || pulses[0];
     if (!target) return;
     const interp = interpretTensionPulse(target);
     exportToPDF({
@@ -101,13 +104,13 @@ export default function TensionPulseSurvey({ orgId }) {
               <Download className="h-4 w-4 mr-1" /> Export
             </Button>
           )}
-          <Button size="sm" onClick={() => setOpen(!open)}>
+          <Button size="sm" onClick={() => { setSubmittedPulse(null); setShowResults(false); setOpen(!open); }}>
             <Plus className="h-4 w-4 mr-1" /> Take Survey
           </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {open && (
+        {open && !submittedPulse && (
           <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/30">
             {METRICS.map(m => (
               <div key={m.key}>
@@ -135,6 +138,29 @@ export default function TensionPulseSurvey({ orgId }) {
               <Button variant="outline" size="sm" onClick={() => setOpen(false)}>Cancel</Button>
               <Button size="sm" onClick={() => createMutation.mutate(form)} disabled={createMutation.isPending}>
                 {createMutation.isPending ? 'Submitting...' : 'Submit Survey'}
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {submittedPulse && open && (
+          <div className="border border-emerald-200 bg-emerald-50/50 rounded-lg p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              <p className="text-sm font-semibold text-emerald-800">Your Tension Pulse has been recorded.</p>
+            </div>
+            {showResults && <TensionPulseInterpretation pulse={submittedPulse} />}
+            <div className="flex flex-wrap gap-2 justify-end">
+              <Button size="sm" variant="outline" onClick={() => handleExport(submittedPulse)}>
+                <Download className="h-4 w-4 mr-1" /> Export Report
+              </Button>
+              {!showResults && (
+                <Button size="sm" onClick={() => setShowResults(true)}>
+                  <Eye className="h-4 w-4 mr-1" /> See Results
+                </Button>
+              )}
+              <Button size="sm" variant="ghost" onClick={() => { setSubmittedPulse(null); setShowResults(false); setOpen(false); }}>
+                Done
               </Button>
             </div>
           </div>
