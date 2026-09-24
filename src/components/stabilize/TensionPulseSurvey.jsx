@@ -44,7 +44,8 @@ export default function TensionPulseSurvey({ orgId }) {
     mutationFn: (data) => base44.functions.invoke('submitTensionPulse', { ...data, organization_id: orgId }),
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['tensionPulses', orgId] });
-      setSubmittedPulse(data?.record || data);
+      const record = data?.data?.record || data?.record || data?.data || data;
+      setSubmittedPulse(record);
       setShowResults(false);
     },
   });
