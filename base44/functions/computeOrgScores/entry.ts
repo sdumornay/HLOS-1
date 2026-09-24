@@ -35,16 +35,17 @@ export default async function(req) {
       const recent = tensionPulses.slice(0, 6);
       const normalized = recent.map(p => {
         const dims = [
-          p.team_tension ? 11 - p.team_tension : 0,
+          p.team_tension ? 6 - p.team_tension : 0,
           p.trust_level || 0,
           p.communication_safety || 0,
-          p.unresolved_conflicts ? 11 - p.unresolved_conflicts : 0,
+          p.unresolved_conflicts ? 6 - p.unresolved_conflicts : 0,
           p.leadership_confidence || 0,
           p.team_morale || 0,
         ];
         return dims.reduce((s, v) => s + v, 0) / dims.length;
       });
-      const avg = normalized.reduce((s, v) => s + v, 0) / normalized.length;
+      // Scale from 1-5 to 0-10 so it's comparable to other health sources
+      const avg = (normalized.reduce((s, v) => s + v, 0) / normalized.length) * 2;
       healthSources.push({ value: avg, weight: 30 });
     }
     const healthScore = healthSources.length > 0

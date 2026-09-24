@@ -22,6 +22,20 @@ const METRICS = [
   { key: 'team_tension', label: 'Team Tension', invert: true },
 ];
 
+const RATING_LABELS = {
+  1: 'Strongly Disagree',
+  2: 'Disagree',
+  3: 'Neutral',
+  4: 'Agree',
+  5: 'Strongly Agree',
+};
+
+// Build radar chart data from a single pulse (1-5 scale, inverted normalized)
+const pulseChartData = (pulse) => METRICS.map(m => ({
+  subject: m.label,
+  value: m.invert ? 6 - (pulse[m.key] || 3) : (pulse[m.key] || 3),
+}));
+
 export default function TensionPulseSurvey({ orgId }) {
   const { user } = useCurrentUser();
   const queryClient = useQueryClient();
@@ -29,8 +43,8 @@ export default function TensionPulseSurvey({ orgId }) {
   const [submittedPulse, setSubmittedPulse] = useState(null);
   const [showResults, setShowResults] = useState(false);
   const [form, setForm] = useState({
-    team_tension: 5, trust_level: 5, communication_safety: 5,
-    unresolved_conflicts: 5, leadership_confidence: 5, team_morale: 5,
+    team_tension: 3, trust_level: 3, communication_safety: 3,
+    unresolved_conflicts: 3, leadership_confidence: 3, team_morale: 3,
     biggest_tension: '', one_change: '',
   });
 
@@ -50,11 +64,11 @@ export default function TensionPulseSurvey({ orgId }) {
     },
   });
 
-  // Aggregate average for radar
+  // Aggregate average for radar (1-5 scale)
   const avgData = METRICS.map(m => {
-    const vals = pulses.map(p => p[m.key] || 5);
+    const vals = pulses.map(p => p[m.key] || 3);
     const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
-    return { subject: m.label, value: m.invert ? 10 - avg : avg };
+    return { subject: m.label, value: m.invert ? 6 - avg : avg };
   });
 
   // Find the current user's most recent submission
@@ -74,7 +88,7 @@ export default function TensionPulseSurvey({ orgId }) {
         {
           heading: 'Scores',
           table: {
-            headers: ['Dimension', 'Score (1-10)'],
+            headers: ['Dimension', 'Score (1-5)'],
             rows: METRICS.map(m => [m.label, String(target[m.key] ?? '—')]),
           },
         },
@@ -83,7 +97,7 @@ export default function TensionPulseSurvey({ orgId }) {
           { label: 'One change that would help', value: target.one_change || '—' },
         ]},
         { heading: 'Interpretation', items: [
-          { label: 'Overall health', value: interp ? `${interp.overall.toFixed(1)}/10` : '—' },
+          { label: 'Overall health', value: interp ? `${interp.overall.toFixed(1)}/5` : '—' },
           { label: 'Strengths', value: interp ? interp.strongest.map(s => s.label).join(', ') : '—' },
           { label: 'Needs attention', value: interp && interp.risks.length ? interp.risks.map(r => r.label).join(', ') : 'None flagged' },
           { label: 'Recommended focus', value: interp ? `${interp.focusDiscipline} (${interp.focusStage})` : '—' },
@@ -115,8 +129,11 @@ export default function TensionPulseSurvey({ orgId }) {
           <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/30">
             {METRICS.map(m => (
               <div key={m.key}>
-                <Label className="text-xs">{m.label}: {form[m.key]}/10</Label>
-                <Slider min={1} max={10} step={1} value={[form[m.key]]}
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs">{m.label}</Label>
+                  <span className="text-xs font-medium text-muted-foreground">{form[m.key]}/5 — {RATING_LABELS[form[m.key]]}</span>
+                </div>
+                <Slider min={1} max={5} step={1} value={[form[m.key]]}
                   onValueChange={([v]) => setForm({ ...form, [m.key]: v })} className="mt-1" />
               </div>
             ))}
@@ -150,7 +167,22 @@ export default function TensionPulseSurvey({ orgId }) {
               <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               <p className="text-sm font-semibold text-emerald-800">Your Tension Pulse has been recorded.</p>
             </div>
-            {showResults && <TensionPulseInterpretation pulse={submittedPulse} />}
+            {showResults && (
+              <>
+                <div className="rounded-lg border border-border/60 bg-white p-3">
+                  <p className="text-xs font-semibold text-muted-foreground mb-1">Your Results</p>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <RadarChart data={pulseChartData(submittedPulse)}>
+                      <PolarGrid />
+                      <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10 }} />
+                      <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.2} />
+                      <Tooltip formatter={(v) => `${v.toFixed(1)}/5`} />
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </div>
+                <TensionPulseInterpretation pulse={submittedPulse} />
+              </>
+            )}
             <div className="flex flex-wrap gap-2 justify-end">
               <Button size="sm" variant="outline" onClick={() => handleExport(submittedPulse)}>
                 <Download className="h-4 w-4 mr-1" /> Export Report
@@ -173,7 +205,7 @@ export default function TensionPulseSurvey({ orgId }) {
               <PolarGrid />
               <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10 }} />
               <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.2} />
-              <Tooltip formatter={(v) => v.toFixed(1)} />
+              <Tooltip formatter={(v) => `${v.toFixed(1)}/5`} />
             </RadarChart>
           </ResponsiveContainer>
         )}
@@ -189,7 +221,7 @@ export default function TensionPulseSurvey({ orgId }) {
                   {p.respondent_email}{isMine && ' (You)'}
                 </span>
                 <span className="text-muted-foreground">{format(new Date(p.created_date), 'MMM d')}</span>
-                <span className="font-medium">Tension: {p.team_tension}/10 • Trust: {p.trust_level}/10</span>
+                <span className="font-medium">Tension: {p.team_tension}/5 • Trust: {p.trust_level}/5</span>
               </div>
             );
           })}
