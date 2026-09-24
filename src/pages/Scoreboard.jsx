@@ -107,6 +107,7 @@ export default function Scoreboard() {
       setScores(resultScores);
       queryClient.invalidateQueries({ queryKey: ['leadershipHealthScoreboard', orgId] });
       queryClient.invalidateQueries({ queryKey: ['organizations'] });
+      queryClient.removeQueries({ queryKey: ['stageAccess'] });
       setStep(5);
     },
     onError: (err) => {

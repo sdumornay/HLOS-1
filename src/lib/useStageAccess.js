@@ -16,15 +16,12 @@ export function useStageAccess(overrideOrgId) {
     queryKey: ['stageAccess', orgId],
     queryFn: async () => {
       if (!orgId) return null;
-      try {
-        const res = await base44.functions.invoke('getStageAccess', { organizationId: orgId });
-        return res;
-      } catch {
-        return null;
-      }
+      const res = await base44.functions.invoke('getStageAccess', { organizationId: orgId });
+      return res;
     },
+    retry: 2,
     enabled: !!orgId && !!user,
-    staleTime: 30000,
+    staleTime: 0,
   });
 
   const stages = data?.stages || [];

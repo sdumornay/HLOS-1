@@ -11,13 +11,14 @@ import { STAGE_LABELS, STAGE_DESCRIPTIONS } from '@/lib/stageDeliverables';
  * instead of the page content. Completed stages remain accessible.
  */
 export default function StageGate({ stage, children }) {
-  const { stages, isLoading, canAccessStage, getStageStatus } = useStageAccess();
+  const { stages, isLoading, error, canAccessStage, getStageStatus } = useStageAccess();
   const navigate = useNavigate();
 
-  if (isLoading) {
+  if (isLoading || (error && stages.length === 0)) {
     return (
-      <div className="flex items-center justify-center py-20">
+      <div className="flex flex-col items-center justify-center py-20 space-y-3">
         <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+        <p className="text-sm text-muted-foreground">Loading stage access...</p>
       </div>
     );
   }
