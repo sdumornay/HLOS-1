@@ -15,8 +15,8 @@ const METRIC_LABELS = {
 const INVERTED = ['unresolved_conflicts', 'team_tension'];
 
 function healthyValue(pulse, key) {
-  const v = pulse[key] ?? 3;
-  return INVERTED.includes(key) ? 6 - v : v;
+  const v = pulse[key] ?? 5;
+  return INVERTED.includes(key) ? 11 - v : v;
 }
 
 export function interpretTensionPulse(pulse) {
@@ -26,32 +26,32 @@ export function interpretTensionPulse(pulse) {
   const scored = keys.map(key => ({
     key,
     label: METRIC_LABELS[key],
-    raw: pulse[key] ?? 3,
+    raw: pulse[key] ?? 5,
     healthy: healthyValue(pulse, key),
   }));
 
   const overall = scored.reduce((sum, s) => sum + s.healthy, 0) / scored.length;
   const sorted = [...scored].sort((a, b) => b.healthy - a.healthy);
-  // Strength = healthy value >= 4 (on 1-5 scale)
-  const strongest = sorted.filter(s => s.healthy >= 4);
-  // Needs attention = healthy value <= 2
-  const risks = sorted.filter(s => s.healthy <= 2).reverse();
+  // Strength = healthy value >= 7 (raw >= 7 for positive metrics, raw <= 4 for inverted)
+  const strongest = sorted.filter(s => s.healthy >= 7);
+  // Needs attention = healthy value <= 4 (raw <= 4 for positive, raw >= 7 for inverted)
+  const risks = sorted.filter(s => s.healthy <= 4).reverse();
 
   // Per-dimension commentary (always rendered for all six metrics)
   const dimensionCommentary = scored.map(s => {
     const h = s.healthy;
     let level, note;
-    if (h >= 4.5) {
+    if (h >= 8) {
       level = 'strong';
       note = INVERTED.includes(s.key)
         ? `${s.label} is well-managed — keep monitoring.`
         : `${s.label} is a clear strength — protect and build on it.`;
-    } else if (h >= 3.5) {
+    } else if (h >= 6) {
       level = 'stable';
       note = INVERTED.includes(s.key)
         ? `${s.label} is manageable but worth watching.`
         : `${s.label} is solid, with room to grow.`;
-    } else if (h >= 2.5) {
+    } else if (h >= 4) {
       level = 'watch';
       note = INVERTED.includes(s.key)
         ? `${s.label} is elevated — consider a structured conversation.`
@@ -66,26 +66,26 @@ export function interpretTensionPulse(pulse) {
   });
 
   const patterns = [];
-  if (pulse.team_tension >= 4) patterns.push('Team tension is running high — consider a structured conflict intake to surface root causes.');
-  if (pulse.trust_level <= 2) patterns.push('Trust scores are low — relational safety needs attention before pushing for alignment.');
-  if (pulse.communication_safety <= 2) patterns.push('Communication safety is fragile — team members may be holding back difficult conversations.');
-  if (pulse.unresolved_conflicts >= 4) patterns.push('Unresolved conflicts are accumulating — schedule a guided conflict conversation soon.');
-  if (pulse.leadership_confidence <= 2) patterns.push('Confidence in leadership is wavering — a leader interview can clarify gaps and hopes.');
-  if (pulse.team_morale <= 2) patterns.push('Morale is low — consider a renewal reflection to identify what would re-energize the team.');
+  if (pulse.team_tension >= 7) patterns.push('Team tension is running high — consider a structured conflict intake to surface root causes.');
+  if (pulse.trust_level <= 4) patterns.push('Trust scores are low — relational safety needs attention before pushing for alignment.');
+  if (pulse.communication_safety <= 4) patterns.push('Communication safety is fragile — team members may be holding back difficult conversations.');
+  if (pulse.unresolved_conflicts >= 7) patterns.push('Unresolved conflicts are accumulating — schedule a guided conflict conversation soon.');
+  if (pulse.leadership_confidence <= 4) patterns.push('Confidence in leadership is wavering — a leader interview can clarify gaps and hopes.');
+  if (pulse.team_morale <= 4) patterns.push('Morale is low — consider a renewal reflection to identify what would re-energize the team.');
   if (patterns.length === 0) patterns.push('No critical risk signals — maintain regular pulse checks to catch shifts early.');
 
   let focusStage = 'stabilize';
   let focusDiscipline = 'Leadership Health';
-  if (pulse.trust_level <= 2 || pulse.communication_safety <= 2) {
+  if (pulse.trust_level <= 4 || pulse.communication_safety <= 4) {
     focusStage = 'stabilize';
     focusDiscipline = 'Healthy Conflict & Communication';
-  } else if (pulse.unresolved_conflicts >= 4) {
+  } else if (pulse.unresolved_conflicts >= 7) {
     focusStage = 'stabilize';
     focusDiscipline = 'Conflict Resolution';
-  } else if (pulse.leadership_confidence <= 3) {
+  } else if (pulse.leadership_confidence <= 5) {
     focusStage = 'align';
     focusDiscipline = 'Leadership Clarity';
-  } else if (pulse.team_morale <= 3) {
+  } else if (pulse.team_morale <= 5) {
     focusStage = 'sustain';
     focusDiscipline = 'Renewal & Rhythm';
   }
@@ -108,10 +108,10 @@ export default function TensionPulseInterpretation({ pulse }) {
 
       <p className="text-sm leading-relaxed">
         Your overall tension health score is{' '}
-        <span className="font-bold">{overall.toFixed(1)}/5</span>.
-        {overall >= 4
+        <span className="font-bold">{overall.toFixed(1)}/10</span>.
+        {overall >= 7
           ? ' The team is in a relatively stable place — keep monitoring with regular pulses.'
-          : overall >= 3
+          : overall >= 5
             ? ' The team has a workable foundation, but a few areas need focused attention.'
             : ' The team is under significant strain — consider prioritizing a stabilization conversation.'}
       </p>
@@ -125,7 +125,7 @@ export default function TensionPulseInterpretation({ pulse }) {
           <div className="flex flex-wrap gap-1.5">
             {strongest.map(s => (
               <Badge key={s.key} className="bg-emerald-100 text-emerald-700 border-0">
-                {s.label} ({s.raw}/5)
+                {s.label} ({s.raw}/10)
               </Badge>
             ))}
           </div>
@@ -141,7 +141,7 @@ export default function TensionPulseInterpretation({ pulse }) {
           <div className="flex flex-wrap gap-1.5">
             {risks.map(r => (
               <Badge key={r.key} className="bg-red-100 text-red-700 border-0">
-                {r.label} ({r.raw}/5)
+                {r.label} ({r.raw}/10)
               </Badge>
             ))}
           </div>
@@ -163,7 +163,7 @@ export default function TensionPulseInterpretation({ pulse }) {
                 : 'bg-red-500'
               }`} />
               <span>
-                <span className="font-medium text-foreground">{d.label} ({d.raw}/5):</span>{' '}
+                <span className="font-medium text-foreground">{d.label} ({d.raw}/10):</span>{' '}
                 <span className="text-muted-foreground">{d.note}</span>
               </span>
             </li>

@@ -10,27 +10,27 @@
     },
     "team_tension": {
       "type": "number",
-      "description": "1-5, 5 = very high tension"
+      "description": "1-10, 10 = very high tension"
     },
     "trust_level": {
       "type": "number",
-      "description": "1-5"
+      "description": "1-10"
     },
     "communication_safety": {
       "type": "number",
-      "description": "1-5"
+      "description": "1-10"
     },
     "unresolved_conflicts": {
       "type": "number",
-      "description": "1-5"
+      "description": "1-10"
     },
     "leadership_confidence": {
       "type": "number",
-      "description": "1-5"
+      "description": "1-10"
     },
     "team_morale": {
       "type": "number",
-      "description": "1-5"
+      "description": "1-10"
     },
     "biggest_tension": {
       "type": "string"
