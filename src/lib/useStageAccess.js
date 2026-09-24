@@ -17,7 +17,9 @@ export function useStageAccess(overrideOrgId) {
     queryFn: async () => {
       if (!orgId) return null;
       const res = await base44.functions.invoke('getStageAccess', { organizationId: orgId });
-      return res;
+      // SDK wraps the function response in a `data` property — unwrap it so
+      // consumers can read stages/baseline_completed directly.
+      return res?.data ?? res;
     },
     retry: 2,
     enabled: !!orgId && !!user,

@@ -22,13 +22,33 @@ export default async function(req) {
       } catch { /* no body */ }
     }
     if (!organizationId) {
-      organizationId = user?.data?.organization_id;
+      organizationId = user?.organization_id || user?.data?.organization_id;
     }
+    console.log('getStageAccess called with organizationId:', organizationId, 'from user:', user?.email);
     if (!organizationId) {
       return Response.json({ error: 'Missing organizationId' }, { status: 400 });
     }
 
-    const org = await base44.asServiceRole.entities.Organization.get(organizationId);
+    let org;
+    try {
+      org = await base44.asServiceRole.entities.Organization.get(organizationId);
+    } catch (orgErr) {
+      // The provided orgId doesn't exist — try the user's own organization_id
+      // as a fallback (handles stale cached org IDs from previous sessions).
+      const fallbackOrgId = user?.organization_id;
+      if (fallbackOrgId && fallbackOrgId !== organizationId) {
+        console.log('getStageAccess: falling back to user org_id:', fallbackOrgId);
+        organizationId = fallbackOrgId;
+        try {
+          org = await base44.asServiceRole.entities.Organization.get(organizationId);
+        } catch {
+          return Response.json({ error: `Organization not found: ${organizationId}` }, { status: 404 });
+        }
+      } else {
+        console.error('getStageAccess: Organization.get failed for', organizationId, orgErr?.message);
+        return Response.json({ error: `Organization not found: ${organizationId}` }, { status: 404 });
+      }
+    }
     if (!org) return Response.json({ error: 'Organization not found' }, { status: 404 });
 
     // Fetch all data needed for deliverable checks across all stages
@@ -205,6 +225,7 @@ export default async function(req) {
       canAccess,
     });
   } catch (error) {
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('getStageAccess error:', error?.message, error?.stack);
+    return Response.json({ error: error.message, organizationId }, { status: 500 });
   }
 }
