@@ -1,6 +1,7 @@
 import React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, AlertTriangle, Eye, Lightbulb, Info } from 'lucide-react';
+import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
 
 const METRIC_LABELS = {
   trust_level: 'Trust',
@@ -99,11 +100,30 @@ export default function TensionPulseInterpretation({ pulse }) {
 
   const { overall, strongest, risks, patterns, focusStage, focusDiscipline, dimensionCommentary } = interpretation;
 
+  // Build chart data for this individual pulse (healthy-adjusted: higher = better)
+  const chartData = Object.keys(METRIC_LABELS).map(key => {
+    const raw = pulse[key] ?? 5;
+    return { subject: METRIC_LABELS[key], value: healthyValue(pulse, key), raw };
+  });
+
   return (
     <div className="rounded-lg border border-border/60 bg-muted/20 p-4 space-y-3">
       <div className="flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-accent" />
         <p className="text-sm font-semibold">What This Means</p>
+      </div>
+
+      <div className="rounded-lg bg-background/50 p-2">
+        <ResponsiveContainer width="100%" height={220}>
+          <RadarChart data={chartData}>
+            <PolarGrid />
+            <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10 }} />
+            <Radar dataKey="value" stroke="hsl(var(--primary))" fill="hsl(var(--primary))" fillOpacity={0.2} />
+            <Tooltip
+              formatter={(v, _name, props) => [`${v.toFixed(1)} (raw: ${props.payload.raw}/10)`, 'Health']}
+            />
+          </RadarChart>
+        </ResponsiveContainer>
       </div>
 
       <p className="text-sm leading-relaxed">
