@@ -29,6 +29,18 @@ export default async function(req) {
       return Response.json({ error: 'No organization found for this user' }, { status: 404 });
     }
 
+    // If the user's organization_id is stale or missing, correct it now so that
+    // all client-side RLS-filtered queries (LeadershipHealthScoreboard, Assessment,
+    // etc.) match the right org. RLS checks data.organization_id against
+    // user.organization_id — a stale value silently returns empty results.
+    if (user.organization_id !== orgId) {
+      try {
+        await base44.asServiceRole.entities.User.update(user.id, { organization_id: orgId });
+      } catch {
+        // best-effort — don't fail the request if the update can't go through
+      }
+    }
+
     return Response.json({ organization_id: orgId, role });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });
