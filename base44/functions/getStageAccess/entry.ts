@@ -226,6 +226,6 @@ export default async function(req) {
     });
   } catch (error) {
     console.error('getStageAccess error:', error?.message, error?.stack);
-    return Response.json({ error: error.message, organizationId }, { status: 500 });
+    return Response.json({ error: error.message }, { status: 500 });
   }
 }
