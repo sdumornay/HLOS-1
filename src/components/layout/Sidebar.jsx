@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import {
   LayoutDashboard, Users, Shield, Compass, Rocket, Leaf,
   ClipboardCheck, Target, Calendar, BarChart3, BookOpen, Settings,
-  ChevronLeft, ChevronRight, Heart, Briefcase, Activity, AlertCircle
+  ChevronLeft, ChevronRight, Heart, Briefcase, Activity, AlertCircle,
+  Pencil
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 import { useStageAccess } from '@/lib/useStageAccess';
 import { useOrgId } from '@/lib/useOrgId';
 import { Lock } from 'lucide-react';
+import EditOrganizationDialog from '@/components/organizations/EditOrganizationDialog';
 
 const LEADER_ROLES = ['super_admin', 'coach', 'lead_pastor'];
 const ADMIN_ROLES = ['super_admin', 'coach'];
@@ -40,9 +44,10 @@ const NAV_ITEMS = [
 export default function Sidebar({ collapsed, setCollapsed }) {
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { user } = useCurrentUser();
+  const { user, isLeadPastor, isAdmin, isCoach } = useCurrentUser();
   const orgId = useOrgId();
   const { canAccessStage } = useStageAccess();
+  const canEditOrg = isLeadPastor || isAdmin || isCoach;
 
   // Detect consultant viewing a specific org (from /coach/:orgId route or ?org= param)
   const routeOrgMatch = location.pathname.match(/\/coach\/([^/]+)/);
@@ -51,6 +56,14 @@ export default function Sidebar({ collapsed, setCollapsed }) {
   const activeOrgId = routeOrgId || queryOrgId;
   const isPortfolioList = location.pathname === '/coach';
   const shouldCarryOrg = activeOrgId && !isPortfolioList;
+
+  // Fetch the user's own org for the edit dialog (skip when consultant is viewing a specific org)
+  const userOrgId = user?.data?.organization_id || user?.organization_id || orgId;
+  const { data: orgForEdit } = useQuery({
+    queryKey: ['sidebar-org', userOrgId],
+    queryFn: () => base44.entities.Organization.get(userOrgId),
+    enabled: !!userOrgId && canEditOrg && !activeOrgId,
+  });
 
   // Coaches and admins can always access all stages
   const canBypassLock = user?.role === 'super_admin' || user?.role === 'coach' || user?.role === 'admin';
@@ -136,6 +149,21 @@ export default function Sidebar({ collapsed, setCollapsed }) {
           );
         })}
       </nav>
+
+      {/* Edit Organization — accessible from anywhere via the sidebar/mobile menu */}
+      {canEditOrg && orgForEdit && !activeOrgId && (
+        <div className="px-2 pb-1 border-t border-sidebar-border pt-2">
+          <EditOrganizationDialog
+            org={orgForEdit}
+            buttonVariant="ghost"
+            hideLabel={collapsed}
+            buttonClassName={cn(
+              "w-full justify-start text-sidebar-foreground/60 hover:text-sidebar-foreground hover:bg-sidebar-accent/60 gap-3 px-3",
+              collapsed && "justify-center px-0"
+            )}
+          />
+        </div>
+      )}
 
       {/* Collapse Toggle */}
       <button

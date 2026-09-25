@@ -40,7 +40,10 @@ export default function CommandCenterHeader({ org, currentStage, stageProgress =
               <h1 className="text-xl lg:text-2xl font-barlow font-bold text-white tracking-tight">
                 {org?.name || 'Your Organization'}
               </h1>
-              <EditOrganizationDialog org={org} />
+              <EditOrganizationDialog
+                org={org}
+                buttonClassName="text-white bg-white/15 hover:bg-white/25 border border-white/20 gap-1.5"
+              />
             </div>
           </div>
           <Link
