@@ -1,13 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, ChevronRight, CheckCircle2, Pencil } from 'lucide-react';
+import { Heart, ChevronRight, CheckCircle2 } from 'lucide-react';
 import EditOrganizationDialog from '@/components/organizations/EditOrganizationDialog';
 
 export default function PreBaselineDashboard({ org, orgId }) {
   const navigate = useNavigate();
-  const [editOpen, setEditOpen] = useState(false);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pt-4">
@@ -31,14 +30,14 @@ export default function PreBaselineDashboard({ org, orgId }) {
           </div>
           <div className="flex items-center gap-3 flex-shrink-0">
             <span className="text-xs font-semibold text-emerald-600">Complete</span>
-            <Button variant="ghost" size="sm" onClick={() => setEditOpen(true)} className="h-7 px-2 text-xs">
-              <Pencil className="h-3 w-3 mr-1" /> Edit
-            </Button>
+            <EditOrganizationDialog
+              org={org}
+              buttonVariant="ghost"
+              buttonClassName="h-7 px-2 text-xs text-emerald-700 hover:bg-emerald-100 gap-1"
+            />
           </div>
         </CardContent>
       </Card>
-
-      <EditOrganizationDialog org={org} open={editOpen} onOpenChange={setEditOpen} />
 
       {/* Step 2: Leadership Health Scoreboard — action required */}
       <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5">
