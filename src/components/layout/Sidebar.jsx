@@ -39,6 +39,7 @@ const NAV_ITEMS = [
   { type: 'divider', label: 'Admin', roles: ADMIN_ROLES },
   { label: 'Coach Workspace', path: '/coach', icon: Briefcase, roles: ['coach'] },
   { label: 'Organizations', path: '/organizations', icon: Settings, roles: ADMIN_ROLES },
+  { label: 'Scoreboard Config', path: '/admin/scoreboard-config', icon: Settings, roles: ['super_admin'] },
 ];
 
 export default function Sidebar({ collapsed, setCollapsed }) {

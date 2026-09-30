@@ -13,6 +13,10 @@ import { ArrowRight, ArrowLeft, Check, Heart, Shield, Compass, Rocket, Leaf, Dow
 import { useToast } from '@/components/ui/use-toast';
 import { exportToPDF } from '@/lib/exportPDF';
 import { format } from 'date-fns';
+import ScoreboardResults from '@/components/health/ScoreboardResults';
+import { useStageAccess } from '@/lib/useStageAccess';
+import { getSeverity } from '@/lib/scoreboardRecommendations';
+import { useScoreboardConfig } from '@/lib/useScoreboardConfig';
 
 const STAGES = [
   {
@@ -80,19 +84,21 @@ const TIMELINE_OPTIONS = [
   'Not sure yet',
 ];
 
-function getScoreTier(score) {
-  if (score >= 8) return { label: 'Thriving', color: 'text-emerald-600', bg: 'bg-emerald-50', desc: 'This stage is a strength. Keep investing here.' };
-  if (score >= 6) return { label: 'Healthy', color: 'text-blue-600', bg: 'bg-blue-50', desc: 'You\u2019re building well. Small adjustments will strengthen this area.' };
-  if (score >= 4) return { label: 'Needs Attention', color: 'text-amber-600', bg: 'bg-amber-50', desc: 'This area needs focused attention. The tools in this stage will help.' };
-  return { label: 'Critical', color: 'text-red-600', bg: 'bg-red-50', desc: 'This is a pressing concern. We recommend starting here.' };
-}
-
 export default function Scoreboard() {
   const navigate = useNavigate();
   const { user } = useCurrentUser();
   const orgId = useOrgId();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { config } = useScoreboardConfig();
+  const getSeverityLabel = (score) => {
+    const merged = config
+      ? { thresholds: { ...config.thresholds }, severity_labels: { ...config.severity_labels } }
+      : null;
+    const sev = getSeverity(score, merged || { thresholds: { strong: 8, stable: 6, needs_attention: 4 } });
+    const labels = merged?.severity_labels || { strong: 'Strong', stable: 'Stable', needs_attention: 'Needs Attention', critical: 'Critical' };
+    return labels[sev];
+  };
 
   const [step, setStep] = useState(0); // 0 = context, 1-4 = stages, 5 = results, 6 = begin
   const [answers, setAnswers] = useState({});
@@ -157,13 +163,13 @@ export default function Scoreboard() {
         {
           heading: 'Stage Scores',
           table: {
-            headers: ['Stage', 'Score (1-10)', 'Tier'],
+            headers: ['Stage', 'Score (1-10)', 'Severity'],
             rows: [
-              ['Stabilize', String(scores.stabilize_score), getScoreTier(scores.stabilize_score).label],
-              ['Align', String(scores.align_score), getScoreTier(scores.align_score).label],
-              ['Execute', String(scores.execute_score), getScoreTier(scores.execute_score).label],
-              ['Sustain', String(scores.sustain_score), getScoreTier(scores.sustain_score).label],
-              ['Overall', String(scores.overall_score), getScoreTier(scores.overall_score).label],
+              ['Stabilize', String(scores.stabilize_score), getSeverityLabel(scores.stabilize_score)],
+              ['Align', String(scores.align_score), getSeverityLabel(scores.align_score)],
+              ['Execute', String(scores.execute_score), getSeverityLabel(scores.execute_score)],
+              ['Sustain', String(scores.sustain_score), getSeverityLabel(scores.sustain_score)],
+              ['Overall', String(scores.overall_score), getSeverityLabel(scores.overall_score)],
             ],
           },
         },
@@ -302,15 +308,6 @@ export default function Scoreboard() {
 
   // ── Step 5: Results ──
   if (step === 5 && scores) {
-    const overallTier = getScoreTier(scores.overall_score);
-    const stageScores = [
-      { name: 'Stabilize', score: scores.stabilize_score, icon: Shield },
-      { name: 'Align', score: scores.align_score, icon: Compass },
-      { name: 'Execute', score: scores.execute_score, icon: Rocket },
-      { name: 'Sustain', score: scores.sustain_score, icon: Leaf },
-    ];
-    const lowestStage = stageScores.reduce((min, s) => s.score < min.score ? s : min, stageScores[0]);
-
     return (
       <div className="max-w-2xl mx-auto space-y-6">
         <div className="text-center space-y-2">
@@ -321,48 +318,7 @@ export default function Scoreboard() {
           <p className="text-sm text-muted-foreground">Health First. Momentum Next.</p>
         </div>
 
-        {/* Overall score */}
-        <Card className={`border-border/50 ${overallTier.bg}`}>
-          <CardContent className="p-6 text-center">
-            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Overall Leadership Health</p>
-            <p className={`text-5xl font-bold ${overallTier.color}`}>{scores.overall_score}<span className="text-lg text-muted-foreground">/10</span></p>
-            <p className={`text-sm font-semibold ${overallTier.color} mt-1`}>{overallTier.label}</p>
-          </CardContent>
-        </Card>
-
-        {/* Stage scores */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          {stageScores.map(s => {
-            const tier = getScoreTier(s.score);
-            const Icon = s.icon;
-            return (
-              <Card key={s.name} className={`border-border/50 ${tier.bg}`}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Icon className="h-4 w-4 text-muted-foreground" />
-                      <p className="text-sm font-semibold">{s.name}</p>
-                    </div>
-                    <p className={`text-xl font-bold ${tier.color}`}>{s.score}</p>
-                  </div>
-                  <p className={`text-xs font-medium ${tier.color}`}>{tier.label}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{tier.desc}</p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Recommendation */}
-        <Card className="border-accent/30 bg-accent/5">
-          <CardContent className="p-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-accent mb-1">Recommended Starting Point</p>
-            <p className="text-sm">
-              Your lowest-scoring stage is <strong>{lowestStage.name}</strong> ({lowestStage.score}/10).
-              We recommend beginning with Stage 1: Stabilize to build a strong foundation of trust and health.
-            </p>
-          </CardContent>
-        </Card>
+        <ScoreboardResults scores={scores} orgId={orgId} />
 
         <div className="flex gap-2">
           <Button variant="outline" onClick={handleExport} className="flex-1">

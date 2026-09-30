@@ -1,0 +1,85 @@
+{
+  "name": "ScoreboardConfig",
+  "type": "object",
+  "properties": {
+    "config_key": {
+      "type": "string",
+      "default": "default",
+      "description": "Singleton key used to look up the active recommendation config"
+    },
+    "thresholds": {
+      "type": "object",
+      "description": "Minimum score for each severity tier (score >= threshold earns that tier)",
+      "properties": {
+        "strong": {
+          "type": "number",
+          "default": 8
+        },
+        "stable": {
+          "type": "number",
+          "default": 6
+        },
+        "needs_attention": {
+          "type": "number",
+          "default": 4
+        }
+      }
+    },
+    "severity_labels": {
+      "type": "object",
+      "description": "Display labels for each severity tier",
+      "properties": {
+        "strong": {
+          "type": "string"
+        },
+        "stable": {
+          "type": "string"
+        },
+        "needs_attention": {
+          "type": "string"
+        },
+        "critical": {
+          "type": "string"
+        }
+      }
+    },
+    "starting_point_template": {
+      "type": "string",
+      "description": "Intro shown at the top of the results page. Use {currentStage} for the current action stage name."
+    },
+    "starting_point_all_strong_template": {
+      "type": "string",
+      "description": "Intro shown when every phase scores Strong."
+    },
+    "stage_configs": {
+      "type": "object",
+      "description": "Per-stage templates. Each stage: { diagnosis: {low,moderate,strong}, current_action: {strong,stable,needs_attention,critical}, future_priority: {strong,stable,needs_attention,critical}, bridging: '...', tools: [string] }",
+      "additionalProperties": true
+    },
+    "updated_by": {
+      "type": "string",
+      "description": "Email of the admin who last edited the config"
+    }
+  },
+  "required": [
+    "config_key"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "super_admin"
+      }
+    }
+  }
+}
