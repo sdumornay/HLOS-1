@@ -5,11 +5,21 @@ import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tool
 
 const METRIC_LABELS = {
   trust_level: 'Trust',
-  communication_safety: 'Communication Safety',
-  team_morale: 'Team Morale',
-  leadership_confidence: 'Leadership Confidence',
-  unresolved_conflicts: 'Unresolved Conflicts',
-  team_tension: 'Team Tension',
+  communication_safety: 'Healthy Conflict',
+  unresolved_conflicts: 'Conflict Avoidance',
+  leadership_confidence: 'Commitment',
+  team_morale: 'Accountability',
+  team_tension: 'Results Drift',
+};
+
+// Maps each metric to its Lencioni dysfunction
+const DYSFUNCTION_MAP = {
+  trust_level: 'Absence of Trust',
+  communication_safety: 'Fear of Conflict',
+  unresolved_conflicts: 'Fear of Conflict',
+  leadership_confidence: 'Lack of Commitment',
+  team_morale: 'Avoidance of Accountability',
+  team_tension: 'Inattention to Results',
 };
 
 // inverted = true means lower score is healthier
@@ -67,28 +77,31 @@ export function interpretTensionPulse(pulse) {
   });
 
   const patterns = [];
-  if (pulse.team_tension >= 7) patterns.push('Team tension is running high — consider a structured conflict intake to surface root causes.');
-  if (pulse.trust_level <= 4) patterns.push('Trust scores are low — relational safety needs attention before pushing for alignment.');
-  if (pulse.communication_safety <= 4) patterns.push('Communication safety is fragile — team members may be holding back difficult conversations.');
-  if (pulse.unresolved_conflicts >= 7) patterns.push('Unresolved conflicts are accumulating — schedule a guided conflict conversation soon.');
-  if (pulse.leadership_confidence <= 4) patterns.push('Confidence in leadership is wavering — a leader interview can clarify gaps and hopes.');
-  if (pulse.team_morale <= 4) patterns.push('Morale is low — consider a renewal reflection to identify what would re-energize the team.');
-  if (patterns.length === 0) patterns.push('No critical risk signals — maintain regular pulse checks to catch shifts early.');
+  if (pulse.trust_level <= 4) patterns.push('Trust is low — vulnerability-based trust is the foundation of Lencioni\u2019s pyramid; address this before pushing for alignment.');
+  if (pulse.communication_safety <= 4) patterns.push('Healthy conflict is fragile — the team may be avoiding the passionate debate that produces better decisions (Fear of Conflict).');
+  if (pulse.unresolved_conflicts >= 7) patterns.push('Conflict avoidance is high — unresolved tensions are piling up; schedule a structured conflict conversation soon.');
+  if (pulse.leadership_confidence <= 4) patterns.push('Commitment is wavering — team members may not be genuinely buying in to decisions (Lack of Commitment).');
+  if (pulse.team_morale <= 4) patterns.push('Accountability is low — peers may be hesitating to call each other out on unproductive behaviors (Avoidance of Accountability).');
+  if (pulse.team_tension >= 7) patterns.push('Results drift is high — individual needs and egos may be overshadowing collective team goals (Inattention to Results).');
+  if (patterns.length === 0) patterns.push('No critical dysfunction signals — maintain regular pulse checks to catch shifts early.');
 
   let focusStage = 'stabilize';
-  let focusDiscipline = 'Leadership Health';
+  let focusDiscipline = 'Trust & Healthy Conflict';
   if (pulse.trust_level <= 4 || pulse.communication_safety <= 4) {
     focusStage = 'stabilize';
-    focusDiscipline = 'Healthy Conflict & Communication';
+    focusDiscipline = 'Trust & Healthy Conflict';
   } else if (pulse.unresolved_conflicts >= 7) {
     focusStage = 'stabilize';
     focusDiscipline = 'Conflict Resolution';
   } else if (pulse.leadership_confidence <= 5) {
     focusStage = 'align';
-    focusDiscipline = 'Leadership Clarity';
+    focusDiscipline = 'Commitment & Clarity';
   } else if (pulse.team_morale <= 5) {
+    focusStage = 'execute';
+    focusDiscipline = 'Accountability';
+  } else if (pulse.team_tension >= 7) {
     focusStage = 'sustain';
-    focusDiscipline = 'Renewal & Rhythm';
+    focusDiscipline = 'Results Focus';
   }
 
   return { overall, strongest, risks, patterns, focusStage, focusDiscipline, dimensionCommentary };
@@ -111,6 +124,7 @@ export default function TensionPulseInterpretation({ pulse }) {
       <div className="flex items-center gap-2">
         <Lightbulb className="h-4 w-4 text-accent" />
         <p className="text-sm font-semibold">What This Means</p>
+        <span className="text-[10px] text-muted-foreground ml-auto">Lencioni's Five Dysfunctions</span>
       </div>
 
       <div className="rounded-lg bg-background/50 p-2">
