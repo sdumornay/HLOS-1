@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Shield, Compass, Rocket, Leaf, Target, Radar, CheckCircle2, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { STAGE_META } from '@/lib/stageMeta';
-import { buildScoreboardRecommendations, SEVERITY_STYLES } from '@/lib/scoreboardRecommendations';
+import { buildScoreboardRecommendations, SEVERITY_STYLES, getSeverity, DEFAULT_CONFIG } from '@/lib/scoreboardRecommendations';
 import { useScoreboardConfig } from '@/lib/useScoreboardConfig';
 import { useStageAccess } from '@/lib/useStageAccess';
 import { cn } from '@/lib/utils';
@@ -26,8 +26,33 @@ export default function ScoreboardResults({ scores, orgId }) {
 
   const result = buildScoreboardRecommendations(scores, stageStatuses, config);
 
+  const overallScore = scores?.overall_score;
+  const showOverall = typeof overallScore === 'number' && !Number.isNaN(overallScore);
+  const cfg = config || DEFAULT_CONFIG;
+  const overallSeverity = showOverall ? getSeverity(overallScore, cfg) : null;
+  const overallStyle = overallSeverity ? SEVERITY_STYLES[overallSeverity] : null;
+  const overallLabel = overallSeverity ? (cfg.severity_labels?.[overallSeverity] || overallSeverity) : null;
+
   return (
     <div className="space-y-5">
+      {/* Overall Score */}
+      {showOverall && overallStyle && (
+        <Card className="border-primary/20 bg-gradient-to-br from-primary/5 to-accent/5">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1.5">Overall Leadership Health Score</p>
+                <div className="flex items-baseline gap-1.5">
+                  <span className={cn('text-4xl font-bold leading-none', overallStyle.text)}>{overallScore}</span>
+                  <span className="text-lg text-muted-foreground">/ 10</span>
+                </div>
+              </div>
+              <Badge className={cn('text-sm px-3 py-1.5 border', overallStyle.badge)}>{overallLabel}</Badge>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Your Starting Point */}
       <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5">
         <CardContent className="p-5">
