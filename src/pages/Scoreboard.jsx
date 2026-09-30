@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -11,12 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowRight, ArrowLeft, Check, Heart, Shield, Compass, Rocket, Leaf, Download, X } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { exportToPDF } from '@/lib/exportPDF';
-import { format } from 'date-fns';
+import { exportElementToPDF } from '@/lib/exportPDF';
 import ScoreboardResults from '@/components/health/ScoreboardResults';
-import { useStageAccess } from '@/lib/useStageAccess';
-import { getSeverity } from '@/lib/scoreboardRecommendations';
-import { useScoreboardConfig } from '@/lib/useScoreboardConfig';
 
 const STAGES = [
   {
@@ -90,21 +86,14 @@ export default function Scoreboard() {
   const orgId = useOrgId();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { config } = useScoreboardConfig();
-  const getSeverityLabel = (score) => {
-    const merged = config
-      ? { thresholds: { ...config.thresholds }, severity_labels: { ...config.severity_labels } }
-      : null;
-    const sev = getSeverity(score, merged || { thresholds: { strong: 8, stable: 6, needs_attention: 4 } });
-    const labels = merged?.severity_labels || { strong: 'Strong', stable: 'Stable', needs_attention: 'Needs Attention', critical: 'Critical' };
-    return labels[sev];
-  };
 
   const [step, setStep] = useState(0); // 0 = context, 1-4 = stages, 5 = results, 6 = begin
   const [answers, setAnswers] = useState({});
   const [biggestChallenge, setBiggestChallenge] = useState('');
   const [timeline, setTimeline] = useState('');
   const [scores, setScores] = useState(null);
+  const [exporting, setExporting] = useState(false);
+  const resultsRef = useRef(null);
 
   const submitMutation = useMutation({
     mutationFn: (data) => base44.functions.invoke('submitScoreboard', data),
@@ -153,28 +142,19 @@ export default function Scoreboard() {
     }
   };
 
-  const handleExport = () => {
-    if (!scores) return;
-    exportToPDF({
-      title: 'Leadership Health Scoreboard Results',
-      subtitle: `Completed ${format(new Date(), 'MMM d, yyyy')} by ${user?.email || 'Unknown'}`,
-      filename: 'leadership-health-scoreboard.pdf',
-      sections: [
-        {
-          heading: 'Stage Scores',
-          table: {
-            headers: ['Stage', 'Score (1-10)', 'Severity'],
-            rows: [
-              ['Stabilize', String(scores.stabilize_score), getSeverityLabel(scores.stabilize_score)],
-              ['Align', String(scores.align_score), getSeverityLabel(scores.align_score)],
-              ['Execute', String(scores.execute_score), getSeverityLabel(scores.execute_score)],
-              ['Sustain', String(scores.sustain_score), getSeverityLabel(scores.sustain_score)],
-              ['Overall', String(scores.overall_score), getSeverityLabel(scores.overall_score)],
-            ],
-          },
-        },
-      ],
-    });
+  const handleExport = async () => {
+    if (!scores || !resultsRef.current) return;
+    setExporting(true);
+    try {
+      await exportElementToPDF({
+        element: resultsRef.current,
+        filename: 'leadership-health-scoreboard-results.pdf',
+      });
+    } catch (err) {
+      toast({ title: 'Export failed', description: 'Could not generate PDF. Please try again.', variant: 'destructive' });
+    } finally {
+      setExporting(false);
+    }
   };
 
   // ── Step 0: Context ──
@@ -310,19 +290,21 @@ export default function Scoreboard() {
   if (step === 5 && scores) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="text-center space-y-2">
-          <div className="h-14 w-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto">
-            <Check className="h-7 w-7 text-emerald-600" />
+        <div ref={resultsRef} className="space-y-6">
+          <div className="text-center space-y-2">
+            <div className="h-14 w-14 rounded-full bg-emerald-100 flex items-center justify-center mx-auto">
+              <Check className="h-7 w-7 text-emerald-600" />
+            </div>
+            <h1 className="text-2xl font-display font-bold">Your Scoreboard Results</h1>
+            <p className="text-sm text-muted-foreground">Health First. Momentum Next.</p>
           </div>
-          <h1 className="text-2xl font-display font-bold">Your Scoreboard Results</h1>
-          <p className="text-sm text-muted-foreground">Health First. Momentum Next.</p>
+
+          <ScoreboardResults scores={scores} orgId={orgId} />
         </div>
 
-        <ScoreboardResults scores={scores} orgId={orgId} />
-
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleExport} className="flex-1">
-            <Download className="h-4 w-4 mr-1" /> Export PDF
+          <Button variant="outline" onClick={handleExport} disabled={exporting} className="flex-1">
+            <Download className="h-4 w-4 mr-1" /> {exporting ? 'Generating...' : 'Export PDF'}
           </Button>
           <Button onClick={() => setStep(6)} className="flex-1">
             Continue <ArrowRight className="h-4 w-4 ml-1" />

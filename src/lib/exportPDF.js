@@ -1,4 +1,5 @@
 import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 export function exportToPDF({ title, subtitle, sections, filename }) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
@@ -126,4 +127,73 @@ export function exportToPDF({ title, subtitle, sections, filename }) {
   }
 
   doc.save(filename || 'hlos-export.pdf');
+}
+
+/**
+ * Captures a live DOM element exactly as rendered on screen (via html2canvas)
+ * and exports it as a multi-page A4 PDF. Preserves all visual styling, colors,
+ * badges, icons, and layout — the PDF is a faithful image of the on-screen report.
+ */
+export async function exportElementToPDF({ element, filename }) {
+  if (!element) return;
+
+  const canvas = await html2canvas(element, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: '#ffffff',
+    logging: false,
+  });
+
+  const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+  const pageW = pdf.internal.pageSize.getWidth();
+  const pageH = pdf.internal.pageSize.getHeight();
+  const marginX = 10;
+  const marginTop = 12;
+  const marginBottom = 15;
+  const contentW = pageW - marginX * 2;
+  const contentH = pageH - marginTop - marginBottom;
+
+  const imgWidth = canvas.width;
+  const imgHeight = canvas.height;
+  const ratio = contentW / imgWidth;
+
+  if (imgHeight * ratio <= contentH) {
+    // Single page
+    pdf.addImage(canvas.toDataURL('image/png'), 'PNG', marginX, marginTop, contentW, imgHeight * ratio);
+  } else {
+    // Multi-page: slice the canvas into page-height chunks
+    const pxPerMm = imgWidth / contentW;
+    const pageHeightPx = Math.floor(contentH * pxPerMm);
+    let yOffsetPx = 0;
+    let page = 0;
+
+    while (yOffsetPx < imgHeight) {
+      const sliceHeightPx = Math.min(pageHeightPx, imgHeight - yOffsetPx);
+      const sliceCanvas = document.createElement('canvas');
+      sliceCanvas.width = imgWidth;
+      sliceCanvas.height = sliceHeightPx;
+      const ctx = sliceCanvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, imgWidth, sliceHeightPx);
+      ctx.drawImage(canvas, 0, yOffsetPx, imgWidth, sliceHeightPx, 0, 0, imgWidth, sliceHeightPx);
+
+      if (page > 0) pdf.addPage();
+      pdf.addImage(sliceCanvas.toDataURL('image/png'), 'PNG', marginX, marginTop, contentW, sliceHeightPx * ratio);
+
+      yOffsetPx += sliceHeightPx;
+      page++;
+    }
+  }
+
+  // Footer with page numbers
+  const pageCount = pdf.internal.getNumberOfPages();
+  for (let i = 1; i <= pageCount; i++) {
+    pdf.setPage(i);
+    pdf.setFontSize(7);
+    pdf.setTextColor(160, 170, 185);
+    pdf.text(`Page ${i} of ${pageCount}`, pageW / 2, pageH - 5, { align: 'center' });
+    pdf.text('Confidential — HLOS', marginX, pageH - 5);
+  }
+
+  pdf.save(filename || 'scoreboard-results.pdf');
 }
