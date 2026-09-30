@@ -216,8 +216,12 @@ export function buildScoreboardRecommendations(scores, stageStatuses, config) {
       recommendationType = 'current_action';
       recommendationText = stageCfg.current_action[severity] || stageCfg.current_action.needs_attention;
       tools = stageCfg.tools;
-      // Personalize: append a bridging sentence if a future stage needs attention.
-      if (concernStage && stageCfg.bridging) {
+      // Personalize: append a bridging sentence when the current stage still has
+      // work to do (not Strong) AND a future stage needs attention. When the
+      // current stage is already Strong, the "maintain and move forward" text
+      // already handles the transition — adding "strengthening…" there would
+      // contradict it.
+      if (concernStage && stageCfg.bridging && severity !== 'strong') {
         const concernName = STAGE_META[concernStage].name;
         const bridge = stageCfg.bridging.replace('{concernStage}', concernName);
         recommendationText = `${recommendationText} ${bridge}`;
