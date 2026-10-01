@@ -14,12 +14,12 @@ import TensionPulseInterpretation, { interpretTensionPulse } from '@/components/
 import { exportToPDF } from '@/lib/exportPDF';
 
 const METRICS = [
-  { key: 'trust_level', label: 'Trust', dysfunction: 'Absence of Trust', question: 'Team members feel safe being vulnerable and honest with each other', invert: false },
-  { key: 'communication_safety', label: 'Healthy Conflict', dysfunction: 'Fear of Conflict', question: 'We engage in open, passionate debate of ideas without holding back', invert: false },
-  { key: 'unresolved_conflicts', label: 'Conflict Avoidance', dysfunction: 'Fear of Conflict', question: 'Unresolved tensions are piling up rather than being addressed', invert: true },
-  { key: 'leadership_confidence', label: 'Commitment', dysfunction: 'Lack of Commitment', question: 'We genuinely buy in and commit to team decisions, even when we initially disagreed', invert: false },
-  { key: 'team_morale', label: 'Accountability', dysfunction: 'Avoidance of Accountability', question: 'We hold each other accountable for commitments and behaviors', invert: false },
-  { key: 'team_tension', label: 'Results Drift', dysfunction: 'Inattention to Results', question: 'Individual needs and egos overshadow our collective team goals', invert: true },
+  { key: 'trust_level', label: 'Trust', invert: false },
+  { key: 'communication_safety', label: 'Comm Safety', invert: false },
+  { key: 'team_morale', label: 'Morale', invert: false },
+  { key: 'leadership_confidence', label: 'Leadership', invert: false },
+  { key: 'unresolved_conflicts', label: 'Unresolved Conflicts', invert: true },
+  { key: 'team_tension', label: 'Team Tension', invert: true },
 ];
 
 export default function TensionPulseSurvey({ orgId }) {
@@ -113,23 +113,11 @@ export default function TensionPulseSurvey({ orgId }) {
       <CardContent className="space-y-4">
         {open && !submittedPulse && (
           <div className="border border-border rounded-lg p-4 space-y-3 bg-muted/30">
-            <div className="rounded-md bg-primary/5 border border-primary/10 px-3 py-2">
-              <p className="text-[11px] text-muted-foreground leading-relaxed">
-                Based on <span className="font-medium text-foreground">Patrick Lencioni's Five Dysfunctions of a Team</span>.
-                Rate each statement from 1 (strongly disagree) to 10 (strongly agree).
-              </p>
-            </div>
             {METRICS.map(m => (
               <div key={m.key}>
-                <div className="flex items-baseline justify-between gap-2">
-                  <div className="min-w-0">
-                    <Label className="text-xs font-medium">{m.question}</Label>
-                    <p className="text-[11px] text-muted-foreground">Lencioni: {m.dysfunction}</p>
-                  </div>
-                  <span className="text-xs font-semibold text-muted-foreground shrink-0">{form[m.key]}/10</span>
-                </div>
+                <Label className="text-xs">{m.label}: {form[m.key]}/10</Label>
                 <Slider min={1} max={10} step={1} value={[form[m.key]]}
-                  onValueChange={([v]) => setForm({ ...form, [m.key]: v })} className="mt-1.5" />
+                  onValueChange={([v]) => setForm({ ...form, [m.key]: v })} className="mt-1" />
               </div>
             ))}
             <div>
@@ -201,7 +189,7 @@ export default function TensionPulseSurvey({ orgId }) {
                   {p.respondent_email}{isMine && ' (You)'}
                 </span>
                 <span className="text-muted-foreground">{format(new Date(p.created_date), 'MMM d')}</span>
-                <span className="font-medium">Trust: {p.trust_level}/10 • Commitment: {p.leadership_confidence}/10</span>
+                <span className="font-medium">Tension: {p.team_tension}/10 • Trust: {p.trust_level}/10</span>
               </div>
             );
           })}

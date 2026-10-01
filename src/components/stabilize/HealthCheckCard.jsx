@@ -13,11 +13,11 @@ import { exportToPDF } from '@/lib/exportPDF';
 
 const METRICS = [
   { key: 'trust_level', label: 'Trust', invert: false },
-  { key: 'communication_safety', label: 'Healthy Conflict', invert: false },
-  { key: 'team_morale', label: 'Accountability', invert: false },
-  { key: 'leadership_confidence', label: 'Commitment', invert: false },
-  { key: 'unresolved_conflicts', label: 'Conflict Avoidance', invert: true },
-  { key: 'team_tension', label: 'Results Drift', invert: true },
+  { key: 'communication_safety', label: 'Comm Safety', invert: false },
+  { key: 'team_morale', label: 'Morale', invert: false },
+  { key: 'leadership_confidence', label: 'Leadership', invert: false },
+  { key: 'unresolved_conflicts', label: 'Unresolved Conflicts', invert: true },
+  { key: 'team_tension', label: 'Team Tension', invert: true },
 ];
 
 export default function HealthCheckCard({ orgId }) {
