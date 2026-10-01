@@ -87,7 +87,10 @@ export default function Scoreboard() {
   const orgId = useOrgId();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { snapshotCompleted, isLoading: snapshotLoading } = useOrgSnapshotStatus(orgId);
+  // Use the user's org ID directly as a fallback so the snapshot status check
+  // runs immediately, without waiting for useOrgId() to resolve via resolveOrgContext.
+  const snapshotOrgId = orgId || user?.data?.organization_id || user?.organization_id;
+  const { snapshotCompleted, isLoading: snapshotLoading } = useOrgSnapshotStatus(snapshotOrgId);
   const canBypassSnapshot = isAdmin || isCoach;
 
   const [step, setStep] = useState(0); // 0 = context, 1-4 = stages, 5 = results, 6 = begin
