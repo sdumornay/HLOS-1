@@ -14,6 +14,7 @@ import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
 import StageGate from '@/components/stages/StageGate';
+import ScoreboardSummaryCard from '@/components/stabilize/ScoreboardSummaryCard';
 
 export default function Stabilize() {
   const orgId = useOrgId();
@@ -63,6 +64,7 @@ export default function Stabilize() {
       <div className="space-y-6">
         <StageHero stage="stabilize" orgId={orgId} counts={counts} />
         <StageGuide stage="stabilize" counts={counts} />
+        <ScoreboardSummaryCard orgId={orgId} />
         <StabilizeProgress counts={counts} />
 
         {/* Discipline 1: Leadership Health */}

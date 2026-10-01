@@ -4,7 +4,10 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Compass } from 'lucide-react';
 import { useStageAccess } from '@/lib/useStageAccess';
+import { useOrgSnapshotStatus } from '@/lib/useOrgSnapshotStatus';
+import { useOrgId } from '@/lib/useOrgId';
 import { STAGE_LABELS, STAGE_DESCRIPTIONS, STATUS_LABELS } from '@/lib/stageDeliverables';
+import { TrendingUp } from 'lucide-react';
 
 /**
  * Replaces the AssessmentStatusPanel on the dashboard.
@@ -13,6 +16,8 @@ import { STAGE_LABELS, STAGE_DESCRIPTIONS, STATUS_LABELS } from '@/lib/stageDeli
 export default function ContinueJourneyCard() {
   const { stages, currentStage, baselineCompleted, isLoading } = useStageAccess();
   const navigate = useNavigate();
+  const orgId = useOrgId();
+  const { snapshotCompleted: orgSnapshotDone } = useOrgSnapshotStatus(orgId);
 
   if (isLoading) {
     return (
@@ -31,7 +36,31 @@ export default function ContinueJourneyCard() {
     s.status === 'in_progress' || s.status === 'available' || s.status === 'awaiting_approval'
   );
 
-  // If no baseline, direct to scoreboard
+  // If no Org Snapshot, direct there first
+  if (!orgSnapshotDone) {
+    return (
+      <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5 shadow-sm">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
+              <TrendingUp className="h-5 w-5 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">Continue Your HLOS Journey</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Start with the Organizational Health Snapshot — a broad look at your organization's health.
+              </p>
+            </div>
+            <Button size="sm" onClick={() => navigate('/org-snapshot')}>
+              Take Snapshot <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // If snapshot done but no Scoreboard baseline, direct to scoreboard
   if (!baselineCompleted) {
     return (
       <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5 shadow-sm">
@@ -43,7 +72,7 @@ export default function ContinueJourneyCard() {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold">Continue Your HLOS Journey</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Start with the Leadership Health Scoreboard — your 16-question baseline assessment.
+                Next: the Leadership Health Scoreboard — your 16-question leadership team baseline.
               </p>
             </div>
             <Button size="sm" onClick={() => navigate('/scoreboard')}>

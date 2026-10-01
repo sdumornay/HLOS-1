@@ -27,6 +27,7 @@ import StageJourneyDashboard from '@/components/stages/StageJourneyDashboard';
 import StageApprovalPanel from '@/components/stages/StageApprovalPanel';
 import PreBaselineDashboard from '@/components/dashboard/PreBaselineDashboard';
 import { useBaselineStatus } from '@/lib/useBaselineStatus';
+import { useOrgSnapshotStatus } from '@/lib/useOrgSnapshotStatus';
 
 import { ArrowLeft } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
@@ -252,6 +253,7 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   // Baseline check — new orgs must complete the Leadership Health Scoreboard before stages unlock.
   // Existing orgs already past stabilize are exempt (preserve their progress).
   const { baselineCompleted: scoreboardBaseline } = useBaselineStatus(orgId);
+  const { snapshotCompleted: orgSnapshotDone } = useOrgSnapshotStatus(orgId);
   // Also use the org's own baseline_completed flag as a fallback — the scoreboards
   // query is RLS-filtered and can return empty if the user's session role is stale,
   // which would incorrectly trigger the pre-baseline dashboard.
@@ -259,6 +261,9 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   const baselineCompleted = scoreboardBaseline || orgBaselineCompleted;
   const isExistingOrg = currentStage !== 'stabilize' || stageProgress.length > 0;
   const needsBaseline = !baselineCompleted && !isExistingOrg && !isConsultantView;
+  // New orgs must complete the Org Health Snapshot first, then the Scoreboard.
+  // Existing orgs that already have a baseline are exempt.
+  const needsSnapshot = needsBaseline && !orgSnapshotDone;
 
   if (needsBaseline) {
     return <PreBaselineDashboard org={currentOrg} orgId={orgId} />;

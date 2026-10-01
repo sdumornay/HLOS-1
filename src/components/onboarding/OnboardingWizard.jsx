@@ -97,11 +97,11 @@ export default function OnboardingWizard({ open, onComplete }) {
   const progress = (step / (STEPS.length - 1)) * 100;
 
   const handleDone = () => {
-    // After onboarding, go straight to the Scoreboard
+    // After onboarding, go to the Organizational Health Snapshot — the first assessment
     if (onComplete) {
       onComplete(true);
     }
-    navigate('/scoreboard');
+    navigate('/org-snapshot');
   };
 
   return (
@@ -296,7 +296,7 @@ export default function OnboardingWizard({ open, onComplete }) {
               <div>
                 <p className="font-barlow font-bold text-xl">Your organization is ready!</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  Next, you'll take the Leadership Health Scoreboard — a 16-question diagnostic that creates your baseline and unlocks Stage 1.
+                  Next, you'll take the Organizational Health Snapshot — a 20-question assessment that gives you a broad perspective on the health of your organization.
                 </p>
               </div>
               <Button className="w-full" onClick={handleDone}>

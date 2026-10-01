@@ -1,0 +1,220 @@
+{
+  "name": "OrgHealthSnapshot",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "respondent_email": {
+      "type": "string"
+    },
+    "respondent_name": {
+      "type": "string"
+    },
+    "q1": {
+      "type": "number",
+      "description": "1-5. Our organization has a clear understanding of its mission and why it exists."
+    },
+    "q2": {
+      "type": "number",
+      "description": "1-5. Our current priorities are clear to the people responsible for carrying them out."
+    },
+    "q3": {
+      "type": "number",
+      "description": "1-5. We are able to distinguish what is most important from what is merely urgent."
+    },
+    "q4": {
+      "type": "number",
+      "description": "1-5. Our activities and programs generally support our stated mission and priorities."
+    },
+    "q5": {
+      "type": "number",
+      "description": "1-5. People in our organization generally feel safe raising concerns or offering a different perspective."
+    },
+    "q6": {
+      "type": "number",
+      "description": "1-5. Difficult issues are more likely to be addressed directly than discussed through side conversations."
+    },
+    "q7": {
+      "type": "number",
+      "description": "1-5. People generally assume positive intent when disagreements occur."
+    },
+    "q8": {
+      "type": "number",
+      "description": "1-5. The culture encourages honesty, respect, and responsibility."
+    },
+    "q9": {
+      "type": "number",
+      "description": "1-5. People generally understand their responsibilities and what is expected of them."
+    },
+    "q10": {
+      "type": "number",
+      "description": "1-5. It is clear who has authority to make important decisions."
+    },
+    "q11": {
+      "type": "number",
+      "description": "1-5. Leaders know when they can make a decision independently and when others need to be involved."
+    },
+    "q12": {
+      "type": "number",
+      "description": "1-5. Meetings generally result in clear decisions and next steps."
+    },
+    "q13": {
+      "type": "number",
+      "description": "1-5. Important commitments have a clear owner and deadline."
+    },
+    "q14": {
+      "type": "number",
+      "description": "1-5. People are appropriately held accountable for following through on their commitments."
+    },
+    "q15": {
+      "type": "number",
+      "description": "1-5. Our most important priorities are making measurable progress."
+    },
+    "q16": {
+      "type": "number",
+      "description": "1-5. We address recurring problems rather than repeatedly working around them."
+    },
+    "q17": {
+      "type": "number",
+      "description": "1-5. Our organization is able to adjust when circumstances change without losing sight of our mission."
+    },
+    "q18": {
+      "type": "number",
+      "description": "1-5. Responsibilities are distributed in a way that does not depend excessively on one or two people."
+    },
+    "q19": {
+      "type": "number",
+      "description": "1-5. Our leaders and key team members have sufficient capacity to fulfill their responsibilities effectively."
+    },
+    "q20": {
+      "type": "number",
+      "description": "1-5. Our current pace and way of operating feel sustainable over time."
+    },
+    "mission_direction_score": {
+      "type": "number",
+      "description": "Average of q1-q4 (1-5 scale)"
+    },
+    "culture_trust_score": {
+      "type": "number",
+      "description": "Average of q5-q8 (1-5 scale)"
+    },
+    "role_clarity_score": {
+      "type": "number",
+      "description": "Average of q9-q11 (1-5 scale)"
+    },
+    "execution_accountability_score": {
+      "type": "number",
+      "description": "Average of q12-q14 (1-5 scale)"
+    },
+    "momentum_adaptability_score": {
+      "type": "number",
+      "description": "Average of q15-q17 (1-5 scale)"
+    },
+    "sustainability_capacity_score": {
+      "type": "number",
+      "description": "Average of q18-q20 (1-5 scale)"
+    },
+    "overall_score": {
+      "type": "number",
+      "description": "Average of all 20 questions (1-5 scale)"
+    }
+  },
+  "required": [
+    "organization_id",
+    "respondent_email"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "data.respondent_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            },
+            {
+              "data.respondent_email": "{{user.email}}"
+            }
+          ]
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

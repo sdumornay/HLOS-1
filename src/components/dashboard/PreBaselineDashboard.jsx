@@ -2,11 +2,15 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, ChevronRight, CheckCircle2 } from 'lucide-react';
+import { ChevronRight, CheckCircle2, TrendingUp, Heart, Lock } from 'lucide-react';
 import EditOrganizationDialog from '@/components/organizations/EditOrganizationDialog';
+import DiagnosticJourney from '@/components/onboarding/DiagnosticJourney';
+import { useOrgSnapshotStatus } from '@/lib/useOrgSnapshotStatus';
+import { cn } from '@/lib/utils';
 
 export default function PreBaselineDashboard({ org, orgId }) {
   const navigate = useNavigate();
+  const { snapshotCompleted } = useOrgSnapshotStatus(orgId);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6 pt-4">
@@ -39,24 +43,80 @@ export default function PreBaselineDashboard({ org, orgId }) {
         </CardContent>
       </Card>
 
-      {/* Step 2: Leadership Health Scoreboard — action required */}
-      <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5">
+      {/* Step 2: Organizational Health Snapshot */}
+      <Card className={cn(
+        'border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5',
+        snapshotCompleted && 'border-emerald-200 bg-emerald-50/40'
+      )}>
         <CardContent className="p-5">
           <div className="flex items-start gap-4 mb-4">
-            <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
-              <Heart className="h-5 w-5 text-accent" />
+            <div className={cn(
+              'h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0',
+              snapshotCompleted ? 'bg-emerald-100' : 'bg-accent/15'
+            )}>
+              {snapshotCompleted ? (
+                <CheckCircle2 className="h-5 w-5 text-emerald-600" />
+              ) : (
+                <TrendingUp className="h-5 w-5 text-accent" />
+              )}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold">Organizational Health Snapshot</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                A 20-question assessment that gives you a broad perspective on the health of your entire organization. Takes about 5 minutes.
+              </p>
+            </div>
+            {snapshotCompleted && (
+              <span className="text-xs font-semibold text-emerald-600 flex-shrink-0">Complete</span>
+            )}
+          </div>
+          {!snapshotCompleted && (
+            <Button className="w-full" onClick={() => navigate('/org-snapshot')}>
+              Take the Snapshot <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          )}
+          {snapshotCompleted && (
+            <Button variant="outline" className="w-full" onClick={() => navigate('/org-snapshot')}>
+              Retake Snapshot <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Step 3: Leadership Health Scoreboard — locked until snapshot is done */}
+      <Card className={cn(
+        snapshotCompleted
+          ? 'border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5'
+          : 'border-border/50 border-dashed opacity-60'
+      )}>
+        <CardContent className="p-5">
+          <div className="flex items-start gap-4 mb-4">
+            <div className={cn(
+              'h-10 w-10 rounded-xl flex items-center justify-center flex-shrink-0',
+              snapshotCompleted ? 'bg-accent/15' : 'bg-muted'
+            )}>
+              {snapshotCompleted ? (
+                <Heart className="h-5 w-5 text-accent" />
+              ) : (
+                <Lock className="h-5 w-5 text-muted-foreground" />
+              )}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold">Leadership Health Scoreboard</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                A 16-question diagnostic across the four HLOS stages. Takes about 10 minutes.
-                This is the only assessment available before Stage 1.
+                A 16-question diagnostic that looks at the health of your leadership team. This creates your baseline and unlocks Stage 1.
               </p>
             </div>
           </div>
-          <Button className="w-full" onClick={() => navigate('/scoreboard')}>
-            Take the Scoreboard <ChevronRight className="h-4 w-4 ml-1" />
-          </Button>
+          {snapshotCompleted ? (
+            <Button className="w-full" onClick={() => navigate('/scoreboard')}>
+              Take the Scoreboard <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
+          ) : (
+            <p className="text-xs text-muted-foreground text-center py-2">
+              Complete the Organizational Health Snapshot first.
+            </p>
+          )}
         </CardContent>
       </Card>
 
@@ -86,7 +146,7 @@ export default function PreBaselineDashboard({ org, orgId }) {
             ))}
           </div>
           <p className="text-xs text-muted-foreground mt-3 text-center">
-            Complete the Leadership Health Scoreboard to unlock Stage 1.
+            Complete both assessments to unlock Stage 1.
           </p>
         </CardContent>
       </Card>
