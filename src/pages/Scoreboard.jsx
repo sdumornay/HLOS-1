@@ -87,7 +87,7 @@ export default function Scoreboard() {
   const orgId = useOrgId();
   const queryClient = useQueryClient();
   const { toast } = useToast();
-  const { snapshotCompleted } = useOrgSnapshotStatus(orgId);
+  const { snapshotCompleted, isLoading: snapshotLoading } = useOrgSnapshotStatus(orgId);
   const canBypassSnapshot = isAdmin || isCoach;
 
   const [step, setStep] = useState(0); // 0 = context, 1-4 = stages, 5 = results, 6 = begin
@@ -161,7 +161,10 @@ export default function Scoreboard() {
   };
 
   // ── Prerequisite: Org Health Snapshot must be completed first ──
-  if (!snapshotCompleted && !canBypassSnapshot) {
+  // Wait for the snapshot status to finish loading before checking, otherwise a
+  // stale (empty) cache right after submitting the snapshot would falsely show
+  // the prerequisite screen and send the user back to retake it.
+  if (!snapshotCompleted && !canBypassSnapshot && !snapshotLoading) {
     return (
       <div className="max-w-2xl mx-auto space-y-6 relative">
         <button
