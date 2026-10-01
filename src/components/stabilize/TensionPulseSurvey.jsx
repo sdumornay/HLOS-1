@@ -11,6 +11,8 @@ import { Activity, Plus, Download, CheckCircle2, Eye } from 'lucide-react';
 import { format } from 'date-fns';
 import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tooltip } from 'recharts';
 import TensionPulseInterpretation, { interpretTensionPulse, PRESSURE_POINTS } from '@/components/stabilize/TensionPulseInterpretation';
+import TensionPulseReport from '@/components/stabilize/TensionPulseReport';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { exportToPDF } from '@/lib/exportPDF';
 
 const QUESTION_TEXT = {
@@ -28,6 +30,7 @@ export default function TensionPulseSurvey({ orgId }) {
   const [open, setOpen] = useState(false);
   const [submittedPulse, setSubmittedPulse] = useState(null);
   const [showResults, setShowResults] = useState(false);
+  const [showReport, setShowReport] = useState(false);
   const [form, setForm] = useState({
     side_conversations: 5, decision_aftermath: 5, ownership_confusion: 5,
     meeting_atmosphere: 5, disengagement: 5, faction_pressure: 5,
@@ -47,6 +50,7 @@ export default function TensionPulseSurvey({ orgId }) {
       const record = data?.data?.record || data?.record || data?.data || data;
       setSubmittedPulse(record);
       setShowResults(false);
+      setShowReport(true);
     },
   });
 
@@ -164,21 +168,29 @@ export default function TensionPulseSurvey({ orgId }) {
               <CheckCircle2 className="h-5 w-5 text-emerald-600" />
               <p className="text-sm font-semibold text-emerald-800">Your Tension Pulse has been recorded.</p>
             </div>
-            {showResults && <TensionPulseInterpretation pulse={submittedPulse} />}
             <div className="flex flex-wrap gap-2 justify-end">
               <Button size="sm" variant="outline" onClick={() => handleExport(submittedPulse)}>
                 <Download className="h-4 w-4 mr-1" /> Export Report
               </Button>
-              {!showResults && (
-                <Button size="sm" onClick={() => setShowResults(true)}>
-                  <Eye className="h-4 w-4 mr-1" /> See Results
-                </Button>
-              )}
+              <Button size="sm" onClick={() => setShowReport(true)}>
+                <Eye className="h-4 w-4 mr-1" /> View Full Report
+              </Button>
               <Button size="sm" variant="ghost" onClick={() => { setSubmittedPulse(null); setShowResults(false); setOpen(false); }}>
                 Done
               </Button>
             </div>
           </div>
+        )}
+
+        {submittedPulse && (
+          <Dialog open={showReport} onOpenChange={setShowReport}>
+            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Relational Pressure Pulse Report</DialogTitle>
+              </DialogHeader>
+              <TensionPulseReport pulse={submittedPulse} onClose={() => setShowReport(false)} />
+            </DialogContent>
+          </Dialog>
         )}
 
         {pulses.length > 0 && !open && (
