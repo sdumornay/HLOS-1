@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Download, TrendingUp, AlertCircle, Info, Heart } from 'lucide-react';
+import { ArrowRight, Download, TrendingUp, AlertCircle, Info, Heart, Shield } from 'lucide-react';
 import { DIMENSIONS, getInterpretation, getBarColor, getToneClass, getStrengthsAndConcerns } from '@/lib/orgSnapshotScoring';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -186,20 +186,23 @@ export default function OrgSnapshotResults({ scores, record, orgName }) {
         <CardContent className="p-6 space-y-4">
           <div className="flex items-start gap-3">
             <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
-              <Heart className="h-5 w-5 text-accent" />
+              <Shield className="h-5 w-5 text-accent" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-semibold">You've looked at the organization. Now let's look at the leadership team.</p>
+              <p className="text-sm font-bold uppercase tracking-wider text-accent">Begin the Stabilize Phase</p>
               <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
-                Organizational patterns are often shaped by what happens within the leadership team — how leaders
-                communicate, make decisions, handle conflict, build trust, and hold one another accountable.
-                The Leadership Health Scoreboard will help you take a closer look at the health of the team
-                leading the organization.
+                You've taken a broad look at the health of your organization. Now it's time to look more closely
+                at the leadership team shaping that environment.
+              </p>
+              <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
+                Your first step in the Stabilize phase is the Leadership Health Scoreboard. It will help you
+                explore how your leadership team is functioning in areas such as trust, communication, alignment,
+                conflict, and accountability.
               </p>
             </div>
           </div>
           <Button className="w-full" onClick={() => navigate('/scoreboard')}>
-            Continue to Leadership Health Scoreboard <ArrowRight className="h-4 w-4 ml-1" />
+            Begin Stabilize: Take the Leadership Health Scoreboard <ArrowRight className="h-4 w-4 ml-1" />
           </Button>
         </CardContent>
       </Card>

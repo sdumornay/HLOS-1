@@ -46,9 +46,10 @@ export default function ContinueJourneyCard() {
               <TrendingUp className="h-5 w-5 text-accent" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">Continue Your HLOS Journey</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Next Step</p>
+              <p className="text-sm font-semibold mt-0.5">Complete Your Organizational Health Snapshot</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Start with the Organizational Health Snapshot — a broad look at your organization's health.
+                A broad look at your organization's health before diving into the leadership team.
               </p>
             </div>
             <Button size="sm" onClick={() => navigate('/org-snapshot')}>
@@ -70,9 +71,10 @@ export default function ContinueJourneyCard() {
               <Compass className="h-5 w-5 text-accent" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold">Continue Your HLOS Journey</p>
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-accent">Current Phase: Stabilize</p>
+              <p className="text-sm font-semibold mt-0.5">Next Step: Take the Leadership Health Scoreboard</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Next: the Leadership Health Scoreboard — your 16-question leadership team baseline.
+                Your 16-question leadership team baseline.
               </p>
             </div>
             <Button size="sm" onClick={() => navigate('/scoreboard')}>

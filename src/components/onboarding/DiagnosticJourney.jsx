@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Users, User, CheckCircle2, ArrowRight, Lock } from 'lucide-react';
+import { Building2, Users, Shield, CheckCircle2, ArrowRight, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
@@ -22,7 +22,7 @@ export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardD
     {
       id: 'org',
       icon: Building2,
-      label: 'Organization',
+      label: 'Organizational Health Discovery',
       title: 'Organizational Health Snapshot',
       desc: 'A broad look at the health of your entire organization.',
       done: orgSnapshotDone,
@@ -31,8 +31,8 @@ export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardD
     },
     {
       id: 'team',
-      icon: Users,
-      label: 'Leadership Team',
+      icon: Shield,
+      label: 'Stabilize',
       title: 'Leadership Health Scoreboard',
       desc: 'A closer look at the health of your leadership team.',
       done: scoreboardDone,
@@ -40,11 +40,11 @@ export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardD
       actionLabel: 'Take Scoreboard',
     },
     {
-      id: 'individual',
-      icon: User,
-      label: 'Individual Leader',
-      title: 'Personal Leadership Assessment',
-      desc: 'Coming later.',
+      id: 'stabilize-tools',
+      icon: Users,
+      label: 'Stabilize',
+      title: 'Additional Stabilize Tools',
+      desc: 'Conflict, communication, and trust-building activities.',
       done: false,
       coming: true,
     },

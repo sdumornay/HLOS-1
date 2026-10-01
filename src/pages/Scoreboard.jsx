@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useOrgId } from '@/lib/useOrgId';
 import { useCurrentUser } from '@/lib/useCurrentUser';
+import { useOrgSnapshotStatus } from '@/lib/useOrgSnapshotStatus';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Textarea } from '@/components/ui/textarea';
@@ -82,10 +83,12 @@ const TIMELINE_OPTIONS = [
 
 export default function Scoreboard() {
   const navigate = useNavigate();
-  const { user } = useCurrentUser();
+  const { user, isAdmin, isCoach } = useCurrentUser();
   const orgId = useOrgId();
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const { snapshotCompleted } = useOrgSnapshotStatus(orgId);
+  const canBypassSnapshot = isAdmin || isCoach;
 
   const [step, setStep] = useState(0); // 0 = context, 1-4 = stages, 5 = results, 6 = begin
   const [answers, setAnswers] = useState({});
@@ -156,6 +159,38 @@ export default function Scoreboard() {
       setExporting(false);
     }
   };
+
+  // ── Prerequisite: Org Health Snapshot must be completed first ──
+  if (!snapshotCompleted && !canBypassSnapshot) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 relative">
+        <button
+          onClick={() => navigate('/')}
+          className="absolute -top-2 right-0 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Close"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        <div className="text-center space-y-2">
+          <div className="h-14 w-14 rounded-2xl bg-accent/15 flex items-center justify-center mx-auto">
+            <Heart className="h-7 w-7 text-accent" />
+          </div>
+          <h1 className="text-2xl font-display font-bold">Leadership Health Scoreboard</h1>
+        </div>
+        <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5">
+          <CardContent className="p-6 space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              First, complete your Organizational Health Snapshot. This gives you a broad picture of your
+              organization before you begin looking more closely at the health of your leadership team.
+            </p>
+            <Button className="w-full" onClick={() => navigate('/org-snapshot')}>
+              Take Organizational Health Snapshot <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // ── Step 0: Context ──
   if (step === 0) {
