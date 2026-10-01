@@ -21,7 +21,6 @@ const ADMIN_ROLES = ['super_admin', 'coach'];
 const NAV_ITEMS = [
   { label: 'Dashboard', path: '/', icon: LayoutDashboard, roles: 'all' },
   { type: 'divider', label: 'Journey' },
-  { label: 'Health Scoreboard', path: '/scoreboard', icon: Heart, roles: ADMIN_ROLES },
   { label: 'Stabilize', path: '/stabilize', icon: Shield, roles: 'all', stage: 'stabilize' },
   { label: 'Align', path: '/align', icon: Compass, roles: 'all', stage: 'align' },
   { label: 'Execute', path: '/execute', icon: Rocket, roles: 'all', stage: 'execute' },
