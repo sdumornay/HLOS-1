@@ -3,6 +3,7 @@ import { CheckCircle2, Circle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MODULES = [
+  { key: 'scoreboard', label: 'Leadership Health Scoreboard' },
   { key: 'conflict_intake', label: 'Conflict Intake' },
   { key: 'tension_pulse', label: 'Quick Health Check' },
   { key: 'leader_interviews', label: 'Leader Self-Assessment' },

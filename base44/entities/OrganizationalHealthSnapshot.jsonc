@@ -1,0 +1,217 @@
+{
+  "name": "OrganizationalHealthSnapshot",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "respondent_email": {
+      "type": "string",
+      "description": "Email of the person who completed the snapshot"
+    },
+    "respondent_name": {
+      "type": "string",
+      "description": "Full name of the respondent"
+    },
+    "q1": {
+      "type": "number",
+      "description": "1-5: clear understanding of mission"
+    },
+    "q2": {
+      "type": "number",
+      "description": "1-5: priorities clear to those carrying them out"
+    },
+    "q3": {
+      "type": "number",
+      "description": "1-5: distinguish important from urgent"
+    },
+    "q4": {
+      "type": "number",
+      "description": "1-5: activities support stated mission"
+    },
+    "q5": {
+      "type": "number",
+      "description": "1-5: safe to raise concerns or differ"
+    },
+    "q6": {
+      "type": "number",
+      "description": "1-5: difficult issues addressed directly"
+    },
+    "q7": {
+      "type": "number",
+      "description": "1-5: positive intent assumed in disagreement"
+    },
+    "q8": {
+      "type": "number",
+      "description": "1-5: culture encourages honesty, respect, responsibility"
+    },
+    "q9": {
+      "type": "number",
+      "description": "1-5: people understand their responsibilities"
+    },
+    "q10": {
+      "type": "number",
+      "description": "1-5: clear who has authority for important decisions"
+    },
+    "q11": {
+      "type": "number",
+      "description": "1-5: leaders know when to decide alone vs involve others"
+    },
+    "q12": {
+      "type": "number",
+      "description": "1-5: meetings result in clear decisions and next steps"
+    },
+    "q13": {
+      "type": "number",
+      "description": "1-5: commitments have clear owner and deadline"
+    },
+    "q14": {
+      "type": "number",
+      "description": "1-5: people held accountable for follow-through"
+    },
+    "q15": {
+      "type": "number",
+      "description": "1-5: important priorities making measurable progress"
+    },
+    "q16": {
+      "type": "number",
+      "description": "1-5: recurring problems addressed not worked around"
+    },
+    "q17": {
+      "type": "number",
+      "description": "1-5: able to adjust without losing sight of mission"
+    },
+    "q18": {
+      "type": "number",
+      "description": "1-5: responsibilities not overly dependent on 1-2 people"
+    },
+    "q19": {
+      "type": "number",
+      "description": "1-5: leaders have sufficient capacity"
+    },
+    "q20": {
+      "type": "number",
+      "description": "1-5: current pace feels sustainable"
+    },
+    "mission_direction_score": {
+      "type": "number",
+      "description": "Average of q1-q4 (1-5)"
+    },
+    "culture_trust_score": {
+      "type": "number",
+      "description": "Average of q5-q8 (1-5)"
+    },
+    "role_decision_clarity_score": {
+      "type": "number",
+      "description": "Average of q9-q11 (1-5)"
+    },
+    "execution_accountability_score": {
+      "type": "number",
+      "description": "Average of q12-q14 (1-5)"
+    },
+    "momentum_adaptability_score": {
+      "type": "number",
+      "description": "Average of q15-q17 (1-5)"
+    },
+    "sustainability_capacity_score": {
+      "type": "number",
+      "description": "Average of q18-q20 (1-5)"
+    },
+    "overall_score": {
+      "type": "number",
+      "description": "Average of all 20 questions (1-5)"
+    },
+    "is_baseline": {
+      "type": "boolean",
+      "default": true,
+      "description": "True if this is the org's initial snapshot"
+    }
+  },
+  "required": [
+    "organization_id",
+    "respondent_email"
+  ],
+  "rls": {
+    "create": {
+      "data.organization_id": "{{user.organization_id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        },
+        {
+          "data.respondent_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "coach"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "user_condition": {
+                "role": "lead_pastor"
+              }
+            },
+            {
+              "data.organization_id": "{{user.organization_id}}"
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

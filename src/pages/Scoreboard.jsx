@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useOrgId } from '@/lib/useOrgId';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -13,6 +13,7 @@ import { ArrowRight, ArrowLeft, Check, Heart, Shield, Compass, Rocket, Leaf, Dow
 import { useToast } from '@/components/ui/use-toast';
 import { exportElementToPDF } from '@/lib/exportPDF';
 import ScoreboardResults from '@/components/health/ScoreboardResults';
+import DiagnosticJourney from '@/components/health/DiagnosticJourney';
 
 const STAGES = [
   {
@@ -95,6 +96,13 @@ export default function Scoreboard() {
   const [exporting, setExporting] = useState(false);
   const resultsRef = useRef(null);
 
+  const { data: orgSnapshots = [] } = useQuery({
+    queryKey: ['orgHealthSnapshots', orgId],
+    queryFn: () => base44.entities.OrganizationalHealthSnapshot.filter({ organization_id: orgId }, '-created_date', 1),
+    enabled: !!orgId,
+  });
+  const orgSnapshotComplete = orgSnapshots.length > 0;
+
   const submitMutation = useMutation({
     mutationFn: (data) => base44.functions.invoke('submitScoreboard', data),
     onSuccess: (res) => {
@@ -175,6 +183,12 @@ export default function Scoreboard() {
           <h1 className="text-2xl font-display font-bold">Leadership Health Scoreboard</h1>
           <p className="text-muted-foreground">Health First. Momentum Next.</p>
         </div>
+
+        <DiagnosticJourney
+          currentStep="leadership_team"
+          orgComplete={orgSnapshotComplete}
+          leadershipComplete={false}
+        />
 
         <Card className="border-border/50 shadow-sm">
           <CardContent className="p-6 space-y-4">
