@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useOrgId } from '@/lib/useOrgId';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -69,10 +69,17 @@ export default function OrgHealthSnapshot() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Use the user's org ID directly as a fallback so the snapshot status check
-  // runs immediately, without waiting for useOrgId() to resolve via resolveOrgContext.
-  const snapshotOrgId = orgId || user?.data?.organization_id || user?.organization_id;
-  const { snapshotCompleted, latestSnapshot } = useOrgSnapshotStatus(snapshotOrgId);
+  // Use the user's org ID directly (available immediately from auth) instead of
+  // waiting for useOrgId() to resolve via resolveOrgContext. This ensures the
+  // snapshot status check runs without delay.
+  const snapshotOrgId = user?.organization_id || orgId;
+  const { data: snapshots = [], isLoading: snapshotLoading } = useQuery({
+    queryKey: ['orgHealthSnapshots', snapshotOrgId],
+    queryFn: () => base44.entities.OrgHealthSnapshot.filter({ organization_id: snapshotOrgId }, '-created_date', 10),
+    enabled: !!snapshotOrgId,
+  });
+  const snapshotCompleted = snapshots.length > 0;
+  const latestSnapshot = snapshots[0] || null;
   const [retake, setRetake] = useState(false);
   const [step, setStep] = useState(0); // 0 = intro, 1-6 = dimensions, 7 = results
   const [answers, setAnswers] = useState({});
@@ -136,6 +143,15 @@ export default function OrgHealthSnapshot() {
       });
     }
   };
+
+  // ── Wait for snapshot status to load before showing intro or already-taken ──
+  if (snapshotOrgId && snapshotLoading && !retake) {
+    return (
+      <div className="max-w-2xl mx-auto flex items-center justify-center py-20">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   // ── Already taken: show options to view answers or retake ──
   if (snapshotCompleted && !retake && step !== 7) {
