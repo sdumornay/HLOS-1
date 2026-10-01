@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, ArrowLeft, X, Building2, Compass } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
-import { DIMENSIONS, QUESTIONS, RESPONSE_OPTIONS, computeSnapshotScores } from '@/lib/orgSnapshotScoring';
+import { DIMENSIONS, QUESTIONS, RESPONSE_OPTIONS } from '@/lib/orgSnapshotScoring';
 import DiagnosticJourney from '@/components/health/DiagnosticJourney';
 import OrgSnapshotResults from '@/components/health/OrgSnapshotResults';
 
@@ -44,16 +44,9 @@ export default function OrgHealthSnapshot() {
 
   const submitMutation = useMutation({
     mutationFn: async (data) => {
-      const record = await base44.entities.OrganizationalHealthSnapshot.create(data);
-      // Mark the org's baseline as completed so Stabilize unlocks
-      try {
-        await base44.functions.invoke('updateOrganization', {
-          id: orgId,
-          baseline_completed: true,
-        });
-      } catch {
-        // non-blocking — the snapshot record itself is the source of truth
-      }
+      const res = await base44.functions.invoke('submitOrgSnapshot', data);
+      const record = res?.data?.record || res?.record;
+      if (!record) throw new Error('No record returned');
       return record;
     },
     onSuccess: (record) => {
@@ -90,18 +83,10 @@ export default function OrgHealthSnapshot() {
     if (step < 6) {
       setStep(step + 1);
     } else {
-      // Submit
-      const { dimensionScores, overall } = computeSnapshotScores(answers);
+      // Submit — the backend function computes scores and sets baseline_completed
       submitMutation.mutate({
         organization_id: orgId,
-        respondent_email: user?.email,
-        respondent_name: user?.full_name || '',
-        is_baseline: true,
         ...answers,
-        ...Object.fromEntries(
-          Object.entries(dimensionScores).map(([k, v]) => [`${k}_score`, Math.round(v * 100) / 100])
-        ),
-        overall_score: Math.round(overall * 100) / 100,
       });
     }
   };

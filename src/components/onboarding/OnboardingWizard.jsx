@@ -97,7 +97,7 @@ export default function OnboardingWizard({ open, onComplete }) {
   const progress = (step / (STEPS.length - 1)) * 100;
 
   const handleDone = () => {
-    // After onboarding, go straight to the Scoreboard
+    // After onboarding, go straight to the Org Health Snapshot
     if (onComplete) {
       onComplete(true);
     }
