@@ -35,10 +35,12 @@ export default function PrimaryScoreCards({
   const healthColor = getScoreColor(healthScore);
   const momentumColor = getMomentumColor(momentumScore);
   const [guidedOpen, setGuidedOpen] = useState(false);
+  const hasHealthData = !!lastAssessmentDate;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-      {/* LEADERSHIP HEALTH */}
+    <div className={cn('grid gap-4', hasHealthData ? 'grid-cols-1 sm:grid-cols-2' : 'grid-cols-1')}>
+      {/* LEADERSHIP HEALTH — hidden until the first assessment is taken */}
+      {hasHealthData && (
       <div onClick={() => setGuidedOpen(true)} className="block">
         <Card className={cn(
           'border-border/50 shadow-sm hover:shadow-md hover:border-primary/40 transition-all cursor-pointer h-full',
@@ -76,6 +78,7 @@ export default function PrimaryScoreCards({
           </CardContent>
         </Card>
       </div>
+      )}
 
       {/* MOMENTUM */}
       <Link to="/momentum" className="block">
