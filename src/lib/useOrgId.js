@@ -15,7 +15,7 @@ export function useOrgId() {
   const orgParam = searchParams.get('org');
 
   const { data: resolvedOrgId } = useQuery({
-    queryKey: ['resolveOrgContext', orgParam, user?.id],
+    queryKey: ['resolvedOrgId', orgParam, user?.id],
     queryFn: async () => {
       try {
         const res = await base44.functions.invoke('resolveOrgContext', { organization_id: orgParam });

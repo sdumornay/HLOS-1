@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { useOrgId } from '@/lib/useOrgId';
 import { useCurrentUser } from '@/lib/useCurrentUser';
@@ -69,17 +69,8 @@ export default function OrgHealthSnapshot() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  // Use the user's org ID directly (available immediately from auth) instead of
-  // waiting for useOrgId() to resolve via resolveOrgContext. This ensures the
-  // snapshot status check runs without delay.
-  const snapshotOrgId = user?.organization_id || orgId;
-  const { data: snapshots = [], isLoading: snapshotLoading } = useQuery({
-    queryKey: ['orgHealthSnapshots', snapshotOrgId],
-    queryFn: () => base44.entities.OrgHealthSnapshot.filter({ organization_id: snapshotOrgId }, '-created_date', 10),
-    enabled: !!snapshotOrgId,
-  });
-  const snapshotCompleted = snapshots.length > 0;
-  const latestSnapshot = snapshots[0] || null;
+  const snapshotOrgId = orgId || user?.data?.organization_id || user?.organization_id;
+  const { snapshotCompleted, latestSnapshot, isLoading: snapshotLoading } = useOrgSnapshotStatus(snapshotOrgId);
   const [retake, setRetake] = useState(false);
   const [step, setStep] = useState(0); // 0 = intro, 1-6 = dimensions, 7 = results
   const [answers, setAnswers] = useState({});
@@ -177,9 +168,12 @@ export default function OrgHealthSnapshot() {
         <Card className="border-border/50 shadow-sm">
           <CardContent className="p-6 space-y-4">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              You can review your previous answers or take the snapshot again. Retaking will create a new
-              record and update your results.
+              Your snapshot is complete. Continue to the Leadership Health Scoreboard, review your results,
+              or retake the snapshot to update them.
             </p>
+            <Button className="w-full whitespace-normal h-auto" onClick={() => navigate(`/scoreboard?org=${encodeURIComponent(snapshotOrgId)}`)}>
+              Continue to Leadership Health Scoreboard <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
             <div className="flex flex-col sm:flex-row gap-3">
               <Button
                 variant="outline"
@@ -193,6 +187,7 @@ export default function OrgHealthSnapshot() {
                 <Eye className="h-4 w-4 mr-2" /> View My Answers
               </Button>
               <Button
+                variant="outline"
                 className="flex-1"
                 onClick={() => {
                   setRetake(true);

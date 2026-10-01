@@ -83,7 +83,7 @@ const TIMELINE_OPTIONS = [
 
 export default function Scoreboard() {
   const navigate = useNavigate();
-  const { user, isAdmin, isCoach } = useCurrentUser();
+  const { user, loading: userLoading, isAdmin, isCoach } = useCurrentUser();
   const orgId = useOrgId();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -162,6 +162,14 @@ export default function Scoreboard() {
       setExporting(false);
     }
   };
+
+  if (userLoading || !snapshotOrgId || snapshotLoading) {
+    return (
+      <div className="max-w-2xl mx-auto flex items-center justify-center py-20" role="status" aria-label="Checking assessment progress">
+        <div className="w-8 h-8 border-4 border-muted border-t-primary rounded-full animate-spin" />
+      </div>
+    );
+  }
 
   // ── Prerequisite: Org Health Snapshot must be completed first ──
   // Wait for the snapshot status to finish loading before checking, otherwise a
