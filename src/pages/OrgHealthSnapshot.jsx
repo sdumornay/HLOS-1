@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -6,11 +6,12 @@ import { useOrgId } from '@/lib/useOrgId';
 import { useCurrentUser } from '@/lib/useCurrentUser';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, ArrowLeft, X, Building2, Compass } from 'lucide-react';
+import { ArrowRight, ArrowLeft, X, Building2, Compass, Download } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
 import { DIMENSIONS, QUESTIONS, RESPONSE_OPTIONS } from '@/lib/orgSnapshotScoring';
 import DiagnosticJourney from '@/components/health/DiagnosticJourney';
 import OrgSnapshotResults from '@/components/health/OrgSnapshotResults';
+import { exportElementToPDF } from '@/lib/exportPDF';
 
 export default function OrgHealthSnapshot() {
   const navigate = useNavigate();
@@ -22,6 +23,23 @@ export default function OrgHealthSnapshot() {
   const [step, setStep] = useState(0); // 0 = intro, 1-6 = dimensions, 7 = results
   const [answers, setAnswers] = useState({});
   const [submittedSnapshot, setSubmittedSnapshot] = useState(null);
+  const resultsRef = useRef(null);
+  const [exporting, setExporting] = useState(false);
+
+  const handleExport = async () => {
+    if (!resultsRef.current) return;
+    setExporting(true);
+    try {
+      await exportElementToPDF({
+        element: resultsRef.current,
+        filename: 'organizational-health-snapshot.pdf',
+      });
+    } catch {
+      // non-blocking
+    } finally {
+      setExporting(false);
+    }
+  };
 
   // Check for existing snapshot by this user
   const { data: existingSnapshots = [] } = useQuery({
@@ -95,14 +113,21 @@ export default function OrgHealthSnapshot() {
   if (step === 7 && mySnapshot) {
     return (
       <div className="max-w-2xl mx-auto space-y-6">
-        <div className="pb-2">
-          <DiagnosticJourney
-            currentStep="organization"
-            orgComplete={true}
-            leadershipComplete={false}
-          />
+        <div ref={resultsRef} className="space-y-6">
+          <div className="pb-2">
+            <DiagnosticJourney
+              currentStep="organization"
+              orgComplete={true}
+              leadershipComplete={false}
+            />
+          </div>
+          <OrgSnapshotResults snapshot={mySnapshot} orgComplete={true} leadershipComplete={false} />
         </div>
-        <OrgSnapshotResults snapshot={mySnapshot} orgComplete={true} leadershipComplete={false} />
+        <div className="flex justify-center">
+          <Button variant="outline" onClick={handleExport} disabled={exporting}>
+            <Download className="h-4 w-4 mr-1" /> {exporting ? 'Generating...' : 'Export PDF'}
+          </Button>
+        </div>
       </div>
     );
   }

@@ -1,12 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { ArrowRight, Download, TrendingUp, TrendingDown, Info, Heart } from 'lucide-react';
+import { ArrowRight, TrendingUp, TrendingDown, Info, Heart } from 'lucide-react';
 import { DIMENSIONS, getInterpretation, getStrongAreas, getAttentionAreas, WHAT_THIS_MEANS_MESSAGE } from '@/lib/orgSnapshotScoring';
-import { exportElementToPDF } from '@/lib/exportPDF';
 import { cn } from '@/lib/utils';
 
 const getBarColor = (score) => {
@@ -19,8 +18,6 @@ const getBarColor = (score) => {
 
 export default function OrgSnapshotResults({ snapshot, orgComplete = true, leadershipComplete = false }) {
   const navigate = useNavigate();
-  const resultsRef = useRef(null);
-  const [exporting, setExporting] = useState(false);
 
   const overall = snapshot.overall_score ?? 0;
   const dimScores = {};
@@ -37,24 +34,9 @@ export default function OrgSnapshotResults({ snapshot, orgComplete = true, leade
     .map(d => ({ name: d.label, shortName: d.shortLabel, score: dimScores[d.key] ?? 0 }))
     .sort((a, b) => b.score - a.score);
 
-  const handleExport = async () => {
-    if (!resultsRef.current) return;
-    setExporting(true);
-    try {
-      await exportElementToPDF({
-        element: resultsRef.current,
-        filename: 'organizational-health-snapshot.pdf',
-      });
-    } catch {
-      // non-blocking
-    } finally {
-      setExporting(false);
-    }
-  };
-
   return (
     <div className="max-w-2xl mx-auto space-y-6">
-      <div ref={resultsRef} className="space-y-6">
+      <div className="space-y-6">
         {/* Header */}
         <div className="text-center space-y-2">
           <div className="h-14 w-14 rounded-2xl bg-accent/15 flex items-center justify-center mx-auto">
@@ -200,12 +182,6 @@ export default function OrgSnapshotResults({ snapshot, orgComplete = true, leade
         </CardContent>
       </Card>
 
-      {/* Export */}
-      <div className="flex justify-center">
-        <Button variant="outline" onClick={handleExport} disabled={exporting}>
-          <Download className="h-4 w-4 mr-1" /> {exporting ? 'Generating...' : 'Export PDF'}
-        </Button>
-      </div>
     </div>
   );
 }
