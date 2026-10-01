@@ -33,11 +33,11 @@ export const DIMENSION_MAP = {
     safety: { field: 'overall_health', invert: false, sourceMax: 10 },
   },
   TensionPulse: {
-    conflict: { field: 'team_tension', invert: true, sourceMax: 10 },
-    trust: { field: 'trust_level', invert: false, sourceMax: 10 },
-    safety: { field: 'communication_safety', invert: false, sourceMax: 10 },
-    clarity: { field: 'leadership_confidence', invert: false, sourceMax: 10 },
-    momentum: { field: 'team_morale', invert: false, sourceMax: 10 },
+    conflict: { field: 'meeting_atmosphere', invert: true, sourceMax: 10 },
+    trust: { field: 'disengagement', invert: true, sourceMax: 10 },
+    safety: { field: 'side_conversations', invert: true, sourceMax: 10 },
+    clarity: { field: 'ownership_confusion', invert: true, sourceMax: 10 },
+    momentum: { field: 'decision_aftermath', invert: true, sourceMax: 10 },
   },
   FiveDysfunctions: {
     trust: { field: 'trust', invert: true, sourceMax: 5 },

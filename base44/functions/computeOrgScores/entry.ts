@@ -33,15 +33,9 @@ export default async function(req) {
     }
     if (tensionPulses.length > 0) {
       const recent = tensionPulses.slice(0, 6);
+      const keys = ['side_conversations', 'decision_aftermath', 'ownership_confusion', 'meeting_atmosphere', 'disengagement', 'faction_pressure'];
       const normalized = recent.map(p => {
-        const dims = [
-          p.team_tension ? 11 - p.team_tension : 0,
-          p.trust_level || 0,
-          p.communication_safety || 0,
-          p.unresolved_conflicts ? 11 - p.unresolved_conflicts : 0,
-          p.leadership_confidence || 0,
-          p.team_morale || 0,
-        ];
+        const dims = keys.map(k => (p[k] ? 11 - p[k] : 0));
         return dims.reduce((s, v) => s + v, 0) / dims.length;
       });
       const avg = normalized.reduce((s, v) => s + v, 0) / normalized.length;

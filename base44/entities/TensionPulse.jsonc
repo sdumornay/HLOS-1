@@ -8,36 +8,37 @@
     "respondent_email": {
       "type": "string"
     },
-    "team_tension": {
+    "side_conversations": {
       "type": "number",
-      "description": "1-10, 10 = very high tension"
+      "description": "1-10, higher = more pressure. Concerns get discussed in side conversations rather than directly with the person involved."
     },
-    "trust_level": {
+    "decision_aftermath": {
       "type": "number",
-      "description": "1-10"
+      "description": "1-10, higher = more pressure. After decisions are made, people continue to second-guess or push back privately."
     },
-    "communication_safety": {
+    "ownership_confusion": {
       "type": "number",
-      "description": "1-10"
+      "description": "1-10, higher = more pressure. It's unclear who is responsible for what, causing overlap or things falling through the cracks."
     },
-    "unresolved_conflicts": {
+    "meeting_atmosphere": {
       "type": "number",
-      "description": "1-10"
+      "description": "1-10, higher = more pressure. Team meetings feel tense, guarded, or like walking on eggshells."
     },
-    "leadership_confidence": {
+    "disengagement": {
       "type": "number",
-      "description": "1-10"
+      "description": "1-10, higher = more pressure. Key people are going quiet, pulling back, or disengaging from the team."
     },
-    "team_morale": {
+    "faction_pressure": {
       "type": "number",
-      "description": "1-10"
+      "description": "1-10, higher = more pressure. People are grouping into subgroups or factions rather than operating as one team."
     },
     "biggest_tension": {
-      "type": "string"
+      "type": "string",
+      "description": "Where the pressure is showing up most \u2014 name the relationship or interaction"
     },
     "one_change": {
       "type": "string",
-      "description": "One thing that would most improve team health"
+      "description": "One conversation or change that would most relieve the pressure"
     }
   },
   "required": [

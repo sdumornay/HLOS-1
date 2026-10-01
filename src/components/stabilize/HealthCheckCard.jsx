@@ -12,12 +12,12 @@ import GuidedAssessment from '@/components/assessments/GuidedAssessment';
 import { exportToPDF } from '@/lib/exportPDF';
 
 const METRICS = [
-  { key: 'trust_level', label: 'Trust', invert: false },
-  { key: 'communication_safety', label: 'Comm Safety', invert: false },
-  { key: 'team_morale', label: 'Morale', invert: false },
-  { key: 'leadership_confidence', label: 'Leadership', invert: false },
-  { key: 'unresolved_conflicts', label: 'Unresolved Conflicts', invert: true },
-  { key: 'team_tension', label: 'Team Tension', invert: true },
+  { key: 'side_conversations', label: 'Side Convo', invert: true },
+  { key: 'decision_aftermath', label: 'Decisions', invert: true },
+  { key: 'ownership_confusion', label: 'Ownership', invert: true },
+  { key: 'meeting_atmosphere', label: 'Meetings', invert: true },
+  { key: 'disengagement', label: 'Disengage', invert: true },
+  { key: 'faction_pressure', label: 'Factions', invert: true },
 ];
 
 export default function HealthCheckCard({ orgId }) {
@@ -64,10 +64,10 @@ export default function HealthCheckCard({ orgId }) {
           { label: 'One change that would help', value: target.one_change || '—' },
         ]},
         { heading: 'Interpretation', items: [
-          { label: 'Overall health', value: interp ? `${interp.overall.toFixed(1)}/10` : '—' },
-          { label: 'Strengths', value: interp ? interp.strongest.map(s => s.label).join(', ') : '—' },
-          { label: 'Needs attention', value: interp && interp.risks.length ? interp.risks.map(r => r.label).join(', ') : 'None flagged' },
-          { label: 'Recommended focus', value: interp ? `${interp.focusDiscipline} (${interp.focusStage})` : '—' },
+          { label: 'Overall pressure level', value: interp ? `${interp.overallPressure.toFixed(1)}/10` : '—' },
+          { label: 'Hottest pressure points', value: interp && interp.hotSpots.length ? interp.hotSpots.map(s => s.label).join(', ') : 'None elevated' },
+          { label: 'Cooler areas', value: interp && interp.coolSpots.length ? interp.coolSpots.map(s => s.label).join(', ') : 'None' },
+          { label: 'Recommended focus', value: interp ? interp.focusArea : '—' },
         ]},
       ],
     });
@@ -118,7 +118,7 @@ export default function HealthCheckCard({ orgId }) {
                   {p.respondent_email}{isMine && ' (You)'}
                 </span>
                 <span className="text-muted-foreground">{format(new Date(p.created_date), 'MMM d')}</span>
-                <span className="font-medium">Tension: {p.team_tension}/10 • Trust: {p.trust_level}/10</span>
+                <span className="font-medium">Pressure: {(METRICS.reduce((s, m) => s + (p[m.key] || 0), 0) / METRICS.length).toFixed(1)}/10</span>
               </div>
             );
           })}

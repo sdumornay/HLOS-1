@@ -10,9 +10,13 @@ export const STAGE_CRITERIA = {
       { key: 'tension_pulse', label: 'At least 1 Tension Pulse submitted', check: (d) => d.tensionPulses?.length > 0 },
       { key: 'comm_agreements', label: 'At least 1 active Communication Agreement', check: (d) => d.commAgreements?.some(a => a.status === 'active') },
       { key: 'conflict_intake', label: 'No open (unresolved) conflicts', check: (d) => !d.conflictIntakes?.some(c => c.status === 'open') },
-      { key: 'low_tension', label: 'Average team tension below 4', check: (d) => {
+      { key: 'low_tension', label: 'Average relational pressure below 4', check: (d) => {
         if (!d.tensionPulses?.length) return false;
-        const avg = d.tensionPulses.reduce((s, p) => s + (p.team_tension || 0), 0) / d.tensionPulses.length;
+        const keys = ['side_conversations', 'decision_aftermath', 'ownership_confusion', 'meeting_atmosphere', 'disengagement', 'faction_pressure'];
+        const avg = d.tensionPulses.reduce((s, p) => {
+          const pulseAvg = keys.reduce((sk, k) => sk + (p[k] || 0), 0) / keys.length;
+          return s + pulseAvg;
+        }, 0) / d.tensionPulses.length;
         return avg < 4;
       }},
     ],
