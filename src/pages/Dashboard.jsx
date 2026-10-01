@@ -124,12 +124,6 @@ export default function Dashboard({ orgId: overrideOrgId }) {
     enabled: !!orgId,
   });
 
-  const { data: orgSnapshots = [] } = useQuery({
-    queryKey: ['orgHealthSnapshots', orgId],
-    queryFn: () => base44.entities.OrganizationalHealthSnapshot.filter({ organization_id: orgId }, '-created_date', 5),
-    enabled: !!orgId,
-  });
-
   // Stabilize-stage data for next-steps logic
   const { data: tensionPulsesNS = [] } = useQuery({
     queryKey: ['tensionPulses-ns', orgId], queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
@@ -262,8 +256,7 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   // query is RLS-filtered and can return empty if the user's session role is stale,
   // which would incorrectly trigger the pre-baseline dashboard.
   const orgBaselineCompleted = currentOrg?.baseline_completed === true;
-  const snapshotCompleted = orgSnapshots.length > 0;
-  const baselineCompleted = snapshotCompleted || scoreboardBaseline || orgBaselineCompleted;
+  const baselineCompleted = scoreboardBaseline || orgBaselineCompleted;
   const isExistingOrg = currentStage !== 'stabilize' || stageProgress.length > 0;
   const needsBaseline = !baselineCompleted && !isExistingOrg && !isConsultantView;
 

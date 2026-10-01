@@ -138,31 +138,10 @@ export async function exportElementToPDF({ element, filename }) {
   if (!element) return;
 
   const canvas = await html2canvas(element, {
-    scale: 3,
+    scale: 2,
     useCORS: true,
     backgroundColor: '#ffffff',
     logging: false,
-    onclone: (clonedDoc) => {
-      // Inject styles that improve PDF clarity: separate text from border lines
-      // and add breathing room so text doesn't sit on top of borders/boxes.
-      const style = clonedDoc.createElement('style');
-      style.textContent = `
-        /* Add vertical breathing room between text and horizontal divider lines */
-        .border-b, .border-t {
-          padding-top: 4px !important;
-          padding-bottom: 6px !important;
-        }
-        /* Ensure card content has enough internal padding */
-        [class*="CardContent"], [class*="p-5"], [class*="p-6"], [class*="p-4"] {
-          padding: 20px !important;
-        }
-        /* Increase line-height for body text to prevent text-line overlap */
-        p, span {
-          line-height: 1.6 !important;
-        }
-      `;
-      clonedDoc.head.appendChild(style);
-    },
   });
 
   const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });

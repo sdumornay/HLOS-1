@@ -13,7 +13,6 @@ import StageHero from '@/components/stages/StageHero';
 import StageGuide from '@/components/stages/StageGuide';
 import DisciplineSection from '@/components/stages/DisciplineSection';
 import StagePriorities from '@/components/stages/StagePriorities';
-import ScoreboardSection from '@/components/stabilize/ScoreboardSection';
 import StageGate from '@/components/stages/StageGate';
 
 export default function Stabilize() {
@@ -49,14 +48,8 @@ export default function Stabilize() {
     queryFn: () => base44.entities.NVCConversation.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
-  const { data: scoreboards = [] } = useQuery({
-    queryKey: ['leadershipHealthScoreboard', orgId],
-    queryFn: () => base44.entities.LeadershipHealthScoreboard.filter({ organization_id: orgId }),
-    enabled: !!orgId,
-  });
 
   const counts = {
-    scoreboard: scoreboards.length,
     conflict_intake: intakes.length,
     tension_pulse: pulses.length,
     leader_interviews: interviews.length,
@@ -70,7 +63,6 @@ export default function Stabilize() {
       <div className="space-y-6">
         <StageHero stage="stabilize" orgId={orgId} counts={counts} />
         <StageGuide stage="stabilize" counts={counts} />
-        <ScoreboardSection orgId={orgId} />
         <StabilizeProgress counts={counts} />
 
         {/* Discipline 1: Leadership Health */}

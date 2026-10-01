@@ -26,7 +26,6 @@ import Align from '@/pages/Align';
 import Execute from '@/pages/Execute';
 import Sustain from '@/pages/Sustain';
 import Scoreboard from '@/pages/Scoreboard';
-import OrgHealthSnapshot from '@/pages/OrgHealthSnapshot';
 import ScoreboardConfigEditor from '@/pages/ScoreboardConfigEditor';
 
 const AuthenticatedApp = () => {
@@ -64,7 +63,6 @@ const AuthenticatedApp = () => {
         <Route path="/execute" element={<Execute />} />
         <Route path="/sustain" element={<Sustain />} />
         <Route path="/scoreboard" element={<Scoreboard />} />
-        <Route path="/org-snapshot" element={<OrgHealthSnapshot />} />
         <Route path="/admin/scoreboard-config" element={<ScoreboardConfigEditor />} />
         <Route path="/assessments" element={<Assessments />} />
         <Route path="/org-health" element={<OrgHealth />} />
