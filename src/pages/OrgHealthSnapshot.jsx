@@ -8,10 +8,13 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, ArrowLeft, X, TrendingUp, Compass, Users, Shield, Rocket, Leaf } from 'lucide-react';
 import { useToast } from '@/components/ui/use-toast';
+import { format } from 'date-fns';
 import { DIMENSIONS } from '@/lib/orgSnapshotScoring';
 import OrgSnapshotResults from '@/components/health/OrgSnapshotResults';
 import DiagnosticJourney from '@/components/onboarding/DiagnosticJourney';
+import { useOrgSnapshotStatus } from '@/lib/useOrgSnapshotStatus';
 import { cn } from '@/lib/utils';
+import { CheckCircle2, Eye, RotateCcw } from 'lucide-react';
 
 const OPTIONS = [
   { value: 1, label: 'Strongly Disagree' },
@@ -66,10 +69,26 @@ export default function OrgHealthSnapshot() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
+  // Use the user's org ID directly as a fallback so the snapshot status check
+  // runs immediately, without waiting for useOrgId() to resolve via resolveOrgContext.
+  const snapshotOrgId = orgId || user?.data?.organization_id || user?.organization_id;
+  const { snapshotCompleted, latestSnapshot } = useOrgSnapshotStatus(snapshotOrgId);
+  const [retake, setRetake] = useState(false);
   const [step, setStep] = useState(0); // 0 = intro, 1-6 = dimensions, 7 = results
   const [answers, setAnswers] = useState({});
   const [scores, setScores] = useState(null);
   const [record, setRecord] = useState(null);
+
+  // Build a scores object from an existing snapshot record (for "view answers")
+  const scoresFromRecord = (snap) => ({
+    overall_score: snap?.overall_score,
+    mission_direction_score: snap?.mission_direction_score,
+    culture_trust_score: snap?.culture_trust_score,
+    role_clarity_score: snap?.role_clarity_score,
+    execution_accountability_score: snap?.execution_accountability_score,
+    momentum_adaptability_score: snap?.momentum_adaptability_score,
+    sustainability_capacity_score: snap?.sustainability_capacity_score,
+  });
 
   const submitMutation = useMutation({
     mutationFn: (data) => base44.functions.invoke('submitOrgHealthSnapshot', data),
@@ -117,6 +136,61 @@ export default function OrgHealthSnapshot() {
       });
     }
   };
+
+  // ── Already taken: show options to view answers or retake ──
+  if (snapshotCompleted && !retake && step !== 7) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6 relative">
+        <button
+          onClick={() => navigate('/')}
+          className="absolute -top-2 right-0 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Close"
+        >
+          <X className="h-5 w-5" />
+        </button>
+        <div className="text-center space-y-2">
+          <div className="h-14 w-14 rounded-2xl bg-emerald-100 flex items-center justify-center mx-auto">
+            <CheckCircle2 className="h-7 w-7 text-emerald-600" />
+          </div>
+          <h1 className="text-2xl font-display font-bold">Snapshot Already Taken</h1>
+          <p className="text-sm text-muted-foreground">
+            You've already completed the Organizational Health Snapshot
+            {latestSnapshot?.created_date ? ` on ${format(new Date(latestSnapshot.created_date), 'MMM d, yyyy')}` : ''}.
+          </p>
+        </div>
+        <Card className="border-border/50 shadow-sm">
+          <CardContent className="p-6 space-y-4">
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              You can review your previous answers or take the snapshot again. Retaking will create a new
+              record and update your results.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => {
+                  setScores(scoresFromRecord(latestSnapshot));
+                  setRecord(latestSnapshot);
+                  setStep(7);
+                }}
+              >
+                <Eye className="h-4 w-4 mr-2" /> View My Answers
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={() => {
+                  setRetake(true);
+                  setStep(0);
+                }}
+              >
+                <RotateCcw className="h-4 w-4 mr-2" /> Retake Snapshot
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // ── Step 0: Intro ──
   if (step === 0) {
