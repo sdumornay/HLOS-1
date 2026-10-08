@@ -104,3 +104,61 @@ export function getStrengthsAndConcerns(scores) {
 
   return { strongest, weakest, allDims: dims };
 }
+
+/**
+ * HLOS stage priority for tie-breaking when dimension scores are identical.
+ * Lower index = earlier HLOS stage = higher priority when scores are tied.
+ * HLOS sequence: Stabilize → Align → Execute → Sustain.
+ */
+export const HLOS_PRIORITY = {
+  culture_trust_score: 0,              // Stabilize
+  mission_direction_score: 1,          // Align
+  role_clarity_score: 2,              // Align
+  execution_accountability_score: 3, // Execute
+  momentum_adaptability_score: 4,    // Execute
+  sustainability_capacity_score: 5,   // Sustain
+};
+
+/**
+ * Dimension-specific diagnostic interpretation for the "What Needs Attention" section.
+ * Each entry explains what the score may indicate for that dimension's specific focus.
+ */
+export const DIMENSION_DIAGNOSTICS = {
+  mission_direction_score: 'The results suggest that mission, priorities, or the connection between activities and organizational purpose may not be sufficiently clear. Greater strategic clarity could help the team make more consistent decisions.',
+  culture_trust_score: 'The results suggest strain in trust, psychological safety, or communication. The team may benefit from creating greater openness and addressing tensions that make candid conversation difficult.',
+  role_clarity_score: 'The results suggest significant uncertainty around responsibilities, authority, or decision-making boundaries. Clarifying who owns what and who has authority to make key decisions may reduce confusion and improve accountability.',
+  execution_accountability_score: 'The results suggest difficulty consistently turning commitments into action. Ownership, follow-through, meeting effectiveness, or accountability practices may need strengthening.',
+  momentum_adaptability_score: 'The organization appears to be experiencing some difficulty maintaining progress on priorities or responding effectively when circumstances change. Greater clarity around problem-solving and adapting plans may help restore momentum.',
+  sustainability_capacity_score: 'The results suggest that responsibilities or workload may not be distributed sustainably. Leadership capacity, delegation, or dependence on a small number of people may require attention.',
+};
+
+const ATTENTION_THRESHOLD = 2.5;
+
+/**
+ * Returns all dimensions scoring below the attention threshold (2.50),
+ * sorted from lowest to highest. When scores are identical, ties are
+ * broken by HLOS stage priority (earlier stages come first).
+ *
+ * Returns:
+ *   allBelow        — every dimension below 2.50, lowest first
+ *   priorityFocus   — the two lowest-scoring dimensions
+ *   additionalAreas — remaining dimensions below 2.50 (empty if ≤2 below)
+ */
+export function getNeedsAttention(scores) {
+  const allBelow = DIMENSIONS
+    .map(d => ({
+      key: d.key,
+      label: d.label,
+      score: scores[d.key] ?? 0,
+    }))
+    .filter(d => d.score < ATTENTION_THRESHOLD)
+    .sort((a, b) => {
+      if (a.score !== b.score) return a.score - b.score;
+      return (HLOS_PRIORITY[a.key] ?? 99) - (HLOS_PRIORITY[b.key] ?? 99);
+    });
+
+  const priorityFocus = allBelow.slice(0, 2);
+  const additionalAreas = allBelow.slice(2);
+
+  return { allBelow, priorityFocus, additionalAreas };
+}

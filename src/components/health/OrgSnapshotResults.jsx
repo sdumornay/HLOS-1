@@ -3,12 +3,30 @@ import { useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, LabelList } from 'recharts';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowRight, Download, TrendingUp, AlertCircle, Info, Heart, Shield } from 'lucide-react';
-import { DIMENSIONS, getInterpretation, getBarColor, getToneClass, getStrengthsAndConcerns } from '@/lib/orgSnapshotScoring';
+import { ArrowRight, Download, TrendingUp, AlertCircle, Info, Heart, Shield, CheckCircle2 } from 'lucide-react';
+import { DIMENSIONS, getInterpretation, getBarColor, getToneClass, getStrengthsAndConcerns, getNeedsAttention, DIMENSION_DIAGNOSTICS } from '@/lib/orgSnapshotScoring';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { exportElementToPDF } from '@/lib/exportPDF';
 import { useToast } from '@/components/ui/use-toast';
+
+function AttentionItem({ item }) {
+  const interp = getInterpretation(item.score);
+  const tone = getToneClass(interp.tone);
+  const diagnostic = DIMENSION_DIAGNOSTICS[item.key] || '';
+  return (
+    <div className="border-b border-amber-200/40 pb-3 last:border-0 last:pb-0">
+      <div className="flex items-center justify-between gap-3 mb-1">
+        <p className="text-sm font-medium">{item.label}</p>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className={cn('text-sm font-bold', tone.text)}>{item.score.toFixed(2)}/5</span>
+          <span className={cn('text-[10px] font-semibold px-2 py-0.5 rounded-full', tone.bg, tone.text)}>{interp.label}</span>
+        </div>
+      </div>
+      <p className="text-xs text-muted-foreground leading-relaxed">{diagnostic}</p>
+    </div>
+  );
+}
 
 export default function OrgSnapshotResults({ scores, record, orgName }) {
   const navigate = useNavigate();
@@ -19,7 +37,8 @@ export default function OrgSnapshotResults({ scores, record, orgName }) {
   const overall = scores.overall_score;
   const interp = getInterpretation(overall);
   const tone = getToneClass(interp.tone);
-  const { strongest, weakest } = getStrengthsAndConcerns(scores);
+  const { strongest } = getStrengthsAndConcerns(scores);
+  const { allBelow, priorityFocus, additionalAreas } = getNeedsAttention(scores);
 
   const chartData = DIMENSIONS.map(d => ({
     name: d.label,
@@ -139,26 +158,52 @@ export default function OrgSnapshotResults({ scores, record, orgName }) {
         )}
 
         {/* What Needs Attention */}
-        {weakest.length > 0 && (
-          <Card className="border-amber-200 bg-amber-50/30">
+        {allBelow.length === 0 ? (
+          <Card className="border-emerald-200 bg-emerald-50/30">
             <CardContent className="p-5">
               <div className="flex items-center gap-2 mb-3">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                <p className="text-sm font-semibold text-emerald-700">What Needs Attention</p>
+              </div>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                No dimensions currently fall below the midpoint. Continue reviewing the individual scores for opportunities to strengthen organizational health.
+              </p>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="border-amber-200 bg-amber-50/30">
+            <CardContent className="p-5 space-y-5">
+              <div className="flex items-center gap-2">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
                 <p className="text-sm font-semibold text-amber-700">What Needs Attention</p>
               </div>
-              <div className="space-y-2">
-                {weakest.map(s => (
-                  <div key={s.key}>
-                    <p className="text-sm font-medium">{s.label} — {s.score.toFixed(2)}/5</p>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {s.score <= 1.79
-                        ? 'This area is under significant strain. It would benefit from focused attention and support.'
-                        : s.score <= 2.59
-                          ? 'This area is experiencing noticeable strain. It is worth exploring what is contributing to the challenges here.'
-                          : 'This area has some gaps worth paying attention to. It is not yet a concern, but it is where the most growth is possible.'}
-                    </p>
-                  </div>
+
+              {/* Priority Focus */}
+              <div className="space-y-3">
+                <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">Priority Focus</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  These are the areas showing the greatest strain in your current assessment. They deserve particular attention as you begin working through HLOS.
+                </p>
+                {priorityFocus.map(s => (
+                  <AttentionItem key={s.key} item={s} />
                 ))}
+              </div>
+
+              {/* Additional Areas Needing Attention */}
+              {additionalAreas.length > 0 && (
+                <div className="space-y-3">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-amber-700">Additional Areas Needing Attention</p>
+                  {additionalAreas.map(s => (
+                    <AttentionItem key={s.key} item={s} />
+                  ))}
+                </div>
+              )}
+
+              {/* Sequential process statement */}
+              <div className="rounded-lg bg-amber-50/60 border border-amber-200/50 p-3">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  Several areas may need attention, but they do not necessarily need to be addressed at the same time. HLOS uses a sequential process to help determine where to begin and what to address next.
+                </p>
               </div>
             </CardContent>
           </Card>
