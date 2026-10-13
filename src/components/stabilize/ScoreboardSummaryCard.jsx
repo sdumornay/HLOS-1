@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Heart, ArrowRight, RotateCcw, CheckCircle2 } from 'lucide-react';
+import { Heart, ArrowRight, RotateCcw, CheckCircle2, Eye } from 'lucide-react';
 import { useBaselineStatus } from '@/lib/useBaselineStatus';
 import { cn } from '@/lib/utils';
+import ScoreboardResultsDialog from '@/components/stabilize/ScoreboardResultsDialog';
 
 const STAGE_LABELS = {
   stabilize_score: 'Stabilize',
@@ -22,6 +23,7 @@ const STAGE_LABELS = {
  */
 export default function ScoreboardSummaryCard({ orgId }) {
   const navigate = useNavigate();
+  const [resultsOpen, setResultsOpen] = useState(false);
   const { latestScoreboard, baselineCompleted: scoreboardBaseline } = useBaselineStatus(orgId);
 
   // Fallback: use the org's baseline_completed flag since the scoreboards query
@@ -85,7 +87,7 @@ export default function ScoreboardSummaryCard({ orgId }) {
   const stageScores = ['stabilize_score', 'align_score', 'execute_score', 'sustain_score']
     .map(k => ({ key: k, label: STAGE_LABELS[k], score: latestScoreboard[k] || 0 }));
 
-  return (
+  const card = (
     <Card className="border-border/50 shadow-sm">
       <CardContent className="p-5">
         <div className="flex items-center justify-between gap-4 mb-4">
@@ -114,10 +116,27 @@ export default function ScoreboardSummaryCard({ orgId }) {
           ))}
         </div>
 
-        <Button variant="outline" size="sm" onClick={() => navigate('/scoreboard')}>
-          <RotateCcw className="h-3.5 w-3.5 mr-1" /> Retake Scoreboard
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" size="sm" onClick={() => setResultsOpen(true)}>
+            <Eye className="h-3.5 w-3.5 mr-1" /> View Results
+          </Button>
+          <Button variant="outline" size="sm" onClick={() => navigate('/scoreboard')}>
+            <RotateCcw className="h-3.5 w-3.5 mr-1" /> Retake Scoreboard
+          </Button>
+        </div>
       </CardContent>
     </Card>
+  );
+
+  return (
+    <>
+      {card}
+      <ScoreboardResultsDialog
+        open={resultsOpen}
+        onOpenChange={setResultsOpen}
+        scores={latestScoreboard}
+        orgId={orgId}
+      />
+    </>
   );
 }
