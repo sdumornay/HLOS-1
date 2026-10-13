@@ -28,12 +28,11 @@ export default async function(req) {
 
     // Fetch all data needed for deliverable checks
     const [
-      tensionPulses, fiveDysfunctions, commAgreements, conflictIntakes,
+      fiveDysfunctions, commAgreements, conflictIntakes,
       workstyles, roleClarity, priorities, decisionRights, covenants,
       planPeriods, meetingAgendas, actions, healthPulses,
       quarterlyReviews, renewalReflections, scoreboards, existingProgress,
     ] = await Promise.all([
-      base44.asServiceRole.entities.TensionPulse.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.FiveDysfunctions.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.CommAgreement.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.ConflictIntake.filter({ organization_id: organizationId }),
@@ -53,7 +52,7 @@ export default async function(req) {
     ]);
 
     const data = {
-      tensionPulses, fiveDysfunctions, commAgreements, conflictIntakes,
+      fiveDysfunctions, commAgreements, conflictIntakes,
       workstyles, roleClarity, priorities, decisionRights, covenants,
       planPeriods, meetingAgendas, actions, healthPulses,
       quarterlyReviews, renewalReflections,

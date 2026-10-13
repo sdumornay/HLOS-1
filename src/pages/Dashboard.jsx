@@ -71,12 +71,6 @@ export default function Dashboard({ orgId: overrideOrgId }) {
     enabled: !!orgId,
   });
 
-  const { data: tensionPulses = [] } = useQuery({
-    queryKey: ['tensionPulses', orgId],
-    queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
-    enabled: !!orgId,
-  });
-
   const { data: actions = [] } = useQuery({
     queryKey: ['actions', orgId],
     queryFn: () => base44.entities.Action.filter({ organization_id: orgId }),
@@ -126,10 +120,6 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   });
 
   // Stabilize-stage data for next-steps logic
-  const { data: tensionPulsesNS = [] } = useQuery({
-    queryKey: ['tensionPulses-ns', orgId], queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
-    enabled: !!orgId,
-  });
   const { data: conflictIntakes = [] } = useQuery({
     queryKey: ['conflictIntakes-ns', orgId], queryFn: () => base44.entities.ConflictIntake.filter({ organization_id: orgId }),
     enabled: !!orgId,
@@ -188,7 +178,7 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   });
 
   // Unified scores
-  const unifiedHealth = orgScores != null ? orgScores : computeUnifiedHealthScore(assessments, healthPulses, tensionPulses);
+  const unifiedHealth = orgScores != null ? orgScores : computeUnifiedHealthScore(assessments, healthPulses);
   const momentumResult = computeMomentumIndicators(priorities, actions, decisions, stageProgress);
   const unifiedMomentum = momentumResult.overall;
 
@@ -205,7 +195,6 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   const allHealthDates = [
     ...assessments.map(a => a.created_date),
     ...healthPulses.map(p => p.created_date),
-    ...tensionPulses.map(p => p.created_date),
   ].filter(Boolean).sort((a, b) => new Date(b) - new Date(a));
   const lastAssessmentDate = allHealthDates.length > 0 ? allHealthDates[0] : null;
 
@@ -220,7 +209,6 @@ export default function Dashboard({ orgId: overrideOrgId }) {
   // Stage steps logic (from NextStepsPanel)
   const stageSteps = STAGE_STEPS[currentStage] || [];
   const stageCounts = {
-    tension_pulse: tensionPulsesNS.length,
     conflict_intake: conflictIntakes.length,
     leader_interviews: 0,
     comm_agreements: commAgreements.length,

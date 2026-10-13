@@ -41,7 +41,7 @@ export const DEFAULT_CONFIG = {
         critical: 'Stabilize is your first priority and will be addressed before the later stages.',
       },
       bridging: 'Strengthening this foundation will prepare the team to address the concerns the assessment revealed in {concernStage}.',
-      tools: ['Tension Pulse', 'Team Health & Culture assessment', 'Conflict Intake', 'Communication Agreements'],
+      tools: ['Team Health & Culture assessment', 'Conflict Intake', 'Communication Agreements'],
     },
     align: {
       diagnosis: {

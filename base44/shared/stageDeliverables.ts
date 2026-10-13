@@ -20,11 +20,6 @@ export interface Deliverable {
 export const STAGE_DELIVERABLES: Record<string, Deliverable[]> = {
   stabilize: [
     {
-      key: 'tension_pulse',
-      label: 'Tension Pulse submitted',
-      check: (d) => d.tensionPulses?.length > 0,
-    },
-    {
       key: 'five_dysfunctions',
       label: 'Team Health & Culture diagnostic completed',
       check: (d) => d.fiveDysfunctions?.length > 0,
@@ -129,7 +124,6 @@ export function evaluateDeliverables(stage: string, data: any) {
 
 // Assessment-to-stage mapping: which assessment submissions are allowed in which stage.
 export const ASSESSMENT_STAGE_MAP: Record<string, string> = {
-  tension_pulse: 'stabilize',
   five_dysfunctions: 'stabilize',
   workstyle: 'align',
   health_pulse: 'sustain',

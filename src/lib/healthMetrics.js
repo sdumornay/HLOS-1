@@ -1,6 +1,6 @@
-// Unified Health Score — aggregates Assessment, HealthPulse, and TensionPulse
+// Unified Health Score — aggregates Assessment and HealthPulse
 // Returns a 0-10 score with weighted contributions from each available source.
-export function computeUnifiedHealthScore(assessments = [], healthPulses = [], tensionPulses = []) {
+export function computeUnifiedHealthScore(assessments = [], healthPulses = []) {
   const sources = [];
 
   // Assessment: overall_health is already 0-10
@@ -14,18 +14,6 @@ export function computeUnifiedHealthScore(assessments = [], healthPulses = [], t
   if (healthPulses.length > 0) {
     const recent = healthPulses.slice(0, 6);
     const avg = recent.reduce((s, p) => s + (p.overall_health || 0), 0) / recent.length;
-    sources.push({ value: avg, weight: 30 });
-  }
-
-  // TensionPulse: 6 pressure points on 1-10, all inverted (higher = more pressure = less healthy)
-  if (tensionPulses.length > 0) {
-    const recent = tensionPulses.slice(0, 6);
-    const keys = ['side_conversations', 'decision_aftermath', 'ownership_confusion', 'meeting_atmosphere', 'disengagement', 'faction_pressure'];
-    const normalized = recent.map(p => {
-      const dims = keys.map(k => (p[k] ? 11 - p[k] : 0));
-      return dims.reduce((s, v) => s + v, 0) / dims.length;
-    });
-    const avg = normalized.reduce((s, v) => s + v, 0) / normalized.length;
     sources.push({ value: avg, weight: 30 });
   }
 

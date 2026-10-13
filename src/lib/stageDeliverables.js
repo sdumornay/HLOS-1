@@ -19,7 +19,6 @@ export const STAGE_DESCRIPTIONS = {
 
 export const STAGE_DELIVERABLE_LABELS = {
   stabilize: [
-    { key: 'tension_pulse', label: 'Tension Pulse submitted' },
     { key: 'five_dysfunctions', label: 'Team Health & Culture diagnostic completed' },
     { key: 'comm_agreements', label: 'At least 1 active Communication Agreement' },
     { key: 'conflict_resolved', label: 'No open (unresolved) conflicts' },

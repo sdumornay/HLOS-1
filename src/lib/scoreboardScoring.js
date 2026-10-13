@@ -172,7 +172,7 @@ export function getRecommendedSteps(dimensions) {
     steps.push({
       stage: 'stabilize',
       discipline: 'Leadership Health',
-      action: 'Complete a Tension Pulse Survey to baseline team trust and tension levels',
+      action: 'Use the Stabilize tools to build trust and address team health',
       link: '/stabilize',
     });
   }

@@ -10,12 +10,11 @@ export default async function(req) {
     }
 
     // The standalone Quick Health Check has been archived. It was redundant with
-    // the Tension Pulse (Stage 1 assessment) and the Leadership Health Scoreboard
-    // (baseline). Historical Assessment records are preserved, but new standalone
-    // submissions are no longer accepted. Use submitTensionPulse for Stage 1 health
-    // checks or submitScoreboard for the baseline.
+    // the Leadership Health Scoreboard (baseline). Historical Assessment records
+    // are preserved, but new standalone submissions are no longer accepted.
+    // Use submitScoreboard for the baseline.
     return Response.json({
-      error: 'The Quick Health Check has been archived. Please use the Tension Pulse survey (Stage 1: Stabilize) or the Leadership Health Scoreboard for health assessments.',
+      error: 'The Quick Health Check has been archived. Please use the Leadership Health Scoreboard for health assessments.',
       archived: true,
     }, { status: 403 });
   } catch (error) {

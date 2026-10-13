@@ -46,12 +46,6 @@ export default function CoachWorkspace() {
     enabled: orgIds.length > 0,
   });
 
-  const { data: tensionPulses = [] } = useQuery({
-    queryKey: ['portfolio-tension-pulses'],
-    queryFn: () => base44.entities.TensionPulse.list('-created_date', 200),
-    enabled: orgIds.length > 0,
-  });
-
   const { data: actions = [] } = useQuery({
     queryKey: ['portfolio-actions'],
     queryFn: () => base44.entities.Action.list('-created_date', 200),
@@ -96,7 +90,6 @@ export default function CoachWorkspace() {
         users,
         assessments,
         healthPulses,
-        tensionPulses,
         actions,
         priorities,
         issues,
@@ -105,7 +98,7 @@ export default function CoachWorkspace() {
         stageProgress,
       })
     );
-  }, [organizations, users, assessments, healthPulses, tensionPulses, actions, priorities, issues, sessions, decisions, stageProgress]);
+  }, [organizations, users, assessments, healthPulses, actions, priorities, issues, sessions, decisions, stageProgress]);
 
   // Apply filters
   const filteredOrgs = useMemo(() => {

@@ -121,7 +121,6 @@ export function buildOrgPortfolio(org, {
   users = [],
   assessments = [],
   healthPulses = [],
-  tensionPulses = [],
   actions = [],
   priorities = [],
   issues = [],
@@ -131,7 +130,6 @@ export function buildOrgPortfolio(org, {
 }) {
   const orgAssessments = assessments.filter(a => a.organization_id === org.id);
   const orgHealthPulses = healthPulses.filter(p => p.organization_id === org.id);
-  const orgTensionPulses = tensionPulses.filter(p => p.organization_id === org.id);
   const orgActions = actions.filter(a => a.organization_id === org.id);
   const orgPriorities = priorities.filter(p => p.organization_id === org.id);
   const orgIssues = issues.filter(i => i.organization_id === org.id);
@@ -147,7 +145,7 @@ export function buildOrgPortfolio(org, {
   const leaderName = leader?.full_name || '—';
 
   // Health
-  const healthScore = computeUnifiedHealthScore(orgAssessments, orgHealthPulses, orgTensionPulses);
+  const healthScore = computeUnifiedHealthScore(orgAssessments, orgHealthPulses);
   const healthTrend = healthTrendFromAssessments(orgAssessments);
 
   // Momentum

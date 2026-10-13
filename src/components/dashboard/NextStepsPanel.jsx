@@ -8,7 +8,6 @@ import { cn } from '@/lib/utils';
 
 export const STAGE_STEPS = {
   stabilize: [
-    { key: 'tension_pulse', label: 'Complete a Quick Health Check', desc: 'Baseline your team tension and trust levels', link: '/stabilize' },
     { key: 'conflict_intake', label: 'Document any active conflicts', desc: 'Surface and categorize ongoing conflicts', link: '/stabilize' },
     { key: 'leader_interviews', label: 'Complete a leader self-assessment', desc: 'Reflect on your strengths, weaknesses, and leadership gaps', link: '/stabilize' },
     { key: 'comm_agreements', label: 'Establish communication agreements', desc: 'Agree on how the team will communicate', link: '/stabilize' },
@@ -39,10 +38,6 @@ export const STAGE_STEPS = {
 
 export default function NextStepsPanel({ stage = 'stabilize', orgId }) {
   // Stabilize queries
-  const { data: tensionPulses = [] } = useQuery({
-    queryKey: ['tensionPulses-next', orgId], queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
-    enabled: !!orgId && stage === 'stabilize',
-  });
   const { data: conflictIntakes = [] } = useQuery({
     queryKey: ['conflictIntakes-next', orgId], queryFn: () => base44.entities.ConflictIntake.filter({ organization_id: orgId }),
     enabled: !!orgId && stage === 'stabilize',
@@ -123,7 +118,6 @@ export default function NextStepsPanel({ stage = 'stabilize', orgId }) {
   });
 
   const counts = {
-    tension_pulse: tensionPulses.length,
     conflict_intake: conflictIntakes.length,
     leader_interviews: leaderInterviews.length,
     comm_agreements: commAgreements.length,

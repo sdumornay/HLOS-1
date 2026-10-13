@@ -42,7 +42,6 @@ export default function GuidedAssessment({ open, onClose, orgId, user }) {
     mutationFn: (data) => base44.functions.invoke('submitAssessment', data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['assessments'] });
-      queryClient.invalidateQueries({ queryKey: ['tensionPulses'] });
       setDone(true);
     },
     onError: (err) => toast({

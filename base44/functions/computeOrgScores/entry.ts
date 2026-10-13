@@ -9,10 +9,9 @@ export default async function(req) {
     const { organizationId } = await req.json();
     if (!organizationId) return Response.json({ error: 'Missing organizationId' }, { status: 400 });
 
-    const [assessments, healthPulses, tensionPulses, actions, decisions, stageProgress, planPeriods] = await Promise.all([
+    const [assessments, healthPulses, actions, decisions, stageProgress, planPeriods] = await Promise.all([
       base44.asServiceRole.entities.Assessment.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.HealthPulse.filter({ organization_id: organizationId }),
-      base44.asServiceRole.entities.TensionPulse.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.Action.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.DecisionLog.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.StageProgress.filter({ organization_id: organizationId }),
@@ -29,16 +28,6 @@ export default async function(req) {
     if (healthPulses.length > 0) {
       const recent = healthPulses.slice(0, 6);
       const avg = recent.reduce((s, p) => s + (p.overall_health || 0), 0) / recent.length;
-      healthSources.push({ value: avg, weight: 30 });
-    }
-    if (tensionPulses.length > 0) {
-      const recent = tensionPulses.slice(0, 6);
-      const keys = ['side_conversations', 'decision_aftermath', 'ownership_confusion', 'meeting_atmosphere', 'disengagement', 'faction_pressure'];
-      const normalized = recent.map(p => {
-        const dims = keys.map(k => (p[k] ? 11 - p[k] : 0));
-        return dims.reduce((s, v) => s + v, 0) / dims.length;
-      });
-      const avg = normalized.reduce((s, v) => s + v, 0) / normalized.length;
       healthSources.push({ value: avg, weight: 30 });
     }
     const healthScore = healthSources.length > 0

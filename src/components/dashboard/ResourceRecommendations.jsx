@@ -14,23 +14,15 @@ export default function ResourceRecommendations({ orgId }) {
     enabled: !!orgId,
   });
 
-  const { data: tensionPulses = [] } = useQuery({
-    queryKey: ['tensionPulses-rec', orgId],
-    queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
-    enabled: !!orgId,
-  });
-
   const { data: resources = [] } = useQuery({
     queryKey: ['resources-rec'],
     queryFn: () => base44.entities.Resource.list(),
   });
 
-  // Compute health gaps from latest assessment + tension pulse
+  // Compute health gaps from latest assessment
   const latestAssessment = assessments[0];
-  const latestPulse = tensionPulses[0];
   const records = [];
   if (latestAssessment) records.push({ entityName: 'Assessment', record: latestAssessment });
-  if (latestPulse) records.push({ entityName: 'TensionPulse', record: latestPulse });
 
   // Use extractDimensions to get a combined view
   const allDims = {};

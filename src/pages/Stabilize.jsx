@@ -4,7 +4,6 @@ import { base44 } from '@/api/base44Client';
 import { useOrgId } from '@/lib/useOrgId';
 import StabilizeProgress from '@/components/stabilize/StabilizeProgress';
 import ConflictIntakeForm from '@/components/stabilize/ConflictIntakeForm';
-import TensionPulseSurvey from '@/components/stabilize/TensionPulseSurvey';
 import LeaderInterviewNotes from '@/components/stabilize/LeaderInterviewNotes';
 import CommunicationAgreements from '@/components/stabilize/CommunicationAgreements';
 import ConflictTriggerTracker from '@/components/stabilize/ConflictTriggerTracker';
@@ -22,11 +21,6 @@ export default function Stabilize() {
   const { data: intakes = [] } = useQuery({
     queryKey: ['conflictIntakes', orgId],
     queryFn: () => base44.entities.ConflictIntake.filter({ organization_id: orgId }),
-    enabled: !!orgId,
-  });
-  const { data: pulses = [] } = useQuery({
-    queryKey: ['tensionPulses', orgId],
-    queryFn: () => base44.entities.TensionPulse.filter({ organization_id: orgId }),
     enabled: !!orgId,
   });
   const { data: interviews = [] } = useQuery({
@@ -52,7 +46,6 @@ export default function Stabilize() {
 
   const counts = {
     conflict_intake: intakes.length,
-    tension_pulse: pulses.length,
     leader_interviews: interviews.length,
     comm_agreements: agreements.length,
     conflict_triggers: triggers.length,
@@ -68,8 +61,7 @@ export default function Stabilize() {
         <StabilizeProgress counts={counts} />
 
         {/* Discipline 1: Leadership Health */}
-        <DisciplineSection number={1} name="Leadership Health" description="Baseline team tension, trust, and leadership health" audience="team">
-          <TensionPulseSurvey orgId={orgId} />
+        <DisciplineSection number={1} name="Leadership Health" description="Baseline trust and leadership health" audience="team">
           <LeaderInterviewNotes orgId={orgId} />
         </DisciplineSection>
 

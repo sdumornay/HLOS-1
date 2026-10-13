@@ -32,13 +32,6 @@ export const DIMENSION_MAP = {
     conflict: { field: 'conflict_level', invert: true, sourceMax: 10 },
     safety: { field: 'overall_health', invert: false, sourceMax: 10 },
   },
-  TensionPulse: {
-    conflict: { field: 'meeting_atmosphere', invert: true, sourceMax: 10 },
-    trust: { field: 'disengagement', invert: true, sourceMax: 10 },
-    safety: { field: 'side_conversations', invert: true, sourceMax: 10 },
-    clarity: { field: 'ownership_confusion', invert: true, sourceMax: 10 },
-    momentum: { field: 'decision_aftermath', invert: true, sourceMax: 10 },
-  },
   FiveDysfunctions: {
     trust: { field: 'trust', invert: true, sourceMax: 5 },
     conflict: { field: 'conflict', invert: true, sourceMax: 5 },
@@ -70,7 +63,7 @@ export function extractDimensions(entityName, record) {
 }
 
 // Aggregate dimensions across multiple entity records
-// Input: [{ entityName: 'Assessment', record: {...} }, { entityName: 'TensionPulse', record: {...} }, ...]
+// Input: [{ entityName: 'Assessment', record: {...} }, { entityName: 'HealthPulse', record: {...} }, ...]
 // Output: { trust: 7.2, safety: 6.5, ... } — averaged across all sources
 export function aggregateDimensions(records) {
   const sums = {};
