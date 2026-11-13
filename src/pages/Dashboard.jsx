@@ -235,7 +235,11 @@ export default function Dashboard({ orgId: overrideOrgId }) {
 
   // Generate notifications on load
   useEffect(() => {
-    if (orgId) base44.functions.invoke('generateNotifications', { organizationId: orgId });
+    // Background housekeeping: never let a failed notification refresh surface as an
+    // unhandled error on the dashboard.
+    if (orgId) {
+      base44.functions.invoke('generateNotifications', { organizationId: orgId }).catch(() => {});
+    }
   }, [orgId]);
 
   // Baseline check — new orgs must complete the Leadership Health Scoreboard before stages unlock.

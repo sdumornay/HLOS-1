@@ -92,6 +92,7 @@ export default async function(req) {
 
     return Response.json({ created: toCreate.length });
   } catch (error) {
+    console.error('generateNotifications failed:', error?.message, error?.stack);
     return Response.json({ error: error.message }, { status: 500 });
   }
 }

@@ -71,6 +71,7 @@ export default async function(req) {
 
     return Response.json({ healthScore, momentumScore });
   } catch (error) {
+    console.error('computeOrgScores failed:', error?.message, error?.stack);
     return Response.json({ error: error.message }, { status: 500 });
   }
 }
