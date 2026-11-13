@@ -28,6 +28,7 @@ import Sustain from '@/pages/Sustain';
 import Scoreboard from '@/pages/Scoreboard';
 import ScoreboardConfigEditor from '@/pages/ScoreboardConfigEditor';
 import OrgHealthSnapshot from '@/pages/OrgHealthSnapshot';
+import DecisionLog from '@/pages/DecisionLog';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -71,6 +72,7 @@ const AuthenticatedApp = () => {
         <Route path="/momentum" element={<Momentum />} />
         <Route path="/issues" element={<Issues />} />
         <Route path="/actions" element={<Actions />} />
+        <Route path="/decisions" element={<DecisionLog />} />
         <Route path="/sessions" element={<Sessions />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/resources" element={<Resources />} />
