@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { BookOpen, Plus, ChevronDown, ChevronUp, ArrowRight } from 'lucide-react';
 import { format } from 'date-fns';
+import DecisionLogExport from './DecisionLogExport';
 
 const CATEGORIES = {
   financial: 'Financial', staffing: 'Staffing', ministry: 'Ministry',
@@ -54,7 +55,10 @@ export default function DecisionLogPanel({ orgId }) {
           <CardTitle className="text-base font-semibold">Decision Log</CardTitle>
           {decisions.length > 0 && <Badge variant="outline" className="text-xs">{decisions.length}</Badge>}
         </div>
-        <Button size="sm" onClick={() => setOpen(!open)}><Plus className="h-4 w-4 mr-1" /> Log Decision</Button>
+        <div className="flex items-center gap-2">
+          <DecisionLogExport orgId={orgId} />
+          <Button size="sm" onClick={() => setOpen(!open)}><Plus className="h-4 w-4 mr-1" /> Log Decision</Button>
+        </div>
       </CardHeader>
       <CardContent className="space-y-3">
         {open && (

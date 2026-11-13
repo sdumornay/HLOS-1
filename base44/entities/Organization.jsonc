@@ -67,6 +67,18 @@
       "type": "boolean",
       "default": false,
       "description": "True after the org completes the Leadership Health Scoreboard baseline"
+    },
+    "decision_log_doc_id": {
+      "type": "string",
+      "description": "Google Doc id that mirrors this organization's Decision Log"
+    },
+    "decision_log_doc_url": {
+      "type": "string",
+      "description": "Link to the organization's Decision Log Google Doc"
+    },
+    "decision_log_synced_date": {
+      "type": "string",
+      "description": "When the Decision Log Google Doc was last written"
     }
   },
   "required": [

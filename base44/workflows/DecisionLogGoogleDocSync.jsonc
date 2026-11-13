@@ -1,0 +1,40 @@
+{
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "decision_log_google_doc_sync",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "sync_doc": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "syncDecisionLogToDoc",
+            "args": {
+              "organization_id": "${ .trigger.data.organization_id }"
+            }
+          },
+          "then": "end",
+          "x-base44": {
+            "title": "Update Google Doc",
+            "description": "Rewrites the organization's Decision Log Doc"
+          }
+        }
+      }
+    ]
+  },
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "DecisionLog"
+    }
+  },
+  "name": "Decision Log Google Doc Sync",
+  "description": "Keeps each organization's Decision Log Google Doc in step with the in-app log whenever a new decision is recorded."
+}
