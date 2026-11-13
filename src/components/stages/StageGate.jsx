@@ -49,6 +49,11 @@ export default function StageGate({ stage, children }) {
                 <p>
                   Complete the <strong>Leadership Health Scoreboard</strong> to unlock Stage 1: Stabilize.
                 </p>
+              ) : stage === 'align' ? (
+                <p>
+                  Complete the <strong>Organizational Health Snapshot</strong> and the{' '}
+                  <strong>Leadership Health Scoreboard</strong> to unlock Align.
+                </p>
               ) : (
                 <p>
                   Complete <strong>{prevStage}</strong> and get administrator approval before accessing {STAGE_LABELS[stage]}.

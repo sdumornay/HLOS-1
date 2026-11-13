@@ -104,7 +104,7 @@ export default function PreBaselineDashboard({ org, orgId }) {
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold">Leadership Health Scoreboard</p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                A 16-question diagnostic that looks at the health of your leadership team. This creates your baseline and unlocks Stage 1.
+                A 16-question diagnostic that looks at the health of your leadership team. This creates your baseline and unlocks Stage 1 (Stabilize) and Stage 2 (Align).
               </p>
             </div>
           </div>
@@ -146,7 +146,7 @@ export default function PreBaselineDashboard({ org, orgId }) {
             ))}
           </div>
           <p className="text-xs text-muted-foreground mt-3 text-center">
-            Complete both assessments to unlock Stage 1.
+            Complete both assessments to unlock Stabilize and Align.
           </p>
         </CardContent>
       </Card>

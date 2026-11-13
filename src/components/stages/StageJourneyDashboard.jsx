@@ -113,7 +113,9 @@ export default function StageJourneyDashboard() {
                     <p className="text-[10px] text-muted-foreground">
                       {i === 0
                         ? 'Complete the Leadership Health Scoreboard to unlock'
-                        : `Complete ${STAGE_LABELS[stages[i - 1].stage]} before accessing ${s.label}`}
+                        : s.stage === 'align'
+                          ? 'Complete both assessments to unlock'
+                          : `Complete ${STAGE_LABELS[stages[i - 1].stage]} before accessing ${s.label}`}
                     </p>
                   ) : (
                     <Button

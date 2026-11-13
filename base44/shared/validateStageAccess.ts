@@ -27,6 +27,19 @@ export async function validateStageAccess(base44: any, organizationId: string, a
     return { allowed: true, requiredStage };
   }
 
+  // Align unlocks once both baseline assessments are complete (Organizational
+  // Health Snapshot + Leadership Health Scoreboard), even if Stabilize has not
+  // been approved yet.
+  if (requiredStage === 'align') {
+    const [snapshots, scoreboardsToCheck] = await Promise.all([
+      base44.asServiceRole.entities.OrgHealthSnapshot.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.LeadershipHealthScoreboard.filter({ organization_id: organizationId }),
+    ]);
+    if (snapshots.length > 0 && scoreboardsToCheck.length > 0) {
+      return { allowed: true, requiredStage };
+    }
+  }
+
   // For stages 2+, check that the previous stage is completed
   const prevStage = ['stabilize', 'align', 'execute', 'sustain'][stageIndex - 1];
   const progressRecords = await base44.asServiceRole.entities.OrganizationStageProgress

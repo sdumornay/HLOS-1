@@ -68,6 +68,7 @@ export default async function(req) {
       quarterlyReviews,
       renewalReflections,
       scoreboards,
+      orgHealthSnapshots,
       existingProgress,
     ] = await Promise.all([
       base44.asServiceRole.entities.FiveDysfunctions.filter({ organization_id: organizationId }),
@@ -86,6 +87,7 @@ export default async function(req) {
       base44.asServiceRole.entities.RenewalReflection.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.LeadershipHealthScoreboard.filter({ organization_id: organizationId }),
       base44.asServiceRole.entities.OrganizationStageProgress.filter({ organization_id: organizationId }),
+      base44.asServiceRole.entities.OrgHealthSnapshot.filter({ organization_id: organizationId }),
     ]);
 
     const data = {
@@ -96,6 +98,10 @@ export default async function(req) {
     };
 
     const baselineCompleted = scoreboards.length > 0 || org.baseline_completed === true;
+    // Both baseline assessments: the Organizational Health Snapshot and the
+    // Leadership Health Scoreboard. Completing both unlocks Stage 2 (Align).
+    const snapshotCompleted = orgHealthSnapshots.length > 0;
+    const assessmentsComplete = snapshotCompleted && baselineCompleted;
     const currentStage = org.current_stage || 'stabilize';
 
     // Build or migrate OrganizationStageProgress records
@@ -136,6 +142,7 @@ export default async function(req) {
     }
 
     // Evaluate deliverables and compute status for each stage
+    const pendingUpdates: Promise<any>[] = [];
     const stages = STAGE_ORDER.map((stage, i) => {
       const stageNum = i + 1;
       const progress = progressMap.get(stage);
@@ -149,7 +156,11 @@ export default async function(req) {
         // Check if previous stage is completed (or this is stage 1 with baseline)
         const prevStage = i > 0 ? STAGE_ORDER[i - 1] : null;
         const prevProgress = prevStage ? progressMap.get(prevStage) : null;
-        const prevCompleted = !prevStage || prevProgress?.status === 'completed';
+        const prevCompleted = !prevStage
+          || prevProgress?.status === 'completed'
+          // Align also unlocks once both baseline assessments are complete, so the
+          // team can begin their next steps without waiting on Stabilize approval.
+          || (stage === 'align' && assessmentsComplete);
 
         if (stage === 'stabilize') {
           if (!baselineCompleted) {
@@ -184,7 +195,10 @@ export default async function(req) {
         if (status === 'in_progress' && !progress.start_date) {
           updates.start_date = new Date().toISOString().split('T')[0];
         }
-        base44.asServiceRole.entities.OrganizationStageProgress.update(progress.id, updates).catch(() => {});
+        pendingUpdates.push(
+          base44.asServiceRole.entities.OrganizationStageProgress.update(progress.id, updates)
+            .catch((err) => console.error('stage progress update failed', progress.id, status, err?.message))
+        );
       }
 
       return {
@@ -202,6 +216,9 @@ export default async function(req) {
       };
     });
 
+    // Persist status changes so other parts of the app read the same view.
+    await Promise.all(pendingUpdates);
+
     // Determine the user's next required activity
     const accessibleStages = stages.filter((s) => s.status !== 'locked');
     const activeStage = stages.find((s) => s.status === 'in_progress' || s.status === 'available' || s.status === 'awaiting_approval');
@@ -217,6 +234,8 @@ export default async function(req) {
     return Response.json({
       organization_id: organizationId,
       baseline_completed: baselineCompleted,
+      snapshot_completed: snapshotCompleted,
+      assessments_complete: assessmentsComplete,
       current_stage: currentStage,
       next_stage: nextStage,
       stages,
