@@ -1,0 +1,137 @@
+{
+  "name": "ImpactMeasurement",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "indicator_id": {
+      "type": "string"
+    },
+    "phase": {
+      "type": "string",
+      "enum": [
+        "baseline",
+        "midpoint",
+        "follow_up",
+        "sustainability_90day"
+      ],
+      "enumColors": [
+        "gray",
+        "yellow",
+        "blue",
+        "green"
+      ],
+      "default": "follow_up"
+    },
+    "value": {
+      "type": "number"
+    },
+    "measured_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "source": {
+      "type": "string",
+      "description": "Assessment, survey, records or observation the value came from"
+    },
+    "evidence": {
+      "type": "string",
+      "description": "Supporting evidence or notes for this measurement"
+    },
+    "recorded_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "indicator_id"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    }
+  }
+}

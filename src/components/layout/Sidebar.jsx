@@ -4,7 +4,7 @@ import {
   LayoutDashboard, Users, Shield, Compass, Rocket, Leaf,
   ClipboardCheck, Target, Calendar, BarChart3, BookOpen, Settings,
   ChevronLeft, ChevronRight, Heart, Briefcase, Activity, AlertCircle,
-  Pencil, Gavel
+  Pencil, Gavel, Gauge
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -30,6 +30,8 @@ const NAV_ITEMS = [
   { label: 'Actions', path: '/actions', icon: Target, roles: 'all' },
   { label: 'Decision Log', path: '/decisions', icon: Gavel, roles: 'all' },
   { label: 'Resources', path: '/resources', icon: BookOpen, roles: 'all' },
+  { type: 'divider', label: 'Evaluation' },
+  { label: 'Organizational Impact', path: '/impact', icon: Gauge, roles: 'all' },
   { type: 'divider', label: 'Insights', roles: LEADER_ROLES },
   { label: 'Team Dashboard', path: '/team', icon: Users, roles: LEADER_ROLES },
   { label: 'Org Health', path: '/org-health', icon: Activity, roles: LEADER_ROLES },

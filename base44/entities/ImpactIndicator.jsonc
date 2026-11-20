@@ -1,0 +1,211 @@
+{
+  "name": "ImpactIndicator",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "agreement_id": {
+      "type": "string",
+      "description": "Organizational Impact Agreement this indicator supports"
+    },
+    "dimension": {
+      "type": "string",
+      "enum": [
+        "organizational_health",
+        "strategic_alignment",
+        "leadership_effectiveness",
+        "operational_execution",
+        "mission_impact"
+      ],
+      "enumColors": [
+        "blue",
+        "purple",
+        "pink",
+        "yellow",
+        "green"
+      ]
+    },
+    "name": {
+      "type": "string"
+    },
+    "definition": {
+      "type": "string",
+      "description": "What this metric measures and how it is calculated"
+    },
+    "unit": {
+      "type": "string",
+      "enum": [
+        "scale_1_5",
+        "percent",
+        "number",
+        "yes_no",
+        "qualitative"
+      ],
+      "enumColors": [
+        "gray",
+        "gray",
+        "gray",
+        "gray",
+        "gray"
+      ],
+      "default": "scale_1_5"
+    },
+    "improvement_direction": {
+      "type": "string",
+      "enum": [
+        "higher_better",
+        "lower_better",
+        "milestone"
+      ],
+      "enumColors": [
+        "green",
+        "blue",
+        "purple"
+      ],
+      "default": "higher_better"
+    },
+    "baseline_value": {
+      "type": "number"
+    },
+    "baseline_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "baseline_source": {
+      "type": "string",
+      "description": "Where the baseline came from (assessment, survey, records, interview)"
+    },
+    "target_value": {
+      "type": "number"
+    },
+    "target_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "actual_value": {
+      "type": "number"
+    },
+    "actual_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "actual_source": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "not_measured",
+        "on_track",
+        "off_track",
+        "achieved"
+      ],
+      "enumColors": [
+        "gray",
+        "green",
+        "red",
+        "blue"
+      ],
+      "default": "not_measured"
+    },
+    "owner": {
+      "type": "string"
+    },
+    "notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "name",
+    "dimension"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    }
+  }
+}

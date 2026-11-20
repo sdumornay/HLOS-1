@@ -29,6 +29,12 @@ import Scoreboard from '@/pages/Scoreboard';
 import ScoreboardConfigEditor from '@/pages/ScoreboardConfigEditor';
 import OrgHealthSnapshot from '@/pages/OrgHealthSnapshot';
 import DecisionLog from '@/pages/DecisionLog';
+import Impact from '@/pages/Impact';
+import ImpactAgreement from '@/pages/ImpactAgreement';
+import ImpactIndicators from '@/pages/ImpactIndicators';
+import ImpactBehaviors from '@/pages/ImpactBehaviors';
+import ImpactEvaluations from '@/pages/ImpactEvaluations';
+import ImpactReports from '@/pages/ImpactReports';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -73,6 +79,12 @@ const AuthenticatedApp = () => {
         <Route path="/issues" element={<Issues />} />
         <Route path="/actions" element={<Actions />} />
         <Route path="/decisions" element={<DecisionLog />} />
+        <Route path="/impact" element={<Impact />} />
+        <Route path="/impact/agreement" element={<ImpactAgreement />} />
+        <Route path="/impact/indicators" element={<ImpactIndicators />} />
+        <Route path="/impact/behaviors" element={<ImpactBehaviors />} />
+        <Route path="/impact/evaluations" element={<ImpactEvaluations />} />
+        <Route path="/impact/reports" element={<ImpactReports />} />
         <Route path="/sessions" element={<Sessions />} />
         <Route path="/reviews" element={<Reviews />} />
         <Route path="/resources" element={<Resources />} />

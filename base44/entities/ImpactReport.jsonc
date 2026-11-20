@@ -1,0 +1,169 @@
+{
+  "name": "ImpactReport",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "baseline",
+        "midpoint",
+        "final",
+        "sustainability_90day"
+      ],
+      "enumColors": [
+        "gray",
+        "yellow",
+        "blue",
+        "green"
+      ],
+      "default": "midpoint"
+    },
+    "title": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "in_review",
+        "approved"
+      ],
+      "enumColors": [
+        "gray",
+        "yellow",
+        "green"
+      ],
+      "default": "draft"
+    },
+    "period_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "period_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "generated_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "ai_generated": {
+      "type": "boolean",
+      "default": false
+    },
+    "narrative": {
+      "type": "object",
+      "description": "Section key to narrative text, editable by the coach",
+      "additionalProperties": true
+    },
+    "data_snapshot": {
+      "type": "object",
+      "description": "Counts and indicator values captured when the report was generated",
+      "additionalProperties": true
+    },
+    "reviewed_by": {
+      "type": "string"
+    },
+    "reviewed_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reviewer_notes": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "type"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    }
+  }
+}

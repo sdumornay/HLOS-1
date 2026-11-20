@@ -1,0 +1,139 @@
+{
+  "name": "EvaluationResponse",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string"
+    },
+    "level": {
+      "type": "number",
+      "description": "Kirkpatrick level 1-4"
+    },
+    "instrument": {
+      "type": "string",
+      "description": "reaction, learning, behavior or results"
+    },
+    "respondent_email": {
+      "type": "string"
+    },
+    "respondent_name": {
+      "type": "string"
+    },
+    "responses": {
+      "type": "object",
+      "description": "Question key to rating (1-5)",
+      "additionalProperties": true
+    },
+    "open_responses": {
+      "type": "object",
+      "description": "Question key to written answer",
+      "additionalProperties": true
+    },
+    "evidence_source": {
+      "type": "string",
+      "description": "For coach-recorded reviews: action tracking, observation, authorized team feedback"
+    },
+    "submitted_date": {
+      "type": "string",
+      "format": "date"
+    },
+    "reviewed_by": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "organization_id",
+    "level",
+    "instrument"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "data.respondent_email": "{{user.email}}"
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    }
+  }
+}

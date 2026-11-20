@@ -1,0 +1,209 @@
+{
+  "name": "ImpactAgreement",
+  "type": "object",
+  "properties": {
+    "organization_id": {
+      "type": "string",
+      "description": "Organization this evaluation agreement belongs to"
+    },
+    "title": {
+      "type": "string",
+      "default": "Organizational Impact Agreement"
+    },
+    "engagement_start": {
+      "type": "string",
+      "format": "date"
+    },
+    "engagement_end": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "under_review",
+        "confirmed"
+      ],
+      "enumColors": [
+        "gray",
+        "yellow",
+        "green"
+      ],
+      "default": "draft"
+    },
+    "sponsor_name": {
+      "type": "string",
+      "description": "Executive sponsor who approves the agreement"
+    },
+    "sponsor_email": {
+      "type": "string"
+    },
+    "coach_email": {
+      "type": "string"
+    },
+    "priority_results": {
+      "type": "array",
+      "description": "Two or three priority organizational results with baseline, target, target date and owner",
+      "items": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "type": "string"
+          },
+          "baseline": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          },
+          "target_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "owner": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "critical_behaviors": {
+      "type": "array",
+      "description": "Leadership behaviors required to achieve the agreed results",
+      "items": {
+        "type": "object",
+        "properties": {
+          "behavior": {
+            "type": "string"
+          },
+          "owner": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "leading_indicators": {
+      "type": "array",
+      "description": "Early signals that show progress before results land",
+      "items": {
+        "type": "object",
+        "properties": {
+          "indicator": {
+            "type": "string"
+          },
+          "frequency": {
+            "type": "string"
+          },
+          "evidence_source": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "barriers": {
+      "type": "string",
+      "description": "Known organizational barriers or risks to the agreed results"
+    },
+    "review_notes": {
+      "type": "string",
+      "description": "Coach and sponsor review comments"
+    },
+    "confirmed_by": {
+      "type": "string"
+    },
+    "confirmed_date": {
+      "type": "string",
+      "format": "date"
+    }
+  },
+  "required": [
+    "organization_id"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        },
+        {
+          "data.organization_id": "{{user.organization_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "coach"
+          }
+        }
+      ]
+    }
+  }
+}
