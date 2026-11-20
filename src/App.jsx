@@ -35,6 +35,7 @@ import ImpactIndicators from '@/pages/ImpactIndicators';
 import ImpactBehaviors from '@/pages/ImpactBehaviors';
 import ImpactEvaluations from '@/pages/ImpactEvaluations';
 import ImpactReports from '@/pages/ImpactReports';
+import ImpactAssessment from '@/pages/ImpactAssessment';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -80,6 +81,7 @@ const AuthenticatedApp = () => {
         <Route path="/actions" element={<Actions />} />
         <Route path="/decisions" element={<DecisionLog />} />
         <Route path="/impact" element={<Impact />} />
+        <Route path="/impact/assessment" element={<ImpactAssessment />} />
         <Route path="/impact/agreement" element={<ImpactAgreement />} />
         <Route path="/impact/indicators" element={<ImpactIndicators />} />
         <Route path="/impact/behaviors" element={<ImpactBehaviors />} />

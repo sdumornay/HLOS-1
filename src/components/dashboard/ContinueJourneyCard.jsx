@@ -5,9 +5,10 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Compass } from 'lucide-react';
 import { useStageAccess } from '@/lib/useStageAccess';
 import { useOrgSnapshotStatus } from '@/lib/useOrgSnapshotStatus';
+import { useImpactAssessmentStatus } from '@/lib/useImpactAssessmentStatus';
 import { useOrgId } from '@/lib/useOrgId';
 import { STAGE_LABELS, STAGE_DESCRIPTIONS, STATUS_LABELS } from '@/lib/stageDeliverables';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Target } from 'lucide-react';
 
 /**
  * Replaces the AssessmentStatusPanel on the dashboard.
@@ -18,6 +19,7 @@ export default function ContinueJourneyCard() {
   const navigate = useNavigate();
   const orgId = useOrgId();
   const { snapshotCompleted: orgSnapshotDone } = useOrgSnapshotStatus(orgId);
+  const { impactCompleted } = useImpactAssessmentStatus(orgId);
 
   if (isLoading) {
     return (
@@ -79,6 +81,31 @@ export default function ContinueJourneyCard() {
             </div>
             <Button size="sm" onClick={() => navigate('/scoreboard')}>
               Take Scoreboard <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // If both diagnostic baselines are done but the impact baseline is not, prompt it
+  if (!impactCompleted) {
+    return (
+      <Card className="border-accent/30 bg-gradient-to-r from-accent/5 to-primary/5 shadow-sm">
+        <CardContent className="p-5">
+          <div className="flex items-center gap-4">
+            <div className="h-10 w-10 rounded-xl bg-accent/15 flex items-center justify-center flex-shrink-0">
+              <Target className="h-5 w-5 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Next Step</p>
+              <p className="text-sm font-semibold mt-0.5">Take the Organizational Impact Baseline</p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                A 15-question baseline across the five impact dimensions, measured against your scoreboard.
+              </p>
+            </div>
+            <Button size="sm" onClick={() => navigate('/impact/assessment')}>
+              Take Assessment <ArrowRight className="h-4 w-4 ml-1" />
             </Button>
           </div>
         </CardContent>

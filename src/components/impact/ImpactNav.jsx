@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 
 const TABS = [
   { label: 'Overview', path: '/impact' },
+  { label: 'Assessment', path: '/impact/assessment' },
   { label: 'Impact Agreement', path: '/impact/agreement', stage: 'Align' },
   { label: 'Indicators', path: '/impact/indicators', stage: 'Align' },
   { label: 'Behaviors', path: '/impact/behaviors', stage: 'Execute' },

@@ -9,6 +9,7 @@ import { Badge } from '@/components/ui/badge';
 import { AlertCircle, ArrowRight, CalendarClock, ClipboardList, Target } from 'lucide-react';
 import ImpactNav from '@/components/impact/ImpactNav';
 import ImpactStatCards from '@/components/impact/ImpactStatCards';
+import ImpactAssessmentCard from '@/components/impact/ImpactAssessmentCard';
 import IndicatorComparisonChart from '@/components/impact/IndicatorComparisonChart';
 import {
   DIMENSION_MAP,
@@ -146,6 +147,8 @@ export default function Impact() {
   return (
     <div className="space-y-5">
       <ImpactNav />
+
+      <ImpactAssessmentCard />
 
       {cards.length > 0 ? (
         <ImpactStatCards cards={cards} />

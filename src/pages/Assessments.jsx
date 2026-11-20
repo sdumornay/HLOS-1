@@ -11,7 +11,7 @@ import { Slider } from '@/components/ui/slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, ClipboardCheck, Activity, Users, Heart } from 'lucide-react';
+import { Plus, ClipboardCheck, Activity, Users, Heart, Target } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -229,6 +229,26 @@ export default function Assessments() {
       <div>
         <h2 className="text-base font-semibold mb-3">Additional Assessments</h2>
         <div className="grid gap-3 sm:grid-cols-2">
+          <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-5 flex items-start gap-4">
+              <div className="h-10 w-10 rounded-xl bg-accent/10 flex items-center justify-center flex-shrink-0">
+                <Target className="h-5 w-5 text-accent" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <p className="text-sm font-semibold">Organizational Impact Baseline</p>
+                  <span className="text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-accent/15 text-accent-foreground border border-accent/30">Impact</span>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1 leading-relaxed">
+                  15 questions across the five impact dimensions. Sets the baseline your indicators are measured against. ~4 minutes.
+                </p>
+              </div>
+              <Link to="/impact/assessment">
+                <Button size="sm" variant="outline" className="flex-shrink-0 gap-1.5">Start</Button>
+              </Link>
+            </CardContent>
+          </Card>
+
           {canAccessStage('stabilize') && (
             <Card className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
               <CardContent className="p-5 flex items-start gap-4">

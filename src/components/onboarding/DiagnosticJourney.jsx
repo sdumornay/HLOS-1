@@ -1,21 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Building2, Users, Shield, CheckCircle2, ArrowRight, Lock } from 'lucide-react';
+import { Building2, Users, Shield, CheckCircle2, ArrowRight, Lock, Target } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 
 /**
- * Visual representation of the 3-step diagnostic journey:
+ * Visual representation of the diagnostic journey:
  * 1. Organization — Organizational Health Snapshot
  * 2. Leadership Team — Leadership Health Scoreboard
- * 3. Individual Leader — Coming later
+ * 3. Evaluation — Organizational Impact Baseline
  *
  * Props:
  *   orgSnapshotDone: boolean
  *   scoreboardDone: boolean
+ *   impactDone: boolean
  *   compact: boolean — smaller version for inline use
  */
-export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardDone = false, compact = false }) {
+export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardDone = false, impactDone = false, compact = false }) {
   const navigate = useNavigate();
 
   const steps = [
@@ -40,6 +41,17 @@ export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardD
       actionLabel: 'Take Scoreboard',
     },
     {
+      id: 'impact',
+      icon: Target,
+      label: 'Evaluation',
+      title: 'Organizational Impact Baseline',
+      desc: 'A 15-question baseline across the five impact dimensions.',
+      done: impactDone,
+      locked: !scoreboardDone && !impactDone,
+      action: scoreboardDone && !impactDone ? () => navigate('/impact/assessment') : null,
+      actionLabel: 'Take Assessment',
+    },
+    {
       id: 'stabilize-tools',
       icon: Users,
       label: 'Stabilize',
@@ -55,23 +67,24 @@ export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardD
       {steps.map((step, i) => {
         const Icon = step.icon;
         const isLast = i === steps.length - 1;
+        const inactive = step.coming || step.locked;
         return (
           <div key={step.id}>
             <div className={cn(
               'flex items-start gap-3 rounded-lg border p-3 transition-colors',
               step.done ? 'border-emerald-200 bg-emerald-50/40'
-                : step.coming ? 'border-border/40 bg-muted/30 opacity-60'
+                : inactive ? 'border-border/40 bg-muted/30 opacity-60'
                 : 'border-accent/30 bg-accent/5'
             )}>
               <div className={cn(
                 'h-9 w-9 rounded-lg flex items-center justify-center flex-shrink-0',
                 step.done ? 'bg-emerald-100'
-                  : step.coming ? 'bg-muted'
+                  : inactive ? 'bg-muted'
                   : 'bg-accent/15'
               )}>
                 {step.done ? (
                   <CheckCircle2 className="h-5 w-5 text-emerald-600" />
-                ) : step.coming ? (
+                ) : inactive ? (
                   <Lock className="h-4 w-4 text-muted-foreground" />
                 ) : (
                   <Icon className="h-5 w-5 text-accent" />
@@ -101,6 +114,8 @@ export default function DiagnosticJourney({ orgSnapshotDone = false, scoreboardD
                   <span className="text-xs font-semibold text-emerald-600">Complete</span>
                 ) : step.coming ? (
                   <span className="text-xs text-muted-foreground">Soon</span>
+                ) : step.locked ? (
+                  <span className="text-xs text-muted-foreground">Locked</span>
                 ) : (
                   <span className="text-xs font-semibold text-accent">Next</span>
                 )}
